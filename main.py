@@ -1,27 +1,19 @@
 from tkinter import *
 import win32com.shell.shell as shell
-import win32con
 import time
 from subprocess import Popen, CREATE_NEW_CONSOLE, PIPE
-
-
-# /K option tells cmd to run the command and keep the command window from closing. You may use /C instead to close the command window after the
-
-
-
-
 
 # Create window object
 app = Tk()
 # Set Properties
 app.title('Overwatch Middle East Server Blocker')
-app.geometry('500x150')
+app.geometry('500x500')
 # Ip ranges
 Ip_ranges = "157.175.0.0-157.175.255.255,15.185.0.0-15.185.255.255,15.184.0.0-15.184.255.255"
 
 
-# To check if server is blocked or not
-def checkIfActive():
+# Functions
+def checkIfActive():  # To check if server is blocked or not
     command = 'netsh advfirewall firewall show rule name="@Overwatch Middle East Server Block"'
     proc = Popen(command, creationflags=CREATE_NEW_CONSOLE, stdout=PIPE)
     output = str(proc.communicate()[0])
@@ -31,8 +23,7 @@ def checkIfActive():
         blockserver()
 
 
-# Functions
-def blockserver():
+def blockserver():  # Used to block servers using cmd, and it run it as admin
     blockingLabel.config(text='Server Blocked ☑', fg='green')
     commands = 'advfirewall firewall delete rule name = "@Overwatch Middle East Server Block"'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
@@ -44,14 +35,14 @@ def blockserver():
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
 
-def unblockserver():
+def unblockserver():  # It removes any rules added by blockserver function
     blockingLabel.config(text='Server unblocked ☒', fg='red')
     commands = 'advfirewall firewall delete rule name = "@Overwatch Middle East Server Block"'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
 
 # Text
-# Program Information text
+# Program Information label text
 info_text = StringVar()
 infor_rawtext = 'This application is used to Manage Middle East Servers of Overwatch \n made by Discord: VERX#2227'
 info_label = Label(app, text=infor_rawtext, font=('bold', 10), pady=20)
