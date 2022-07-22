@@ -21,5 +21,7 @@ In addtion, some NA players wants to choose from West and East, which will be a 
 - Icons are new also to thanks to OXIDE.
 - Made a program name MINA OVERWATCH SERVER SELECTOR
 
+[DOWNLOAD MINA OVERWATCH SERVER SELECTOR V2.0.0](https://drive.google.com/file/d/1GLZXNddyA3bS6wbOjaj-6-uGWErIPgfW/view?usp=sharing)
+
 
 Please reach out if you want to help or have a question, discord: VERX#2227
