@@ -1,4 +1,6 @@
 # Overwatch-Server-Selector
+###If you want to convert the files to exe with out using my download link look at the last section
+
 A simple program allows you to select the server you want to play on.
 
 The program simply works by adding the block remote ip's rules to wf.msc (Firewall with Advance Security).
