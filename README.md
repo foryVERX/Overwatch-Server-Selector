@@ -41,7 +41,7 @@ Please reach out if you want to help or have a question, discord: VERX#2227
 
 # Auto py to exe users
 
-if you want to convert py to exe follow the guide.
+If you want to convert py to exe follow the guide.
 note you need to know what are you doing if you are here (smile).
 
 1. Install Auto py to exe.
