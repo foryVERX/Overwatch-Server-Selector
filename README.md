@@ -9,10 +9,6 @@ Some times the match making gets you in bad server for you, for example if your 
 Another issue where some EU players want to play on NA. Even if you change the region it gets you back to EU. The solution is to block EU and ME severs and change the region to NA.
 In addtion, some NA players wants to choose from West and East, which will be a feature of the program.
 
-# MINA OVERWATCH SERVER SELECTOR V1.0.0
--Only support EU TO ME and vice versa.
-
-
 # MINA OVERWATCH SERVER SELECTOR V2.0.0
 - SUPPORT(Play on EU, NA-West, NA-East, and Block ME).
 - Added whole new UI thanks to OXIDE.
@@ -21,7 +17,17 @@ In addtion, some NA players wants to choose from West and East, which will be a 
 - Icons are new also to thanks to OXIDE.
 - Made a program name MINA OVERWATCH SERVER SELECTOR
 
+Please reach out if you want to help or have a question, discord: VERX#2227
+
 [DOWNLOAD MINA OVERWATCH SERVER SELECTOR V2.0.0](https://drive.google.com/file/d/1GLZXNddyA3bS6wbOjaj-6-uGWErIPgfW/view?usp=sharing)
 
 
-Please reach out if you want to help or have a question, discord: VERX#2227
+# MINA OVERWATCH SERVER SELECTOR V1.0.0
+-Only support EU TO ME and vice versa.
+
+[DOWNLOAD MINA OVERWATCH SERVER SELECTOR V1.0.0](https://drive.google.com/file/d/16v0kw9dUi-mNuzWB6i4_lPkrAkY-bM3U/view?usp=sharing)
+
+
+
+
+
