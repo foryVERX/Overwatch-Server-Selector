@@ -60,7 +60,7 @@ Ip_ranges_AS = "104.198.0.0-104.198.255.255,34.84.0.0-34.84.255.255,34.85.0.0-34
 
 
 # Functions
-def iconMaker():
+def iconMaker():  # Used to check if there is an icon in the same directory or not it will create the icon if not.
     if exists("LOGO_SMALL_APPLICATION.ico"):
         app.iconbitmap("LOGO_SMALL_APPLICATION.ico")
     else:
