@@ -31,6 +31,7 @@ In addtion, some NA players wants to choose from West and East, which will be a 
 Please reach out if you want to help or have a question, discord: VERX#2227
 
 For better experiance run as administrator but it is not manditory, you will have to approve each command in UAC
+
 [DOWNLOAD MINA OVERWATCH SERVER SELECTOR V2.0.0](https://drive.google.com/file/d/1GLZXNddyA3bS6wbOjaj-6-uGWErIPgfW/view?usp=sharing)
 
 
@@ -38,6 +39,7 @@ For better experiance run as administrator but it is not manditory, you will hav
 -Only support EU TO ME and vice versa.
 
 For better experiance run as administrator but it is not manditory, you will have to approve each command in UAC
+
 [DOWNLOAD MINA OVERWATCH SERVER SELECTOR V1.0.0](https://drive.google.com/file/d/16v0kw9dUi-mNuzWB6i4_lPkrAkY-bM3U/view?usp=sharing)
 
 
