@@ -10,6 +10,8 @@ Another issue where some EU players want to play on NA. Even if you change the r
 In addtion, some NA players wants to choose from West and East, which will be a feature of the program.
 
 # MINA OVERWATCH SERVER SELECTOR V2.0.0
+[MINA OVERWATCH SERVER SELECTOR V2.0.0 IMAGE](https://drive.google.com/uc?id=1te7OayrmqVRUkzJmWeP1Hq6IMIWlzbNk)
+
 - SUPPORT(Play on EU, NA-West, NA-East, and Block ME).
 - Added whole new UI thanks to OXIDE.
 - Added feature shows what region you are playing on now, but must be done using the program and it will remember each option you chose.
