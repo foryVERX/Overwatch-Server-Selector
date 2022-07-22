@@ -39,6 +39,19 @@ Please reach out if you want to help or have a question, discord: VERX#2227
 [DOWNLOAD MINA OVERWATCH SERVER SELECTOR V1.0.0](https://drive.google.com/file/d/16v0kw9dUi-mNuzWB6i4_lPkrAkY-bM3U/view?usp=sharing)
 
 
+# Auto py to exe users
+
+if you want to convert py to exe follow the guide.
+note you need to know what are you doing if you are here (smile).
+
+1- Install Auto py to exe.
+2- Launch the tool.
+3- Script Location use main.py where ever you locate it.
+4- Choose onefile.
+5- Icon choose icon provided in .img folder.
+6- Additional File (very important), to include pic2str.py which have all the images used in byte format.
+7- CONVERT .PY TO .EXE
+
 
 
 
