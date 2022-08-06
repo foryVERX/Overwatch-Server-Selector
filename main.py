@@ -7,6 +7,7 @@ from io import BytesIO
 import pic2str
 import base64
 from os.path import exists
+from ping3 import ping
 
 # Create window object
 app = Tk()
@@ -68,6 +69,21 @@ def iconMaker():  # Used to check if there is an icon in the same directory or n
         app.iconbitmap("LOGO_SMALL_APPLICATION.ico")
 
 
+def pingServers():  # Return ping to all regions
+    server_list = ["24.105.30.129", "24.105.62.129", "185.60.114.159"]
+    ping_list = []
+    for ip in server_list:
+        result = ping(ip, unit="ms")
+        ping_list.append(int(result))
+    na_west_ping = str(ping_list[0])
+    na_central_ping = str(ping_list[1])
+    eu_ping = str(ping_list[2])
+    pingtext = "NA West: " + na_west_ping + " ms" + " | NA Central: " + na_central_ping + " ms" + " | EU: " \
+               + eu_ping + " ms"
+    pingLabel.config(text=pingtext, fg='#26ef4c')
+    return na_west_ping, na_central_ping, eu_ping
+
+
 def ruleMakerBlock(*argv):  # Used to block IP range
     ip_range = ""
     for arg in argv:
@@ -94,6 +110,7 @@ def ruleDelete(rule_name):  # Delete rule by exact name, name must be a string '
 
 
 def checkIfActive():  # To check if server is blocked or not
+    pingServers()
     servers_active_rule_list = ['"@ME_OW_SERVER_BLOCKER"', '"@NAEAST_OW_SERVER_BLOCKER"', '"@NAWEST_OW_SERVER_BLOCKER"',
                                 '"@EU_OW_SERVER_BLOCKER"']
     for rule in servers_active_rule_list:
@@ -161,12 +178,17 @@ def unblockALL():
     list_rule_names = ["@NAEAST_OW_SERVER_BLOCKER", "@EU_OW_SERVER_BLOCKER", "@ME_OW_SERVER_BLOCKER",
                        "@NAWEST_OW_SERVER_BLOCKER", "@Overwatch Block"]
     ruleDelete(list_rule_names)
+    pingServers()
 
 
 # Labels
 blockingLabel = Label(app, text='', bg='#282828', fg='#ddee4a', font=futrabook_font)
 blockingLabel.grid(row=0, column=0)
 blockingLabel.place(x=250, y=410, anchor="center")
+
+pingLabel = Label(app, text='', bg='#282828', fg='#ddee4a', font=futrabook_font)
+pingLabel.grid(row=0, column=0)
+pingLabel.place(x=250, y=430, anchor="center")
 
 # Buttons
 PlayMEButton = Button(app, image=button_img_ME, font=futrabook_font, command=blockMEServer,
