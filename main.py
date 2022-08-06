@@ -1,8 +1,7 @@
 from tkinter import *
 from tkinter.font import Font
 import win32com.shell.shell as shell
-import time
-from subprocess import Popen, CREATE_NEW_CONSOLE, PIPE
+from subprocess import Popen, CREATE_NEW_CONSOLE, PIPE, STARTUPINFO, STARTF_USESHOWWINDOW, SW_HIDE
 from PIL import ImageTk, Image
 from io import BytesIO
 import pic2str
@@ -69,43 +68,52 @@ def iconMaker():  # Used to check if there is an icon in the same directory or n
         app.iconbitmap("LOGO_SMALL_APPLICATION.ico")
 
 
+def ruleMakerBlock(*argv):  # Used to block IP range
+    ip_range = ""
+    for arg in argv:
+        if len(argv) > 1:
+            ip_range += arg + ","
+        else:
+            ip_range = arg
+    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=In Action=Block RemoteIP=' + ip_range
+    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=Out Action=Block RemoteIP=' + ip_range
+    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+
+
+def ruleDelete(rule_name):  # Delete rule by exact name, name must be a string '' or list of strings
+    if type(rule_name) == list:
+        for rule in rule_name:
+            rule = '"' + rule + '"'
+            commands = 'advfirewall firewall delete rule name = ' + rule
+            shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+    else:
+        rule_name = '"' + rule_name + '"'
+        commands = 'advfirewall firewall delete rule name = ' + rule_name
+        shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+
+
 def checkIfActive():  # To check if server is blocked or not
-    command = 'netsh advfirewall firewall show rule name="@ME_OW_SERVER_BLOCKER"'
-    proc = Popen(command, creationflags=CREATE_NEW_CONSOLE, stdout=PIPE)
-    output = str(proc.communicate()[0])
-    if "No rules" in output:
-        pass
-    else:
-        blockingLabel.config(text='ME BLOCKED', bg='#282828', fg='#ef2626', font=futrabook_font)
-        return
-
-    command = 'netsh advfirewall firewall show rule name="@NAEAST_OW_SERVER_BLOCKER"'
-    proc = Popen(command, creationflags=CREATE_NEW_CONSOLE, stdout=PIPE)
-    output = str(proc.communicate()[0])
-    if "No rules" in output:
-        pass
-    else:
-        blockingLabel.config(text='YOUR PLAYING ON NA EAST', bg='#282828', fg='#26ef4c', font=futrabook_font)
-        return
-
-    command = 'netsh advfirewall firewall show rule name="@NAWEST_OW_SERVER_BLOCKER"'
-    proc = Popen(command, creationflags=CREATE_NEW_CONSOLE, stdout=PIPE)
-    output = str(proc.communicate()[0])
-    if "No rules" in output:
-        pass
-    else:
-        blockingLabel.config(text='YOUR PLAYING ON NA WEST', bg='#282828', fg='#26ef4c', font=futrabook_font)
-        return
-
-    command = 'netsh advfirewall firewall show rule name="@EU_OW_SERVER_BLOCKER"'
-    proc = Popen(command, creationflags=CREATE_NEW_CONSOLE, stdout=PIPE)
-    output = str(proc.communicate()[0])
-    if "No rules" in output:
-        pass
-    else:
-        blockingLabel.config(text='YOU ARE PLAYING ON EU', bg='#282828', fg='#26ef4c', font=futrabook_font)
-        return
-    blockingLabel.config(text='ALL UNBLOCKED (DEFAULT SETTINGS)', fg='#ddee4a')
+    servers_active_rule_list = ['"@ME_OW_SERVER_BLOCKER"', '"@NAEAST_OW_SERVER_BLOCKER"', '"@NAWEST_OW_SERVER_BLOCKER"',
+                                '"@EU_OW_SERVER_BLOCKER"']
+    for rule in servers_active_rule_list:
+        command = 'netsh advfirewall firewall show rule name=' + rule
+        proc = Popen(command, creationflags=CREATE_NEW_CONSOLE, stdout=PIPE)
+        output = proc.communicate()[0]
+        output = str(output.strip().decode("utf-8"))
+        temp_rule = rule.replace('"', "")
+        if temp_rule in output:
+            filtered = output.rpartition('_')[0].replace(" ", "").replace("RuleName:@", "").replace("_OW_SERVER", "")
+            if filtered == 'ME':
+                blockingLabel.config(text='ME BLOCKED', bg='#282828', fg='#ef2626', font=futrabook_font)
+                break
+            else:
+                filtered = filtered[0:2] + ' ' + filtered[2:]
+                label_text = 'YOUR PLAYING ON ' + filtered
+                blockingLabel.config(text=label_text, bg='#282828', fg='#26ef4c',
+                                     font=futrabook_font)
+                break
+        blockingLabel.config(text='ALL UNBLOCKED (DEFAULT SETTINGS)', fg='#ddee4a')
 
 
 def blockMEServer():  # It removes any rules added by blockserver function
@@ -113,10 +121,9 @@ def blockMEServer():  # It removes any rules added by blockserver function
     blockingLabel.config(text='ME BLOCKED', fg='#ef2626')
     commands = 'advfirewall firewall add rule name="@ME_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP=' + Ip_ranges_EU
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=Out Action=Block RemoteIP=' + Ip_ranges_ME
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=In Action=Block RemoteIP=' + Ip_ranges_ME
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+
+    # Block ME, NA West, AS, NA East
+    ruleMakerBlock(Ip_ranges_ME)
 
 
 def playNAEast_server():
@@ -125,29 +132,8 @@ def playNAEast_server():
     commands = 'advfirewall firewall add rule name="@NAEAST_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP=' + Ip_ranges_NA_East
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
-    # ME Block
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=Out Action=Block RemoteIP=' + Ip_ranges_ME
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=In Action=Block RemoteIP=' + Ip_ranges_ME
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-
-    # EU BLOCK
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=Out Action=Block RemoteIP=' + Ip_ranges_EU
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=In Action=Block RemoteIP=' + Ip_ranges_EU
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-
-    # NA West Block
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=Out Action=Block RemoteIP=' + Ip_ranges_NA_West
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=In Action=Block RemoteIP=' + Ip_ranges_NA_West
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-
-    # AS Block
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=Out Action=Block RemoteIP=' + Ip_ranges_AS
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=In Action=Block RemoteIP=' + Ip_ranges_AS
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+    # Block ME, EU, NA West, AS
+    ruleMakerBlock(Ip_ranges_ME, Ip_ranges_AS, Ip_ranges_NA_West, Ip_ranges_EU)
 
 
 def playNAWest_server():
@@ -156,29 +142,8 @@ def playNAWest_server():
     commands = 'advfirewall firewall add rule name="@NAWEST_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP=' + Ip_ranges_NA_West
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
-    # ME Block
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=Out Action=Block RemoteIP=' + Ip_ranges_ME
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=In Action=Block RemoteIP=' + Ip_ranges_ME
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-
-    # EU BLOCK
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=Out Action=Block RemoteIP=' + Ip_ranges_EU
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=In Action=Block RemoteIP=' + Ip_ranges_EU
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-
-    # East Block
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=Out Action=Block RemoteIP=' + Ip_ranges_NA_East
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=In Action=Block RemoteIP=' + Ip_ranges_NA_East
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-
-    # AS Block
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=Out Action=Block RemoteIP=' + Ip_ranges_AS
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=In Action=Block RemoteIP=' + Ip_ranges_AS
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+    # Block ME, EU, AS, NA East
+    ruleMakerBlock(Ip_ranges_ME, Ip_ranges_AS, Ip_ranges_NA_East, Ip_ranges_EU)
 
 
 def playEU_server():
@@ -187,47 +152,18 @@ def playEU_server():
     commands = 'advfirewall firewall add rule name="@EU_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP=' + Ip_ranges_EU
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
-    # ME Block
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=Out Action=Block RemoteIP=' + Ip_ranges_ME
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=In Action=Block RemoteIP=' + Ip_ranges_ME
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-
-    # East Block
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=Out Action=Block RemoteIP=' + Ip_ranges_NA_East
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=In Action=Block RemoteIP=' + Ip_ranges_NA_East
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-
-    # NA West Block
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=Out Action=Block RemoteIP=' + Ip_ranges_NA_West
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall add rule name="@Overwatch Block" Dir=In Action=Block RemoteIP=' + Ip_ranges_NA_West
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+    # Block ME, NA West, AS, NA East
+    ruleMakerBlock(Ip_ranges_ME, Ip_ranges_NA_West, Ip_ranges_NA_East, Ip_ranges_AS)
 
 
 def unblockALL():
     blockingLabel.config(text='ALL UNBLOCKED (DEFAULT SETTINGS)', fg='#ddee4a')
-    commands = 'advfirewall firewall delete rule name = "@NAEAST_OW_SERVER_BLOCKER"'
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall delete rule name = "@NAWEST_OW_SERVER_BLOCKER"'
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall delete rule name = "@EU_OW_SERVER_BLOCKER"'
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall delete rule name = "@ME_OW_SERVER_BLOCKER"'
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall delete rule name = "@Overwatch Block"'
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+    list_rule_names = ["@NAEAST_OW_SERVER_BLOCKER", "@EU_OW_SERVER_BLOCKER", "@ME_OW_SERVER_BLOCKER",
+                       "@NAWEST_OW_SERVER_BLOCKER", "@Overwatch Block"]
+    ruleDelete(list_rule_names)
 
 
-# Text
-# Program Information label text
-# info_text = StringVar()
-# infor_rawtext = 'This application is used to Manage Middle East Servers of Overwatch \n made by Discord: VERX#2227'
-# info_label = Label(app, text=infor_rawtext, font=futrabook_font, pady=20)
-# info_label.grid(row=0, column=0)
-# info_label.place(x=250, y=40, anchor="center")
-
+# Labels
 blockingLabel = Label(app, text='', bg='#282828', fg='#ddee4a', font=futrabook_font)
 blockingLabel.grid(row=0, column=0)
 blockingLabel.place(x=250, y=410, anchor="center")
