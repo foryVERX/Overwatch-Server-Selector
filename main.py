@@ -126,7 +126,7 @@ def checkIfActive():  # To check if server is blocked or not
                 break
             else:
                 filtered = filtered[0:2] + ' ' + filtered[2:]
-                label_text = 'YOUR PLAYING ON ' + filtered
+                label_text = 'PLAYING ON ' + filtered
                 blockingLabel.config(text=label_text, bg='#282828', fg='#26ef4c',
                                      font=futrabook_font)
                 break
@@ -145,7 +145,7 @@ def blockMEServer():  # It removes any rules added by blockserver function
 
 def playNAEast_server():
     unblockALL()
-    blockingLabel.config(text='YOUR PLAYING ON NA EAST', fg='#26ef4c')
+    blockingLabel.config(text='PLAYING ON NA EAST', fg='#26ef4c')
     commands = 'advfirewall firewall add rule name="@NAEAST_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP=' + Ip_ranges_NA_East
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
@@ -155,7 +155,7 @@ def playNAEast_server():
 
 def playNAWest_server():
     unblockALL()
-    blockingLabel.config(text='YOUR PLAYING ON NA WEST', fg='#26ef4c')
+    blockingLabel.config(text='PLAYING ON NA WEST', fg='#26ef4c')
     commands = 'advfirewall firewall add rule name="@NAWEST_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP=' + Ip_ranges_NA_West
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
@@ -165,7 +165,7 @@ def playNAWest_server():
 
 def playEU_server():
     unblockALL()
-    blockingLabel.config(text='YOUR PLAYING ON EU', fg='#26ef4c')
+    blockingLabel.config(text='PLAYING ON EU', fg='#26ef4c')
     commands = 'advfirewall firewall add rule name="@EU_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP=' + Ip_ranges_EU
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
