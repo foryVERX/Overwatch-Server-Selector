@@ -1,4 +1,4 @@
-# Overwatch-Server-Selector
+# MINA Overwatch 2-Server-Selector
 
 ## General Information
 - DOWNLOAD LINK BELLOW OR USE RELEASE
