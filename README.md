@@ -50,6 +50,9 @@ Please reach out if you want to help or have a question, discord: VERX#2227
 
 For better experiance run as administrator but it is not manditory, you will have to approve each command in UAC
 
+
+<iframe src="https://drive.google.com/file/d/1sn0HPwEao-43__avo8h_BrzczG0PLeBs/preview" width="640" height="480" allow="autoplay"></iframe>
+
 [DOWNLOAD MINA OVERWATCH SERVER SELECTOR V2.0.0](https://drive.google.com/file/d/1GLZXNddyA3bS6wbOjaj-6-uGWErIPgfW/view?usp=sharing)
 
 
