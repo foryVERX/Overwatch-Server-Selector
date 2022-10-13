@@ -21,7 +21,8 @@ if __name__ == '__main__':
     pic2str('play_on_eu.png', 'play_on_eu')
     pic2str('play_on_na_east.png', 'play_on_na_east')
     pic2str('play_on_na_west.png', 'play_on_na_west')
-    pic2str('SQUARE_BACKGROUND_MINA_TEST.png', 'SQUARE_BACKGROUND_MINA_TEST')
-    pic2str('UNBLOCK_ALL_MAIN.png', 'UNBLOCK_ALL_MAIN')
+    pic2str('play_on_australia.png', 'play_on_australia')
+    pic2str('Frame 1.png', 'SQUARE_BACKGROUND_MINA_TEST')
+    pic2str('UNBLOCK_ALL.png', 'UNBLOCK_ALL_MAIN')
     pic2str('LOGO_SMALL_APPLICATION.png', 'LOGO_SMALL_APPLICATION')
-
+    pic2str('Donation_Button.png', 'Donation_Button')
