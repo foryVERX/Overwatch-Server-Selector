@@ -18,7 +18,7 @@ In addtion, some NA players wants to choose from West and East, which will be a 
 # MINA OVERWATCH SERVER SELECTOR V3.0-beta.1
 
 <p align="center">
-  <img src="https://drive.google.com/uc?id=1CS6q4chYBpCconOKuHQHMuZvK2mM6IuJ">
+  <img src="https://drive.google.com/uc?id=1sn0HPwEao-43__avo8h_BrzczG0PLeBs">
 </p>
 
 - SUPPORT(Play on EU, NA-West, NA-East, and Block ME).
