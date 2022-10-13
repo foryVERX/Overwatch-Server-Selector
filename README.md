@@ -30,7 +30,7 @@ Please reach out if you want to help or have a question, discord: VERX#2227
 
 For better experiance run as administrator but it is not manditory, you will have to approve each command in UAC
 
-[DOWNLOAD MINA OVERWATCH SERVER SELECTOR V2.0.0](https://github.com/foryVERX/Overwatch-Server-Selector/releases/download/Overwatch2_Server_Selector/MINA.Overwatch.2.Server.Selector.Beta.Version.3.0-beta.1.exe)
+[DOWNLOAD MINA OVERWATCH 2 SERVER SELECTOR V3.0-beta.1](https://github.com/foryVERX/Overwatch-Server-Selector/releases/download/Overwatch2_Server_Selector/MINA.Overwatch.2.Server.Selector.Beta.Version.3.0-beta.1.exe)
 
 
 # MINA OVERWATCH SERVER SELECTOR V2.0.0
