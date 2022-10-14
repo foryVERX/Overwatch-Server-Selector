@@ -60,17 +60,19 @@ futrabook_font = Font(family="Futura PT Demi", size=10)
 
 # Ip ranges
 Ip_ranges_ME = "157.175.0.0-157.175.255.255,15.185.0.0-15.185.255.255,15.184.0.0-15.184.255.255"
-Ip_ranges_EU = "35.246.0.0-35.246.255.255,35.228.0.0-35.228.255.255,34.89.0.0-34.89.255.255,35.242.0.0-35.242.255.255,34.159.0.0-34.159.255.255,34.141.0.0-34.141.255.255,5.42.184.0-5.42.191.255,5.42.168.0-5.42.175.255,34.88.53.0-34.88.255.255"
-Ip_ranges_NA_East = "34.86.0.0-34.86.255.255,35.236.0.0-35.236.255.255,35.245.0.0-35.245.255.255,35.186.0.0-35.186.255.255,34.145.0.0-34.145.255.255,34.150.0.0-34.150.255.255,34.85.130.0-34.85.255.255"
-Ip_ranges_NA_central = "24.105.40.0-24.105.47.255"
-Ip_ranges_NA_West1 = "24.105.8.0-24.105.15.255"
-Ip_ranges_NA_West2 = "35.235.70.0-35.235.130.255,34.102.30.0-34.102.78.255,34.94.0.0-34.94.255.255"
+Ip_ranges_EU = "35.198.64.0-35.198.191.255,34.107.0.0-34.107.127.255,35.195.0.0-35.195.255.255,35.246.0.0-35.246.255.255,35.228.0.0-35.228.255.255,34.89.128.0-34.89.255.255,35.242.128.0-35.242.255.255,34.159.0.0-34.159.255.255,34.141.0.0-34.141.127.255,5.42.168.0-5.42.191.255,34.88.0.0-34.88.255.255"
+Ip_ranges_NA_East = "35.236.192.0-35.236.255.255,35.199.0.0-35.199.63.255,34.86.0.0-34.86.255.255,35.245.0.0-35.245.255.255,35.186.160.0-35.186.191.255,34.145.128.0-34.145.255.255,34.150.128.0-34.150.255.255,34.85.128.0-34.85.255.255"
+Ip_ranges_NA_central = "24.105.16.0-24.105.63.255"
+Ip_ranges_NA_West1 = "24.105.0.0-24.105.15.255"
+Ip_ranges_NA_West2 = "35.247.0.0-35.247.127.255,35.236.0.0-35.236.127.255,35.235.70.0-35.235.130.255,34.102.0.0-34.102.127.255,34.94.0.0-34.94.255.255"
+Ip_ranges_NA_West3 = "34.19.0.0-34.19.127.255,34.82.0.0-34.83.255.255,34.105.0.0-34.105.127.255,34.118.192.0-34.118.199.255,34.127.0.0-34.127.127.255,34.145.0.0-34.145.127.255,34.157.112.0-34.157.119.255,34.157.240.0-34.157.247.255,34.168.0.0-34.169.255.255,35.185.192.0-35.185.255.255,35.197.0.0-35.197.127.255,35.199.144.0-35.199.159.255,35.199.160.0-35.199.191.255,35.203.128.0-35.203.191.255,35.212.128.0-35.212.255.255,35.220.48.0-35.220.55.255,35.227.128.0-35.227.191.255,35.230.0.0-35.230.127.255,35.233.128.0-35.233.255.255,35.242.48.0-35.242.55.255,35.243.32.0-35.243.39.255,35.247.0.0-35.247.127.255"
 Ip_ranges_AS_Korea = "34.64.0.0-34.64.255.255,117.52.0.0-117.52.255.255"
-Ip_ranges_AS_Singapore = "34.87.0.0-34.87.255.255,34.142.0.0-34.143.255.255,34.124.0.0-34.124.255.255,34.126.0.0-34.126.255.255,35.240.0.0-35.240.255.255"
-Ip_ranges_AS_Taiwan = "5.42.0.0-5.42.168.255"
-Ip_ranges_AS_Japan = "34.85.0.0-34.85.129.255,34.84.0.0-34.84.255.255,35.190.0.0-35.190.255.255,35.194.0.0-35.194.255.255,35.221.0.0-35.221.255.255,34.146.0.0-34.146.255.255"
+Ip_ranges_AS_Singapore1 = "34.124.42.0-34.124.43.255,34.142.128.0-34.142.255.255,35.185.176.0-35.185.191.255,35.186.144.0-35.186.159.255,35.247.128.0-35.247.191.255,34.87.0.0-34.87.191.255,34.143.128.0-34.143.255.255,34.124.128.0-34.124.255.255,34.126.64.0-34.126.191.255,35.240.128.0-35.240.255.255,35.198.192.0-35.198.255.255"
+Ip_ranges_AS_Singapore2 = "34.21.128.0-34.21.255.255,34.87.0.0-34.87.191.255,34.104.58.0-34.104.59.255,34.124.41.0-34.124.42.255,34.124.128.0-34.124.255.255,34.126.64.0-34.126.191.255,34.157.82.0-34.157.83.255,34.157.88.0-34.157.89.255,34.157.210.0-34.157.211.255,35.187.224.0-35.187.255.255,35.197.128.0-35.197.159.255,35.198.192.0-35.198.255.255,35.213.128.0-35.213.191.255,35.220.24.0-35.220.25.255,35.234.192.0-35.234.207.255,35.240.128.0-35.240.255.255,35.242.24.0-35.242.25.255,35.247.128.0-35.247.191.255"
+Ip_ranges_AS_Taiwan = "5.42.160.0-5.42.160.255"
+Ip_ranges_AS_Japan = "34.85.0.0-34.85.127.255,34.84.0.0-34.84.255.255,35.190.224.0-35.190.239.255,35.194.96.0-35.194.255.255,35.221.64.0-35.221.255.255,34.146.0.0-34.146.255.255"
 Ip_ranges_oc = "37.244.42.0-37.244.42.255"
-Ip_ranges_SA = "34.151.0.0-34.151.255.255,34.95.0.0-34.95.255.255,35.198.0.0-35.198.255.255,35.247.0.0-35.247.255.255,35.199.0.0-35.199.255.255"
+Ip_ranges_SA = "34.151.0.0-34.151.255.255,34.95.128.0-34.95.255.255,35.198.0.0-35.198.63.255,35.247.192.0-35.247.255.255,35.199.64.0-35.199.127.255"
 
 
 # NA CENTRAL CAN'T QUEUE
@@ -128,7 +130,7 @@ def ruleDelete(rule_name):  # Delete rule by exact name, name must be a string '
 
 
 def checkIfActive():  # To check if server is blocked or not
-    #pingServers()
+    # pingServers()
     servers_active_rule_list = ['"@ME_OW_SERVER_BLOCKER"', '"@NAEAST_OW_SERVER_BLOCKER"', '"@NAWEST_OW_SERVER_BLOCKER"',
                                 '"@EU_OW_SERVER_BLOCKER"', '"@AU_OW_SERVER_BLOCKER"']
     for rule in servers_active_rule_list:
@@ -151,6 +153,16 @@ def checkIfActive():  # To check if server is blocked or not
         blockingLabel.config(text='ALL UNBLOCKED (DEFAULT SETTINGS)', fg='#ddee4a')
 
 
+def blockALL():  # This function is for testing reasons only DO NOT USE.
+    unblockALL()
+    blockingLabel.config(text='ALL BLOCKED', fg='#ef2626')
+
+    # Block ALL
+    ruleMakerBlock(Ip_ranges_ME, Ip_ranges_EU, Ip_ranges_NA_East, Ip_ranges_NA_West1, Ip_ranges_NA_West2
+                   , Ip_ranges_AS_Japan, Ip_ranges_AS_Korea,
+                   Ip_ranges_SA, Ip_ranges_AS_Singapore, Ip_ranges_NA_central, Ip_ranges_oc)
+
+
 def blockMEServer():  # It removes any rules added by blockserver function
     unblockALL()
     blockingLabel.config(text='ME BLOCKED', fg='#ef2626')
@@ -164,12 +176,12 @@ def blockMEServer():  # It removes any rules added by blockserver function
 def PlayAustralia_server():
     unblockALL()
     blockingLabel.config(text='PLAYING ON Australia', fg='#26ef4c')
-    commands = 'advfirewall firewall add rule name="@AU_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP=' + Ip_ranges_NA_East
+    commands = 'advfirewall firewall add rule name="@AU_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP=' + Ip_ranges_oc
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
-    ruleMakerBlock(Ip_ranges_ME, Ip_ranges_EU, Ip_ranges_NA_East, Ip_ranges_NA_West1, Ip_ranges_NA_West2
-                   , Ip_ranges_AS_Japan, Ip_ranges_AS_Korea, Ip_ranges_AS_Taiwan,
-                   Ip_ranges_SA, Ip_ranges_AS_Singapore, Ip_ranges_NA_central)
+    ruleMakerBlock(Ip_ranges_ME, Ip_ranges_EU, Ip_ranges_NA_East, Ip_ranges_NA_West1, Ip_ranges_NA_West2, Ip_ranges_NA_West3
+                   , Ip_ranges_AS_Japan, Ip_ranges_AS_Korea,Ip_ranges_AS_Taiwan,
+                   Ip_ranges_SA, Ip_ranges_AS_Singapore1, Ip_ranges_NA_central, Ip_ranges_AS_Singapore2)
 
 
 def playNAEast_server():
@@ -179,19 +191,21 @@ def playNAEast_server():
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
     # Block ME, EU, NA West, AS
-    ruleMakerBlock(Ip_ranges_ME, Ip_ranges_EU, Ip_ranges_NA_West1, Ip_ranges_NA_West2
+    ruleMakerBlock(Ip_ranges_ME, Ip_ranges_EU, Ip_ranges_NA_West1, Ip_ranges_NA_West2, Ip_ranges_NA_West3
                    , Ip_ranges_AS_Japan, Ip_ranges_AS_Korea, Ip_ranges_AS_Taiwan,
-                   Ip_ranges_SA, Ip_ranges_AS_Singapore, Ip_ranges_NA_central)
+                   Ip_ranges_SA, Ip_ranges_AS_Singapore1, Ip_ranges_AS_Singapore2, Ip_ranges_NA_central, Ip_ranges_oc)
 
 
 def playNAWest_server():
     unblockALL()
     blockingLabel.config(text='PLAYING ON NA WEST', fg='#26ef4c')
-    commands = 'advfirewall firewall add rule name="@NAWEST_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP=' + Ip_ranges_NA_West1
+    commands = 'advfirewall firewall add rule name="@NAWEST1_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP=' + Ip_ranges_NA_West1
+    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+    commands = 'advfirewall firewall add rule name="@NAWEST2_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP=' + Ip_ranges_NA_West2
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
     ruleMakerBlock(Ip_ranges_ME, Ip_ranges_EU, Ip_ranges_AS_Japan, Ip_ranges_AS_Korea, Ip_ranges_AS_Taiwan,
-                   Ip_ranges_SA, Ip_ranges_AS_Singapore, Ip_ranges_NA_central)
+                   Ip_ranges_SA, Ip_ranges_AS_Singapore1, Ip_ranges_AS_Singapore2, Ip_ranges_NA_central, Ip_ranges_NA_East, Ip_ranges_oc)
 
 
 def playEU_server():
@@ -202,31 +216,33 @@ def playEU_server():
 
     ruleMakerBlock(Ip_ranges_ME, Ip_ranges_NA_West1, Ip_ranges_NA_West2
                    , Ip_ranges_AS_Japan, Ip_ranges_AS_Korea, Ip_ranges_AS_Taiwan,
-                   Ip_ranges_SA, Ip_ranges_AS_Singapore, Ip_ranges_NA_central)
+                   Ip_ranges_SA, Ip_ranges_AS_Singapore1, Ip_ranges_AS_Singapore2, Ip_ranges_NA_central, Ip_ranges_oc, Ip_ranges_NA_East)
 
 
 def unblockALL():
     blockingLabel.config(text='ALL UNBLOCKED (DEFAULT SETTINGS)', fg='#ddee4a')
     list_rule_names = ["@NAEAST_OW_SERVER_BLOCKER", "@EU_OW_SERVER_BLOCKER", "@ME_OW_SERVER_BLOCKER",
-                       "@NAWEST_OW_SERVER_BLOCKER", "@AU_OW_SERVER_BLOCKER", "@Overwatch Block"]
+                       "@NAWEST1_OW_SERVER_BLOCKER", "@AU_OW_SERVER_BLOCKER", "@NAWEST2_OW_SERVER_BLOCKER"
+        , "@Overwatch Block"]
     ruleDelete(list_rule_names)
-    #pingServers()
+    # pingServers()
 
 
 def donationPage():
     webbrowser.open("https://paypal.me/vantverx?country.x=SA&locale.x=en_US")
+
 
 # Labels
 blockingLabel = Label(app, text='', bg='#282828', fg='#ddee4a', font=futrabook_font)
 blockingLabel.grid(row=0, column=0)
 blockingLabel.place(x=250, y=440, anchor="center")
 
-#pingLabel = Label(app, text='', bg='#282828', fg='#ddee4a', font=futrabook_font)
-#pingLabel.grid(row=0, column=0)
-#pingLabel.place(x=250, y=430, anchor="center")
+# pingLabel = Label(app, text='', bg='#282828', fg='#ddee4a', font=futrabook_font)
+# pingLabel.grid(row=0, column=0)
+# pingLabel.place(x=250, y=430, anchor="center")
 
 # Buttons
-PlayMEButton = Button(app, image=button_img_ME, font=futrabook_font, command=blockMEServer,
+PlayMEButton = Button(app, image=button_img_ME, font=futrabook_font, command=blockALL,
                       bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
 PlayMEButton.place(x=135, y=70, height=40, width=230)
 
@@ -243,7 +259,7 @@ PlayNAEASTButton = Button(app, image=button_img_ME_EAST, font=futrabook_font, co
 PlayNAEASTButton.place(x=135, y=240, height=40, width=230)
 
 PlayAustraliaButton = Button(app, image=button_img_Australia, font=futrabook_font, command=PlayAustralia_server,
-                          bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
+                             bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
 PlayAustraliaButton.place(x=135, y=300, height=40, width=230)
 
 ClearBlocksButton = Button(app, image=button_img_Default, font=futrabook_font, command=unblockALL,
@@ -251,7 +267,7 @@ ClearBlocksButton = Button(app, image=button_img_Default, font=futrabook_font, c
 ClearBlocksButton.place(x=135, y=360, height=40, width=230)
 
 DonationButton = Button(app, image=button_img_donation, font=futrabook_font, command=donationPage,
-                           bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
+                        bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
 DonationButton.place(x=420, y=360, height=73, width=68)
 
 # Start Program
