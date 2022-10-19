@@ -34,6 +34,9 @@ For better experiance run as administrator but it is not manditory, you will hav
 
 [DOWNLOAD MINA OVERWATCH 2 SERVER SELECTOR V3.0-beta.2](https://github.com/foryVERX/Overwatch-Server-Selector/releases/download/Overwatch2_Server_Selector_V3.0-beta.2/MINA.Overwatch.2.Server.Selector.Beta.Version.3.0-beta.2.exe)
 
+# DONATION SUPPORT
+[Paypal](https://www.paypal.com/paypalme/vantverx?country.x=SA&locale.x=en_US)
+
 
 # Auto py to exe users
 
