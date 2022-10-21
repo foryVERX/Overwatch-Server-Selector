@@ -76,6 +76,7 @@ Ip_ranges_AS_Japan = "34.85.0.0-34.85.127.255,34.84.0.0-34.84.255.255,35.190.224
 Ip_ranges_oc = "37.244.42.0-37.244.42.255"
 Ip_ranges_SA = "34.151.0.0-34.151.255.255,34.95.128.0-34.95.255.255,35.198.0.0-35.198.63.255,35.247.192.0-35.247.255.255,35.199.64.0-35.199.127.255"
 
+
 # NA CENTRAL CAN'T QUEUE
 #
 
@@ -138,19 +139,23 @@ def checkIfActive():  # To check if server is blocked or not
         command = 'netsh advfirewall firewall show rule name=' + rule
         proc = Popen(command, creationflags=CREATE_NEW_CONSOLE, stdout=PIPE)
         output = proc.communicate()[0]
-        output = str(output.strip().decode("utf-8"))
-        temp_rule = rule.replace('"', "")
-        if temp_rule in output:
-            filtered = output.rpartition('_')[0].replace(" ", "").replace("RuleName:@", "").replace("_OW_SERVER", "")
-            if filtered == 'ME':
-                blockingLabel.config(text='ME BLOCKED', bg='#282828', fg='#ef2626', font=futrabook_font)
-                break
-            else:
-                filtered = filtered[0:2] + ' ' + filtered[2:]
-                label_text = 'PLAYING ON ' + filtered
-                blockingLabel.config(text=label_text, bg='#282828', fg='#26ef4c',
-                                     font=futrabook_font)
-                break
+        rules_existence = str(output)
+        rules_existence = rules_existence.find('Rule Name:')
+        if rules_existence == 6:  # Position of the Rule Name string
+            output = str(output.strip().decode("utf-8"))
+            temp_rule = rule.replace('"', "")
+            if temp_rule in output:
+                filtered = output.rpartition('_')[0].replace(" ", "").replace("RuleName:@", "").replace("_OW_SERVER",
+                                                                                                        "")
+                if filtered == 'ME':
+                    blockingLabel.config(text='ME BLOCKED', bg='#282828', fg='#ef2626', font=futrabook_font)
+                    break
+                else:
+                    filtered = filtered[0:2] + ' ' + filtered[2:]
+                    label_text = 'PLAYING ON ' + filtered
+                    blockingLabel.config(text=label_text, bg='#282828', fg='#26ef4c',
+                                         font=futrabook_font)
+                    break
         blockingLabel.config(text='ALL UNBLOCKED (DEFAULT SETTINGS)', fg='#ddee4a')
 
 
@@ -164,8 +169,8 @@ def blockALL():  # This function is for testing reasons only DO NOT USE.
 def blockMEServer():  # It removes any rules added by blockserver function
     unblockALL()
     blockingLabel.config(text='ME BLOCKED', fg='#ef2626')
-    #commands = 'advfirewall firewall add rule name="@ME_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP=' + Ip_ranges_EU
-    #shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+    # commands = 'advfirewall firewall add rule name="@ME_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP=' + Ip_ranges_EU
+    # shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
     # Block ME
     ruleMakerBlock(Ip_ranges_ME)
@@ -177,7 +182,8 @@ def PlayAustralia_server():
     commands = 'advfirewall firewall add rule name="@AU_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP=' + Ip_ranges_oc
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
-    ruleMakerBlock(Ip_ranges_ME, Ip_ranges_EU2, Ip_ranges_AS_1, Ip_ranges_EU1, Ip_ranges_NA_East, Ip_ranges_NA_West1, Ip_ranges_NA_West2,
+    ruleMakerBlock(Ip_ranges_ME, Ip_ranges_EU2, Ip_ranges_AS_1, Ip_ranges_EU1, Ip_ranges_NA_East, Ip_ranges_NA_West1,
+                   Ip_ranges_NA_West2,
                    Ip_ranges_NA_West3
                    , Ip_ranges_AS_Japan, Ip_ranges_AS_Korea, Ip_ranges_AS_Taiwan,
                    Ip_ranges_SA, Ip_ranges_AS_Singapore1, Ip_ranges_NA_central, Ip_ranges_AS_Singapore2)
@@ -190,7 +196,8 @@ def playNAEast_server():
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
     # Block ME, EU, NA West, AS
-    ruleMakerBlock(Ip_ranges_ME, Ip_ranges_EU2, Ip_ranges_AS_1, Ip_ranges_EU1, Ip_ranges_NA_West1, Ip_ranges_NA_West2, Ip_ranges_NA_West3
+    ruleMakerBlock(Ip_ranges_ME, Ip_ranges_EU2, Ip_ranges_AS_1, Ip_ranges_EU1, Ip_ranges_NA_West1, Ip_ranges_NA_West2,
+                   Ip_ranges_NA_West3
                    , Ip_ranges_AS_Japan, Ip_ranges_AS_Korea, Ip_ranges_AS_Taiwan,
                    Ip_ranges_SA, Ip_ranges_AS_Singapore1, Ip_ranges_AS_Singapore2, Ip_ranges_NA_central, Ip_ranges_oc)
 
@@ -203,7 +210,8 @@ def playNAWest_server():
     commands = 'advfirewall firewall add rule name="@NAWEST2_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP=' + Ip_ranges_NA_West2
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
-    ruleMakerBlock(Ip_ranges_ME, Ip_ranges_EU2, Ip_ranges_AS_1, Ip_ranges_EU1, Ip_ranges_AS_Japan, Ip_ranges_AS_Korea, Ip_ranges_AS_Taiwan,
+    ruleMakerBlock(Ip_ranges_ME, Ip_ranges_EU2, Ip_ranges_AS_1, Ip_ranges_EU1, Ip_ranges_AS_Japan, Ip_ranges_AS_Korea,
+                   Ip_ranges_AS_Taiwan,
                    Ip_ranges_SA, Ip_ranges_AS_Singapore1, Ip_ranges_AS_Singapore2, Ip_ranges_NA_central,
                    Ip_ranges_NA_East, Ip_ranges_oc)
 
