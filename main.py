@@ -140,7 +140,7 @@ def checkIfActive():  # To check if server is blocked or not
         proc = Popen(command, creationflags=CREATE_NEW_CONSOLE, stdout=PIPE)
         output = proc.communicate()[0]
         rules_existence = str(output)
-        rules_existence = rules_existence.find('Rule Name:')
+        rules_existence = rules_existence.find('Rule Name:')  # To avoid processing useless bytes
         if rules_existence == 6:  # Position of the Rule Name string
             output = str(output.strip().decode("utf-8"))
             temp_rule = rule.replace('"', "")
