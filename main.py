@@ -234,7 +234,6 @@ def unblockALL():
                        "@NAWEST1_OW_SERVER_BLOCKER", "@AU_OW_SERVER_BLOCKER", "@NAWEST2_OW_SERVER_BLOCKER"
         , "@Overwatch Block", "@NAWEST_OW_SERVER_BLOCKER"]
     ruleDelete(list_rule_names)
-    # pingServers()
 
 
 def donationPage():
