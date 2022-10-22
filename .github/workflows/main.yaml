@@ -11,24 +11,27 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: gh_checkout
         uses: actions/checkout@v2
       - name: Package Application
         uses: JackMcKew/pyinstaller-action-windows@main
         with:
           path: .
-      - name: Uploading to Workflow
+      - name: exe_to_workflow
         uses: actions/upload-artifact@v2
         with:
           name: Overwatch-Server-Selector.exe
           path: dist
-      - name: Github Tag Bump
+      - name: gh_tag
+        id: gh_tag
         uses: anothrNick/github-tag-action@1.52.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: GH Release
+      - name: gh_release
         uses: softprops/action-gh-release@v0.1.14
         if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'pull_request'  }}
         with:
-          files: dist/Overwatch-Server-Selector.exe
+          files: dist/windows/Overwatch-Server-Selector.exe
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ steps.gh_tag.outputs.tag }}
 
