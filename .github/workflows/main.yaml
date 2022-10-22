@@ -27,7 +27,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: gh_release
-        needs: gh_tag
         uses: softprops/action-gh-release@v0.1.14
         if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'pull_request'  }}
         with:
