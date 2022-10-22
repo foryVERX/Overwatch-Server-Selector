@@ -49,5 +49,5 @@ note you need to know what are you doing if you are here (smile).
 7. CONVERT .PY TO .EXE
 
 
-
+[![Overwatch-Server-Selector](https://github.com/mr-gh-actions/Overwatch-Server-Selector/actions/workflows/main.yaml/badge.svg)](https://github.com/mr-gh-actions/Overwatch-Server-Selector/actions/workflows/main.yaml)
 
