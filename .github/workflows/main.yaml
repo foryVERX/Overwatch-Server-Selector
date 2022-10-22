@@ -23,6 +23,7 @@ jobs:
           name: Overwatch-Server-Selector.exe
           path: dist
       - name: gh_tag
+        id: gh_tag
         uses: anothrNick/github-tag-action@1.52.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -32,5 +33,5 @@ jobs:
         with:
           files: dist/Overwatch-Server-Selector.exe
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ gh_tag.outputs.tag }}
+          tag: ${{ steps.gh_tag.outputs.tag }}
 
