@@ -33,5 +33,5 @@ jobs:
         with:
           files: dist/Overwatch-Server-Selector.exe
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ steps.gh_tag.outputs.tag }}
+          tag_name: ${{ steps.gh_tag.outputs.tag }}
 
