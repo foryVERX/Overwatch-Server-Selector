@@ -1,14 +1,17 @@
 from tkinter import *
 from tkinter.font import Font
 import win32com.shell.shell as shell
-from subprocess import Popen, CREATE_NEW_CONSOLE, PIPE, STARTUPINFO, STARTF_USESHOWWINDOW, SW_HIDE
+from subprocess import call, Popen, CREATE_NEW_CONSOLE, PIPE, STARTUPINFO, STARTF_USESHOWWINDOW, SW_HIDE
 from PIL import ImageTk, Image
 from io import BytesIO
 import pic2str
 import base64
-from os.path import exists
+from os.path import exists, isdir
+from os import getenv, path, mkdir
 from ping3 import ping
 import webbrowser
+import socket
+import threading
 
 # Create window object
 app = Tk()
@@ -76,9 +79,11 @@ Ip_ranges_AS_Japan = "34.85.0.0-34.85.127.255,34.84.0.0-34.84.255.255,35.190.224
 Ip_ranges_oc = "37.244.42.0-37.244.42.255"
 Ip_ranges_SA = "34.151.0.0-34.151.255.255,34.95.128.0-34.95.255.255,35.198.0.0-35.198.63.255,35.247.192.0-35.247.255.255,35.199.64.0-35.199.127.255"
 
+# Global variables
+state = ''
+updating_state = 'Off'
+isUpdated = ''
 
-# NA CENTRAL CAN'T QUEUE
-#
 
 # Functions
 def iconMaker():  # Used to check if there is an icon in the same directory or not it will create the icon if not.
@@ -89,6 +94,53 @@ def iconMaker():  # Used to check if there is an icon in the same directory or n
         icon.save("LOGO_SMALL_APPLICATION.ico")
         app.iconbitmap("LOGO_SMALL_APPLICATION.ico")
 
+
+def is_connect():
+    global state
+    try:
+        socket.create_connection(("www.google.com", 80))
+        state = "Online"
+        if updating_state == 'Off':
+            internetLabel.config(text=state, fg='#26ef4c')
+    except OSError:
+        state = "Offline Can't Update"
+        if updating_state == 'Off':
+            internetLabel.config(text=state, fg='#ef2626')
+
+    print(state)
+    app.after(5000, is_connect)  # do checking again one second later
+
+
+def updateIp():
+    global updating_state
+    # Check if current version is matching github version
+    # if version is diffrent try to update
+    # if internet cut give a massege
+    pass
+
+
+def checkUpdate():  # A function called at the start of the program to check for update
+    global isUpdated, updating_state
+    localappdata_path = getenv('APPDATA') + '\\OverwatchServerBlocker'
+    ip_version_path = localappdata_path + '\\IP_version.txt'
+    if isdir(localappdata_path):  # Check what is the current version of servers
+        if path.exists(ip_version_path):
+            with open(ip_version_path, "r") as reader:
+                for line in reader.readlines():
+                    print(line)
+        else:
+            updateIp()
+        pass
+    else:  # Make directory and call updateIp
+        updating_state = "On"  # Change state to On to stop any other process
+        internetLabel.config(text='Creating Servers List', fg='#ddee4a')
+        mkdir(localappdata_path)  # Make directory
+        # Call updateIp
+        updating_state = "Off"  # Change state to Off
+
+
+# Tomorrow to do
+# CONTINUTE CHECK UPDATE FUNCTION, FINISH ELSE PART FIRST THEN IF. Test offline status
 
 def pingServers():  # Return ping to all regions
     server_list = ["24.105.30.129", "24.105.62.129", "185.60.114.159", "au-syd-speedtest01.urlnetworks.net"]
@@ -117,6 +169,7 @@ def ruleMakerBlock(*argv, rule_name="@Overwatch Block"):  # Used to block IP ran
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
     commands = 'advfirewall firewall add rule name="' + rule_name + '" Dir=Out Action=Block RemoteIP=' + ip_range
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+    # advfirewall firewall add rule name="Test" Dir=In Action=Block RemoteIP=
 
 
 def ruleDelete(rule_name):  # Delete rule by exact name, name must be a string '' or list of strings
@@ -161,6 +214,7 @@ def checkIfActive():  # To check if server is blocked or not
 
 def blockALL():  # This function is for testing reasons only DO NOT USE.
     unblockALL()
+    powerShell('import-firewall-blocklist.ps1 -rulename Singapore-IPv4 -deleteonly')
     blockingLabel.config(text='ALL BLOCKED', fg='#ef2626')
 
     # Block ALL
@@ -245,6 +299,10 @@ blockingLabel = Label(app, text='', bg='#282828', fg='#ddee4a', font=futrabook_f
 blockingLabel.grid(row=0, column=0)
 blockingLabel.place(x=250, y=440, anchor="center")
 
+internetLabel = Label(app, text='', bg='#282828', fg='#26ef4c', font=futrabook_font)
+internetLabel.grid(row=0, column=0)
+internetLabel.place(x=435, y=470, anchor="center")
+
 # pingLabel = Label(app, text='', bg='#282828', fg='#ddee4a', font=futrabook_font)
 # pingLabel.grid(row=0, column=0)
 # pingLabel.place(x=250, y=430, anchor="center")
@@ -280,5 +338,16 @@ DonationButton.place(x=420, y=360, height=73, width=68)
 
 # Start Program
 iconMaker()
-checkIfActive()
+checkIfActive_thread = threading.Thread(target=checkIfActive)
+checkIfActive_thread.setDaemon(True)
+checkIfActive_thread.start()
+
+isconnect_thread = threading.Thread(target=is_connect)
+isconnect_thread.setDaemon(True)
+isconnect_thread.start()
+
+checkUpdate_thread = threading.Thread(target=checkUpdate)
+checkUpdate_thread.setDaemon(True)
+checkUpdate_thread.start()
+
 app.mainloop()
