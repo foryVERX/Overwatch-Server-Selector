@@ -8,6 +8,8 @@ ping3 = "*"
 pillow = "*"
 pywin32 = "*"
 pyinstaller = "*"
+requests = "*"
+pandas = "*"
 
 [dev-packages]
 
