@@ -1,7 +1,7 @@
 import time
 from tkinter import *
 from tkinter.font import Font
-from tkinter import ttk
+from tkinter import ttk, filedialog
 import win32com.shell.shell as shell
 from subprocess import call, Popen, CREATE_NEW_CONSOLE, PIPE, STARTUPINFO, STARTF_USESHOWWINDOW, SW_HIDE
 from PIL import ImageTk, Image
@@ -67,6 +67,7 @@ futrabook_font = Font(family="Futura PT Demi", size=10)
 # Global variables
 localappdata_path = getenv('APPDATA') + '\\OverwatchServerBlocker'
 ip_version_path = localappdata_path + '\\IP_version.txt'
+overwatch_path = 'C:\\Program Files (x86)\\Overwatch\\_retail_\\Overwatch.exe'
 ip_version_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/IP_version.txt'
 Ip_ranges_ME_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_ME.txt'
 Ip_ranges_EU_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_EU.txt'
@@ -85,10 +86,10 @@ updating_state = False
 internet_initialization = False
 sorter_initialization = False
 checkForUpdate_initialization = False
+tunnel_option = False
 isUpdated = ''
 internetConnection = ''
 update_time = 0
-
 
 # IP Ranges
 Ip_ranges_dic = {}
@@ -258,19 +259,21 @@ def ruleMakerBlock(server_exception, np_ips, rule_name='@Overwatch Block'):  # U
                         ip_string = ip_string[1:]
                     if ip_string[len(ip_string) - 1] == ',':
                         ip_string = ip_string[:-1]
-                    print(ip_string)
                     if not ip_string == '':
+                        if tunnel_option:
+                            program = ' program=' + '"' + overwatch_path + '"'
+                        else:
+                            program = ''
                         commands = 'advfirewall firewall add rule name="' \
-                                   + rule_name + \
-                                   '" Dir=In Action=Block RemoteIP=' \
+                                   + rule_name + '"' + program + \
+                                   ' Dir=In Action=Block RemoteIP=' \
                                    + ip_string
                         shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
                         commands = 'advfirewall firewall add rule name="' \
-                                   + rule_name + \
-                                   '" Dir=Out Action=Block RemoteIP=' \
+                                   + rule_name + '"' + program + \
+                                   ' Dir=Out Action=Block RemoteIP=' \
                                    + ip_string
                         shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-                        print(commands)
                     temp_ip_ranges.clear()
     print(str(x) + " Rules created")
 
@@ -313,6 +316,45 @@ def checkIfActive():  # To check if server is blocked or not
                                          font=futrabook_font)
                     break
         blockingLabel.config(text='ALL UNBLOCKED (DEFAULT SETTINGS)', fg='#ddee4a')
+
+
+def tunnel():  # Handle tunnelling options for Overwatch.exe
+    global overwatch_path, tunnel_option
+    checkbotton_state = tunnelCheckBox_state.get()
+    print("Check buttons state =  ", str(checkbotton_state))
+    if checkbotton_state == 1:
+        if exists(overwatch_path):
+            print("Game detected")
+            createTextFile('Options', 'Tunnel=True', False)
+            tunnel_option = True
+        else:
+            app.overwatch = filedialog.askopenfilename(initialdir='C:\\',
+                                                       title='Select Overwatch\_retail_\Overwatch.exe ',
+                                                       filetypes=(("Select Overwatch\_retail_\Overwatch.exe",
+                                                                   "Overwatch.exe"),))
+            if "\_retail_\Overwatch.exe" in app.overwatch:
+                overwatch_path = app.overwatch
+                tunnel_option = True
+                print("Overwatch path is:  " + overwatch_path)
+                createTextFile('Options', 'Tunnel=True', False)
+            else:
+                createTextFile('Options', 'Tunnel=False', False)
+                tunnelCheckBox_state.set(0)
+    else:
+        createTextFile('Options', 'Tunnel=False', False)
+        tunnel_option = False
+
+
+def checkOptions():
+    global tunnel_option
+    if exists(localappdata_path + '\\Options.txt'):
+        with open(localappdata_path + '\\Options.txt', "r") as reader:
+            for line in reader.readlines():
+                if line == 'Tunnel=True':
+                    tunnel_option = True
+    else:
+        tunnel_option = False
+    return tunnel_option
 
 
 def blockALL():  # This function is for testing reasons only DO NOT USE.
@@ -416,6 +458,12 @@ DonationButton = Button(app, image=button_img_donation, font=futrabook_font, com
                         bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
 DonationButton.place(x=420, y=360, height=73, width=68)
 
+# Check box
+tunnelCheckBox_state = IntVar()
+tunnelCheckBox = Checkbutton(app, text="Only affect Overwatch ", font=futrabook_font, activebackground='#282828',
+                             bg='#282828', fg='#26ef4c', borderwidth=0, variable=tunnelCheckBox_state, command=tunnel)
+
+
 # Start Program
 iconMaker()
 ipSorter_thread = threading.Thread(target=ipSorter, daemon=True)  # Follow main thread
@@ -423,5 +471,9 @@ ipSorter_thread.start()
 
 checkIfActive_thread = threading.Thread(target=checkIfActive, daemon=True).start()  # Follow main thread
 checkUpdate.thread = threading.Thread(target=checkUpdate, daemon=True).start()  # Follow main thread
+
+tunnelCheckBox.place(x=0, y=475)
+if checkOptions():
+    tunnelCheckBox.select()
 
 app.mainloop()
