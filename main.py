@@ -79,6 +79,7 @@ Ip_ranges_AS_Taiwan_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-
 Ip_ranges_AS_Japan_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_AS_Japan.txt'
 Ip_ranges_Australia_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_Australia.txt'
 Ip_ranges_Brazil_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_Brazil.txt'
+BlockingConfig_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/BlockingConfig.txt'
 
 updating_state = False
 internet_initialization = False
@@ -91,7 +92,7 @@ update_time = 0
 
 # IP Ranges
 Ip_ranges_dic = {}
-
+blockingConfigDic = {}
 
 # Functions
 def iconMaker():  # Used to check if there is an icon in the same directory or not it will create the icon if not.
@@ -110,6 +111,7 @@ def ipSorter():  # Store ip ranges from Ip_ranges_....txt into Ip_ranges diction
         servers_files = listdir(localappdata_path)
         for server in servers_files:
             if server.startswith("Ip_ranges"):
+                blockingConfig(path.splitext(server)[0])
                 server_path = localappdata_path + '\\' + server
                 with open(server_path, "r") as reader:
                     temp_list = []
@@ -180,6 +182,7 @@ def updateIp():
         update_text = "UPDATING..."
         internetLabel.config(text=update_text, fg='#ddee4a')
         msg_fail = "CONNECTION FAILED... Trying to update"
+        createTextFile('BlockingConfig', request_raw_file(BlockingConfig_url, msg_fail), progressbar=True)
         createTextFile('Ip_ranges_EU', request_raw_file(Ip_ranges_EU_url, msg_fail), progressbar=True)
         createTextFile('Ip_ranges_ME', request_raw_file(Ip_ranges_ME_url, msg_fail), progressbar=True)
         createTextFile('Ip_ranges_AS_Singapore', request_raw_file(Ip_ranges_AS_Singapore_url, msg_fail),
@@ -244,21 +247,21 @@ def checkUpdate(thread_type='mainThread'):  # A function called at the start of 
 def ruleMakerBlock(server_exception, np_ips, block_exception=True, rule_name='@Overwatch Block'):
     # Used to block IP range
     # np_ips is number of ip ranges that included in one function
-    # server_exception is the only server to not block
+    # server_exception is the only server to not block can be a list or string
     # If block_exception set to false then the server_exception is blocked ONLY
     x = 0
     temp_ip_ranges = []
     size_of_ip_range = 0
     if not block_exception:
         for server in Ip_ranges_dic:
-            if server in server_exception:
+            if (server in server_exception):
                 for ip in Ip_ranges_dic[server]:
                     temp_ip_ranges.append(ip)
                 blockIpRange(temp_ip_ranges, rule_name)
                 print("One rule created")
                 return
     for server in Ip_ranges_dic:
-        if server not in server_exception:
+        if not (server in server_exception):
             for ip in Ip_ranges_dic[server]:
                 temp_ip_ranges.append(ip)
                 size_of_ip_range += 1
@@ -271,7 +274,8 @@ def ruleMakerBlock(server_exception, np_ips, block_exception=True, rule_name='@O
     else:
         temp_ip_ranges.clear()
         for indexServer, server in enumerate(Ip_ranges_dic):
-            if not server == server_exception:
+            if not (server in server_exception):
+                print("Server: ", server, "is not: ", server_exception)
                 for indexIp, ip in enumerate(Ip_ranges_dic[server]):
                     temp_ip_ranges.append(ip)
                     if int(len(temp_ip_ranges) / 2) == np_ips:  # /2 because each range separated by ','
@@ -380,13 +384,38 @@ def tunnel():  # Handle tunnelling options for Overwatch.exe
 def checkOptions():
     global tunnel_option
     if exists(localappdata_path + '\\Options.txt'):
+        x = 0
         with open(localappdata_path + '\\Options.txt', "r") as reader:
             for line in reader.readlines():
+                line.strip("\n")
+                if line == "hello":
+                    print("Line: ", line)
                 if line == 'Tunnel=True':
                     tunnel_option = True
     else:
         tunnel_option = False
     return tunnel_option
+
+
+def blockingConfig(server_name):
+    global blockingConfigDic
+    temp_block_config_list = []
+    if exists(localappdata_path + '\\BlockingConfig.txt'):
+        with open(localappdata_path + '\\BlockingConfig.txt', "r") as reader:
+            for line in reader.readlines():
+                if '@' in line:
+                    if 'ipRangeName::' + server_name in line:
+                        indexes = [pos for pos, char in enumerate(line) if char == "@"]
+                        if len(indexes) > 1:
+                            for i in range(len(indexes)):
+                                if i != len(indexes)-1:
+                                    temp_block_config_list.append(line[indexes[i]:indexes[i+1]].strip('\n').strip('@'))
+                                else:
+                                    temp_block_config_list.append(line[indexes[-i]:].strip('\n').strip('@'))
+                        else:
+                            temp_block_config_list.append(line[indexes[0]:].strip('\n').strip('@'))
+                        print("String blocking server: ", server_name, "want to exclude", temp_block_config_list)
+                        blockingConfigDic[server_name] = temp_block_config_list
 
 
 def blockALL():  # This function is for testing reasons only DO NOT USE.
@@ -400,7 +429,7 @@ def blockMEServer():  # It removes any rules added by blockserver function
     commands = 'advfirewall firewall add rule name="@ME_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
-    ruleMakerBlock('Ip_ranges_ME', 248, block_exception=False)
+    ruleMakerBlock(blockingConfigDic['Ip_ranges_ME'], 467, block_exception=False)
 
 
 def PlayAustralia_server():
@@ -419,7 +448,7 @@ def playNAEast_server():
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
     # Block ME, EU, NA West, AS
-    ruleMakerBlock('Ip_ranges_NA_East', 467)
+    ruleMakerBlock(blockingConfigDic['Ip_ranges_NA_East'], 467)
 
 
 def playNAWest_server():
