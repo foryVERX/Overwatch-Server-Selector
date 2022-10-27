@@ -8,7 +8,7 @@ from io import BytesIO
 import pic2str
 import base64
 from os.path import exists, isdir
-from os import getenv, path, mkdir, listdir, system
+from os import getenv, path, mkdir, listdir, system, linesep
 import webbrowser
 import socket
 import threading
@@ -216,15 +216,20 @@ def checkUpdate(thread_type='mainThread'):  # A function called at the start of 
         if isdir(localappdata_path) and path.exists(ip_version_path):
             with open(ip_version_path, "r") as reader:  # Read Ip_version.txt from GitHub and analyze
                 for line in reader.readlines():
-                    msg_fail = "Update check failed"
-                    ip_version_request = request_raw_file(ip_version_url, msg_fail)
-                    if ip_version_request == line:
-                        update_text = "UPDATED"
-                        app.after(250, internetLabel.config(text=update_text, fg='#26ef4c'))
-                    else:
-                        update_text = "NOT UPDATED"
-                        app.after(250, internetLabel.config(text=update_text, fg='#ef2626'))
-                        threading.Thread(target=updateIp, daemon=True).start()
+                    if len(line) > 1:
+                        msg_fail = "Update check failed"
+                        ip_version_request = request_raw_file(ip_version_url, msg_fail)
+                        ip_version_request = linesep.join([s for s in ip_version_request.splitlines() if s])
+                        line = linesep.join([s for s in line.splitlines() if s])
+                        print("Line length: ", len(line))
+                        print("ip length: ", len(ip_version_request))
+                        if ip_version_request == line:
+                            update_text = "UPDATED"
+                            app.after(250, internetLabel.config(text=update_text, fg='#26ef4c'))
+                        else:
+                            update_text = "NOT UPDATED"
+                            app.after(250, internetLabel.config(text=update_text, fg='#ef2626'))
+                            threading.Thread(target=updateIp, daemon=True).start()
         else:  # Make directory and call updateIp
             update_text = "FIRST TIME RUNNING.. UPDATING"
             app.after(250, internetLabel.config(text=update_text, fg='#ddee4a'))
