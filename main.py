@@ -1,4 +1,3 @@
-import time
 from tkinter import *
 from tkinter.font import Font
 from tkinter import ttk, filedialog
@@ -10,7 +9,6 @@ import pic2str
 import base64
 from os.path import exists, isdir
 from os import getenv, path, mkdir, listdir, system
-from ping3 import ping
 import webbrowser
 import socket
 import threading
@@ -19,7 +17,7 @@ import requests
 # Create window object
 app = Tk()
 # Set Properties
-app.title('MINA Overwatch 2 Server Selector Beta Version 3.0')
+app.title('MINA Overwatch 2 Server Selector')
 app.resizable(False, False)
 app.geometry('500x500')
 app.configure(bg='#282828')
@@ -243,39 +241,71 @@ def checkUpdate(thread_type='mainThread'):  # A function called at the start of 
         app.after(5000 * 60, checkUpdate)
 
 
-def ruleMakerBlock(server_exception, np_ips, rule_name='@Overwatch Block'):  # Used to block IP range
+def ruleMakerBlock(server_exception, np_ips, block_exception=True, rule_name='@Overwatch Block'):
+    # Used to block IP range
     # np_ips is number of ip ranges that included in one function
     # server_exception is the only server to not block
+    # If block_exception set to false then the server_exception is blocked ONLY
     x = 0
     temp_ip_ranges = []
+    size_of_ip_range = 0
+    if not block_exception:
+        for server in Ip_ranges_dic:
+            if server in server_exception:
+                for ip in Ip_ranges_dic[server]:
+                    temp_ip_ranges.append(ip)
+                blockIpRange(temp_ip_ranges, rule_name)
+                print("One rule created")
+                return
     for server in Ip_ranges_dic:
-        if not server == server_exception:
+        if server not in server_exception:
             for ip in Ip_ranges_dic[server]:
                 temp_ip_ranges.append(ip)
-                if len(temp_ip_ranges) / 2 == np_ips:  # /2 because each range separated by ','
-                    x += 1
-                    ip_string = ''.join(temp_ip_ranges)
-                    if ip_string[1:] == ',':
-                        ip_string = ip_string[1:]
-                    if ip_string[len(ip_string) - 1] == ',':
-                        ip_string = ip_string[:-1]
-                    if not ip_string == '':
-                        if tunnel_option:
-                            program = ' program=' + '"' + overwatch_path + '"'
-                        else:
-                            program = ''
-                        commands = 'advfirewall firewall add rule name="' \
-                                   + rule_name + '"' + program + \
-                                   ' Dir=In Action=Block RemoteIP=' \
-                                   + ip_string
-                        shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-                        commands = 'advfirewall firewall add rule name="' \
-                                   + rule_name + '"' + program + \
-                                   ' Dir=Out Action=Block RemoteIP=' \
-                                   + ip_string
-                        shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-                    temp_ip_ranges.clear()
-    print(str(x) + " Rules created")
+                size_of_ip_range += 1
+            temp_ip_ranges.append(',')
+    size_of_ip_range = int(size_of_ip_range / 2)
+    print(size_of_ip_range)
+    if size_of_ip_range <= np_ips:
+        blockIpRange(temp_ip_ranges, rule_name)
+        print("One rule created")
+    else:
+        temp_ip_ranges.clear()
+        for indexServer, server in enumerate(Ip_ranges_dic):
+            if not server == server_exception:
+                for indexIp, ip in enumerate(Ip_ranges_dic[server]):
+                    temp_ip_ranges.append(ip)
+                    if int(len(temp_ip_ranges) / 2) == np_ips:  # /2 because each range separated by ','
+                        x += 1
+                        blockIpRange(temp_ip_ranges, rule_name)
+                        temp_ip_ranges.clear()
+                    if indexServer == len(Ip_ranges_dic) - 1 and indexIp == len(Ip_ranges_dic[server]) - 1:
+                        x += 1
+                        print("Last index")
+                        blockIpRange(temp_ip_ranges, rule_name)
+        print(str(x) + " Rules created")
+
+
+def blockIpRange(ip_list, rule_name):
+    ip_string = ''.join(ip_list)
+    if ip_string[1:] == ',':
+        ip_string = ip_string[1:]
+    if ip_string[len(ip_string) - 1] == ',':
+        ip_string = ip_string[:-1]
+    if not ip_string == '':
+        if tunnel_option:
+            program = ' program=' + '"' + overwatch_path + '"'
+        else:
+            program = ''
+        commands = 'advfirewall firewall add rule name="' \
+                   + rule_name + '"' + program + \
+                   ' Dir=In Action=Block RemoteIP=' \
+                   + ip_string
+        shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+        commands = 'advfirewall firewall add rule name="' \
+                   + rule_name + '"' + program + \
+                   ' Dir=Out Action=Block RemoteIP=' \
+                   + ip_string
+        shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
 
 def ruleDelete(rule_name):  # Delete rule by exact name, name must be a string '' or list of strings
@@ -291,9 +321,8 @@ def ruleDelete(rule_name):  # Delete rule by exact name, name must be a string '
 
 
 def checkIfActive():  # To check if server is blocked or not
-    # pingServers()
     servers_active_rule_list = ['"@ME_OW_SERVER_BLOCKER"', '"@NAEAST_OW_SERVER_BLOCKER"', '"@NAWEST_OW_SERVER_BLOCKER"',
-                                '"@EU_OW_SERVER_BLOCKER"', '"@AU_OW_SERVER_BLOCKER"']
+                                '"@EU_OW_SERVER_BLOCKER"', '"@AU_OW_SERVER_BLOCKER"', '"@Australia_OW_SERVER_BLOCKER"']
     for rule in servers_active_rule_list:
         command = 'netsh advfirewall firewall show rule name=' + rule
         proc = Popen(command, creationflags=CREATE_NEW_CONSOLE, stdout=PIPE)
@@ -306,11 +335,14 @@ def checkIfActive():  # To check if server is blocked or not
             if temp_rule in output:
                 filtered = output.rpartition('_')[0].replace(" ", "").replace("RuleName:@", "").replace("_OW_SERVER",
                                                                                                         "")
+                print(filtered)
                 if filtered == 'ME':
                     blockingLabel.config(text='ME BLOCKED', bg='#282828', fg='#ef2626', font=futrabook_font)
                     break
                 else:
-                    filtered = filtered[0:2] + ' ' + filtered[2:]
+                    if len(filtered) < 8:
+                        filtered = filtered[0:2] + ' ' + filtered[2:]
+                    print(filtered)
                     label_text = 'PLAYING ON ' + filtered
                     blockingLabel.config(text=label_text, bg='#282828', fg='#26ef4c',
                                          font=futrabook_font)
@@ -364,53 +396,55 @@ def blockALL():  # This function is for testing reasons only DO NOT USE.
 
 def blockMEServer():  # It removes any rules added by blockserver function
     unblockALL()
-    ruleMakerBlock('Ip_ranges_ME', 18)
+    blockingLabel.config(text='ME BLOCKED', bg='#282828', fg='#ef2626')
+    commands = 'advfirewall firewall add rule name="@ME_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
+    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+
+    ruleMakerBlock('Ip_ranges_ME', 248, block_exception=False)
 
 
 def PlayAustralia_server():
     unblockALL()
     blockingLabel.config(text='PLAYING ON Australia', fg='#26ef4c')
-    commands = 'advfirewall firewall add rule name="@AU_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP='
+    commands = 'advfirewall firewall add rule name="@Australia_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
-    ruleMakerBlock('Ip_ranges_Australia', 18)
+    ruleMakerBlock('Ip_ranges_Australia', 467)
 
 
 def playNAEast_server():
     unblockALL()
     blockingLabel.config(text='PLAYING ON NA EAST', fg='#26ef4c')
-    commands = 'advfirewall firewall add rule name="@NAEAST_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP='
+    commands = 'advfirewall firewall add rule name="@NAEAST_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
     # Block ME, EU, NA West, AS
-    ruleMakerBlock('Ip_ranges_NA_East', 18)
+    ruleMakerBlock('Ip_ranges_NA_East', 467)
 
 
 def playNAWest_server():
     unblockALL()
     blockingLabel.config(text='PLAYING ON NA WEST', fg='#26ef4c')
-    commands = 'advfirewall firewall add rule name="@NAWEST1_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP='
-    shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    commands = 'advfirewall firewall add rule name="@NAWEST2_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP='
+    commands = 'advfirewall firewall add rule name="@NAWEST_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
-    ruleMakerBlock('Ip_ranges_NA_West', 18)
+    ruleMakerBlock('Ip_ranges_NA_West', 467)
 
 
 def playEU_server():
     unblockALL()
     blockingLabel.config(text='PLAYING ON EU', fg='#26ef4c')
-    commands = 'advfirewall firewall add rule name="@EU_OW_SERVER_BLOCKER" Dir=Out Action=Allow RemoteIP='
+    commands = 'advfirewall firewall add rule name="@EU_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
-    ruleMakerBlock('Ip_ranges_EU', 18)
+    ruleMakerBlock('Ip_ranges_EU', 467)
 
 
 def unblockALL():
     blockingLabel.config(text='ALL UNBLOCKED (DEFAULT SETTINGS)', fg='#ddee4a')
     list_rule_names = ["@NAEAST_OW_SERVER_BLOCKER", "@EU_OW_SERVER_BLOCKER", "@ME_OW_SERVER_BLOCKER",
                        "@NAWEST1_OW_SERVER_BLOCKER", "@AU_OW_SERVER_BLOCKER", "@NAWEST2_OW_SERVER_BLOCKER",
-                       "@Overwatch Block", "@NAWEST_OW_SERVER_BLOCKER"]
+                       "@Overwatch Block", "@NAWEST_OW_SERVER_BLOCKER", "@Australia_OW_SERVER_BLOCKER"]
     ruleDelete(list_rule_names)
 
 
@@ -462,7 +496,6 @@ DonationButton.place(x=420, y=360, height=73, width=68)
 tunnelCheckBox_state = IntVar()
 tunnelCheckBox = Checkbutton(app, text="Only affect Overwatch ", font=futrabook_font, activebackground='#282828',
                              bg='#282828', fg='#26ef4c', borderwidth=0, variable=tunnelCheckBox_state, command=tunnel)
-
 
 # Start Program
 iconMaker()
