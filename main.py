@@ -345,7 +345,6 @@ def checkIfActive():  # To check if server is blocked or not
 
     output = run(command_list, capture_output=True, text=True)
     output = str(output.stdout)
-    print(output)
     for rule_name in servers_active_rule_list:
         rules_existence = output.find(rule_name)
         if rules_existence > 0:
@@ -357,7 +356,6 @@ def checkIfActive():  # To check if server is blocked or not
             else:
                 if len(filtered) < 8:
                     filtered = filtered[0:2] + ' ' + filtered[2:]
-                print(filtered)
                 label_text = 'PLAYING ON ' + filtered
                 blockingLabel.config(text=label_text, bg='#282828', fg='#26ef4c',
                                      font=futrabook_font)
