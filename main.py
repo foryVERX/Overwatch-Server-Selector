@@ -257,6 +257,7 @@ def ruleMakerBlock(server_exception, np_ips, block_exception=True, rule_name='@O
     # np_ips is number of ip ranges that included in one function
     # server_exception is the only server to not block can be a list or string
     # If block_exception set to false then the server_exception is blocked ONLY
+    controlButtons('disabled')
     x = 0
     temp_ip_ranges = []
     size_of_ip_range = 0
@@ -297,6 +298,7 @@ def ruleMakerBlock(server_exception, np_ips, block_exception=True, rule_name='@O
                         blockIpRange(temp_ip_ranges, rule_name)
         print(str(x) + " Rules created")
         checkIfActive()
+        controlButtons('normal')
 
 
 def blockIpRange(ip_list, rule_name):
