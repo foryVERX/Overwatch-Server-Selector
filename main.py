@@ -1,3 +1,4 @@
+import time
 from tkinter import *
 from tkinter.font import Font
 from tkinter import ttk, filedialog
@@ -94,6 +95,7 @@ update_time = 0
 Ip_ranges_dic = {}
 blockingConfigDic = {}
 
+
 # Functions
 def iconMaker():  # Used to check if there is an icon in the same directory or not it will create the icon if not.
     if exists("LOGO_SMALL_APPLICATION.ico"):
@@ -116,10 +118,11 @@ def ipSorter():  # Store ip ranges from Ip_ranges_....txt into Ip_ranges diction
                 with open(server_path, "r") as reader:
                     temp_list = []
                     for line in reader.readlines():
-                        line = line.strip()
-                        server = path.splitext(server)[0]
-                        temp_list.append(line)
-                        temp_list.append(',')
+                        line = line.strip('\n')
+                        if len(line) > 5:
+                            server = path.splitext(server)[0]
+                            temp_list.append(line)
+                            temp_list.append(',')
                     Ip_ranges_dic[server] = temp_list
         update_text = "UPDATED"
         app.after(250, internetLabel.config(text=update_text, fg='#26ef4c'))
@@ -315,6 +318,7 @@ def blockIpRange(ip_list, rule_name):
                    ' Dir=Out Action=Block RemoteIP=' \
                    + ip_string
         shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+        print(commands)
 
 
 def ruleDelete(rule_name):  # Delete rule by exact name, name must be a string '' or list of strings
@@ -413,8 +417,9 @@ def blockingConfig(server_name):
                         indexes = [pos for pos, char in enumerate(line) if char == "@"]
                         if len(indexes) > 1:
                             for i in range(len(indexes)):
-                                if i != len(indexes)-1:
-                                    temp_block_config_list.append(line[indexes[i]:indexes[i+1]].strip('\n').strip('@'))
+                                if i != len(indexes) - 1:
+                                    temp_block_config_list.append(
+                                        line[indexes[i]:indexes[i + 1]].strip('\n').strip('@'))
                                 else:
                                     temp_block_config_list.append(line[indexes[-i]:].strip('\n').strip('@'))
                         else:
@@ -433,8 +438,9 @@ def blockMEServer():  # It removes any rules added by blockserver function
     blockingLabel.config(text='ME BLOCKED', bg='#282828', fg='#ef2626')
     commands = 'advfirewall firewall add rule name="@ME_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-
-    ruleMakerBlock(blockingConfigDic['Ip_ranges_ME'], 467, block_exception=False)
+    threading.Thread(target=ruleMakerBlock, args=(blockingConfigDic['Ip_ranges_Australia'], 467,),
+                     daemon=True, kwargs={'block_exception': False}).start()  # Follow main thread
+    # ruleMakerBlock(blockingConfigDic['Ip_ranges_Australia'], 467)
 
 
 def PlayAustralia_server():
@@ -442,8 +448,8 @@ def PlayAustralia_server():
     blockingLabel.config(text='PLAYING ON Australia', fg='#26ef4c')
     commands = 'advfirewall firewall add rule name="@Australia_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-
-    ruleMakerBlock('Ip_ranges_Australia', 467)
+    threading.Thread(target=ruleMakerBlock, args=(blockingConfigDic['Ip_ranges_Australia'], 467,),
+                     daemon=True).start()  # Follow main thread
 
 
 def playNAEast_server():
@@ -451,9 +457,8 @@ def playNAEast_server():
     blockingLabel.config(text='PLAYING ON NA EAST', fg='#26ef4c')
     commands = 'advfirewall firewall add rule name="@NAEAST_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-
-    # Block ME, EU, NA West, AS
-    ruleMakerBlock(blockingConfigDic['Ip_ranges_NA_East'], 467)
+    threading.Thread(target=ruleMakerBlock, args=(blockingConfigDic['Ip_ranges_NA_East'], 467,),
+                     daemon=True).start()  # Follow main thread
 
 
 def playNAWest_server():
@@ -461,8 +466,8 @@ def playNAWest_server():
     blockingLabel.config(text='PLAYING ON NA WEST', fg='#26ef4c')
     commands = 'advfirewall firewall add rule name="@NAWEST_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-
-    ruleMakerBlock('Ip_ranges_NA_West', 467)
+    threading.Thread(target=ruleMakerBlock, args=(blockingConfigDic['Ip_ranges_NA_West'], 467,),
+                     daemon=True).start()  # Follow main thread
 
 
 def playEU_server():
@@ -470,8 +475,8 @@ def playEU_server():
     blockingLabel.config(text='PLAYING ON EU', fg='#26ef4c')
     commands = 'advfirewall firewall add rule name="@EU_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-
-    ruleMakerBlock('Ip_ranges_EU', 467)
+    threading.Thread(target=ruleMakerBlock, args=(blockingConfigDic['Ip_ranges_EU'], 467,),
+                     daemon=True).start()  # Follow main thread
 
 
 def unblockALL():
