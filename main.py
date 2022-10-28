@@ -267,6 +267,7 @@ def ruleMakerBlock(server_exception, np_ips, block_exception=True, rule_name='@O
                     temp_ip_ranges.append(ip)
                 blockIpRange(temp_ip_ranges, rule_name)
                 print("One rule created")
+                checkIfActive()
                 return
     for server in Ip_ranges_dic:
         if not (server in server_exception):
@@ -441,7 +442,6 @@ def blockMEServer():  # It removes any rules added by blockserver function
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
     threading.Thread(target=ruleMakerBlock, args=(blockingConfigDic['Ip_ranges_Australia'], 467,),
                      daemon=True, kwargs={'block_exception': False}).start()  # Follow main thread
-    # ruleMakerBlock(blockingConfigDic['Ip_ranges_Australia'], 467)
 
 
 def PlayAustralia_server():
