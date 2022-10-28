@@ -339,33 +339,30 @@ def ruleDelete(rule_name):  # Delete rule by exact name, name must be a string '
 
 
 def checkIfActive():  # To check if server is blocked or not
-    servers_active_rule_list = ['"@ME_OW_SERVER_BLOCKER"', '"@NAEAST_OW_SERVER_BLOCKER"', '"@NAWEST_OW_SERVER_BLOCKER"',
-                                '"@EU_OW_SERVER_BLOCKER"', '"@AU_OW_SERVER_BLOCKER"', '"@Australia_OW_SERVER_BLOCKER"']
-    for rule in servers_active_rule_list:
-        command_list = ['netsh', 'advfirewall', 'firewall', 'show', 'rule', 'name=', rule]
-        output = run(command_list, capture_output=True, text=True)
-        output = str(output.stdout)
-        rules_existence = output.find('Rule Name:')  # To avoid processing useless bytes
-        if rules_existence > 0:  # Position of the Rule Name string
-            output = str(output.strip())
-            temp_rule = rule.replace('"', "")
-            if temp_rule in output:
-                filtered = output.rpartition('_')[0].replace(" ", "").replace("RuleName:@", "").replace("_OW_SERVER",
-                                                                                                        "")
+    servers_active_rule_list = ['ME_OW_SERVER_BLOCKER', 'NAEAST_OW_SERVER_BLOCKER', 'NAWEST_OW_SERVER_BLOCKER',
+                                'EU_OW_SERVER_BLOCKER', 'AU_OW_SERVER_BLOCKER', 'Australia_OW_SERVER_BLOCKER']
+    command_list = ['netsh', 'advfirewall', 'firewall', 'show', 'rule', 'name=all']
+
+    output = run(command_list, capture_output=True, text=True)
+    output = str(output.stdout)
+    print(output)
+    for rule_name in servers_active_rule_list:
+        rules_existence = output.find(rule_name)
+        if rules_existence > 0:
+            filtered = rule_name.rpartition('_')[0].replace(" ", "").replace("RuleName:@", "").replace("_OW_SERVER",
+                                                                                                    "")
+            if filtered == 'ME':
+                blockingLabel.config(text='ME BLOCKED', bg='#282828', fg='#ef2626', font=futrabook_font)
+                return
+            else:
+                if len(filtered) < 8:
+                    filtered = filtered[0:2] + ' ' + filtered[2:]
                 print(filtered)
-                if filtered == 'ME':
-                    blockingLabel.config(text='ME BLOCKED', bg='#282828', fg='#ef2626', font=futrabook_font)
-                    return
-                else:
-                    if len(filtered) < 8:
-                        filtered = filtered[0:2] + ' ' + filtered[2:]
-                    print(filtered)
-                    label_text = 'PLAYING ON ' + filtered
-                    blockingLabel.config(text=label_text, bg='#282828', fg='#26ef4c',
-                                         font=futrabook_font)
-                    return
-        if rule == servers_active_rule_list[len(servers_active_rule_list)-1]:
-            blockingLabel.config(text='ALL UNBLOCKED (DEFAULT SETTINGS)', fg='#ddee4a')
+                label_text = 'PLAYING ON ' + filtered
+                blockingLabel.config(text=label_text, bg='#282828', fg='#26ef4c',
+                                     font=futrabook_font)
+                return
+    blockingLabel.config(text='ALL UNBLOCKED (DEFAULT SETTINGS)', fg='#ddee4a')
 
 
 def tunnel():  # Handle tunnelling options for Overwatch.exe
