@@ -295,6 +295,7 @@ def ruleMakerBlock(server_exception, np_ips, block_exception=True, rule_name='@O
                         print("Last index")
                         blockIpRange(temp_ip_ranges, rule_name)
         print(str(x) + " Rules created")
+        checkIfActive()
 
 
 def blockIpRange(ip_list, rule_name):
@@ -435,7 +436,7 @@ def blockALL():  # This function is for testing reasons only DO NOT USE.
 
 def blockMEServer():  # It removes any rules added by blockserver function
     unblockALL()
-    blockingLabel.config(text='ME BLOCKED', bg='#282828', fg='#ef2626')
+    blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
     commands = 'advfirewall firewall add rule name="@ME_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
     threading.Thread(target=ruleMakerBlock, args=(blockingConfigDic['Ip_ranges_Australia'], 467,),
@@ -445,7 +446,7 @@ def blockMEServer():  # It removes any rules added by blockserver function
 
 def PlayAustralia_server():
     unblockALL()
-    blockingLabel.config(text='PLAYING ON Australia', fg='#26ef4c')
+    blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
     commands = 'advfirewall firewall add rule name="@Australia_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
     threading.Thread(target=ruleMakerBlock, args=(blockingConfigDic['Ip_ranges_Australia'], 467,),
@@ -454,7 +455,7 @@ def PlayAustralia_server():
 
 def playNAEast_server():
     unblockALL()
-    blockingLabel.config(text='PLAYING ON NA EAST', fg='#26ef4c')
+    blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
     commands = 'advfirewall firewall add rule name="@NAEAST_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
     threading.Thread(target=ruleMakerBlock, args=(blockingConfigDic['Ip_ranges_NA_East'], 467,),
@@ -463,7 +464,7 @@ def playNAEast_server():
 
 def playNAWest_server():
     unblockALL()
-    blockingLabel.config(text='PLAYING ON NA WEST', fg='#26ef4c')
+    blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
     commands = 'advfirewall firewall add rule name="@NAWEST_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
     threading.Thread(target=ruleMakerBlock, args=(blockingConfigDic['Ip_ranges_NA_West'], 467,),
@@ -472,7 +473,7 @@ def playNAWest_server():
 
 def playEU_server():
     unblockALL()
-    blockingLabel.config(text='PLAYING ON EU', fg='#26ef4c')
+    blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
     commands = 'advfirewall firewall add rule name="@EU_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
     threading.Thread(target=ruleMakerBlock, args=(blockingConfigDic['Ip_ranges_EU'], 467,),
