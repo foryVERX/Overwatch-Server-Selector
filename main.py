@@ -269,6 +269,7 @@ def ruleMakerBlock(server_exception, np_ips, block_exception=True, rule_name='@O
                 blockIpRange(temp_ip_ranges, rule_name)
                 print("One rule created")
                 checkIfActive()
+                controlButtons('normal')
                 return
     for server in Ip_ranges_dic:
         if not (server in server_exception):
