@@ -379,11 +379,9 @@ def tunnel():  # Handle tunnelling options for Overwatch.exe
                                                        title='Select Overwatch\_retail_\Overwatch.exe ',
                                                        filetypes=(("Select Overwatch\_retail_\Overwatch.exe",
                                                                    "Overwatch.exe"),))
-            print(app.overwatch)
-            print(type(app.overwatch))
             existance_overwatch = app.overwatch.find("/_retail_/Overwatch.exe")
             if existance_overwatch > 0:
-                overwatch_path = app.overwatch.replace('/', r'\\')
+                overwatch_path = app.overwatch.replace('/', "\\")
                 tunnel_option = True
                 print("Overwatch path is:  " + overwatch_path)
                 createTextFile('Options', ['Tunnel=True\n', overwatch_path], False)
