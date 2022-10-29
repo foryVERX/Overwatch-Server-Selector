@@ -170,8 +170,12 @@ def request_raw_file(url, msg_fail):
 
 
 def createTextFile(file_name, contents, progressbar=False):
+    # Contents can be a string or a list of strings must end with \n except last element in the list
     with open(localappdata_path + '\\' + file_name + '.txt', "w") as text_file:
-        text_file.write(contents)
+        if isinstance(contents, list):
+            text_file.writelines(contents)
+        else:
+            text_file.write(contents)
     if progressbar:
         progressBar.place(x=360, y=465)
         progressBar['value'] += 10
@@ -208,7 +212,6 @@ def updateIp():
     else:
         update_text = "Please check your internet connection to download servers ip"
         internetLabel.config(text=update_text, fg='#ddee4a')
-    # progressBar after lower doesnt' apear next time
 
 
 def checkUpdate(thread_type='mainThread'):  # A function called at the start of the program to check for update
@@ -323,7 +326,6 @@ def blockIpRange(ip_list, rule_name):
                    ' Dir=Out Action=Block RemoteIP=' \
                    + ip_string
         shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-        print(commands)
 
 
 def ruleDelete(rule_name):  # Delete rule by exact name, name must be a string '' or list of strings
@@ -349,7 +351,7 @@ def checkIfActive():  # To check if server is blocked or not
         rules_existence = output.find(rule_name)
         if rules_existence > 0:
             filtered = rule_name.rpartition('_')[0].replace(" ", "").replace("RuleName:@", "").replace("_OW_SERVER",
-                                                                                                    "")
+                                                                                                       "")
             if filtered == 'ME':
                 blockingLabel.config(text='ME BLOCKED', bg='#282828', fg='#ef2626', font=futrabook_font)
                 return
@@ -377,11 +379,14 @@ def tunnel():  # Handle tunnelling options for Overwatch.exe
                                                        title='Select Overwatch\_retail_\Overwatch.exe ',
                                                        filetypes=(("Select Overwatch\_retail_\Overwatch.exe",
                                                                    "Overwatch.exe"),))
-            if "\_retail_\Overwatch.exe" in app.overwatch:
-                overwatch_path = app.overwatch
+            print(app.overwatch)
+            print(type(app.overwatch))
+            existance_overwatch = app.overwatch.find("/_retail_/Overwatch.exe")
+            if existance_overwatch > 0:
+                overwatch_path = app.overwatch.replace('/', r'\\')
                 tunnel_option = True
                 print("Overwatch path is:  " + overwatch_path)
-                createTextFile('Options', 'Tunnel=True', False)
+                createTextFile('Options', ['Tunnel=True\n', overwatch_path], False)
             else:
                 createTextFile('Options', 'Tunnel=False', False)
                 tunnelCheckBox_state.set(0)
@@ -391,16 +396,17 @@ def tunnel():  # Handle tunnelling options for Overwatch.exe
 
 
 def checkOptions():
-    global tunnel_option
+    global tunnel_option, overwatch_path
     if exists(localappdata_path + '\\Options.txt'):
-        x = 0
         with open(localappdata_path + '\\Options.txt', "r") as reader:
-            for line in reader.readlines():
-                line.strip("\n")
-                if line == "hello":
-                    print("Line: ", line)
-                if line == 'Tunnel=True':
-                    tunnel_option = True
+            options = reader.readlines()
+        if options[0].strip() == 'Tunnel=True':
+            tunnel_option = True
+        if len(options) > 1:
+            temp_path = options[1].strip()
+            overwatch_path = temp_path
+            tunnel_option = True
+
     else:
         tunnel_option = False
     return tunnel_option
