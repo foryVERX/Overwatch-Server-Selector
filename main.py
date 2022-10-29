@@ -438,7 +438,7 @@ def blockMEServer():  # It removes any rules added by blockserver function
     blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
     commands = 'advfirewall firewall add rule name="@ME_OW_SERVER_BLOCKER" Dir=Out Action=Allow'
     shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-    threading.Thread(target=ruleMakerBlock, args=(blockingConfigDic['Ip_ranges_Australia'], 467,),
+    threading.Thread(target=ruleMakerBlock, args=(blockingConfigDic['Ip_ranges_ME'], 467,),
                      daemon=True, kwargs={'block_exception': False}).start()  # Follow main thread
 
 
