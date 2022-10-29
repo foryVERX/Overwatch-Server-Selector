@@ -4,12 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-ping3 = "*"
 pillow = "*"
 pywin32 = "*"
 pyinstaller = "*"
 requests = "*"
-pandas = "*"
+socket = "*"
 
 [dev-packages]
 
