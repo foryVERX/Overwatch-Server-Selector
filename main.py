@@ -1,15 +1,14 @@
-import time
 from tkinter import *
 from tkinter.font import Font
 from tkinter import ttk, filedialog
 import win32com.shell.shell as shell
-from subprocess import call, Popen, CREATE_NEW_CONSOLE, PIPE, run, STARTUPINFO, STARTF_USESHOWWINDOW, SW_HIDE
+from subprocess import run
 from PIL import ImageTk, Image
 from io import BytesIO
 import pic2str
 import base64
 from os.path import exists, isdir
-from os import getenv, path, mkdir, listdir, system, linesep
+from os import getenv, path, mkdir, listdir, linesep
 import webbrowser
 import socket
 import threading
@@ -67,20 +66,20 @@ futrabook_font = Font(family="Futura PT Demi", size=10)
 localappdata_path = getenv('APPDATA') + '\\OverwatchServerBlocker'
 ip_version_path = localappdata_path + '\\IP_version.txt'
 overwatch_path = 'C:\\Program Files (x86)\\Overwatch\\_retail_\\Overwatch.exe'
-ip_version_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/IP_version.txt'
-Ip_ranges_ME_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_ME.txt'
-Ip_ranges_EU_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_EU.txt'
-Ip_ranges_NA_East_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_NA_East.txt'
-Ip_ranges_NA_central_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_NA_central.txt'
-Ip_ranges_NA_West_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_NA_West.txt'
-Ip_ranges_AS_Korea_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_AS_Korea.txt'
-Ip_ranges_AS_1_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_AS_1.txt'
-Ip_ranges_AS_Singapore_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_AS_Singapore.txt'
-Ip_ranges_AS_Taiwan_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_AS_Taiwan.txt'
-Ip_ranges_AS_Japan_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_AS_Japan.txt'
-Ip_ranges_Australia_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_Australia.txt'
-Ip_ranges_Brazil_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/Ip_ranges_Brazil.txt'
-BlockingConfig_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector-1/main/ip_lists/BlockingConfig.txt'
+ip_version_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/IP_version.txt'
+Ip_ranges_ME_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_ME.txt'
+Ip_ranges_EU_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_EU.txt'
+Ip_ranges_NA_East_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_NA_East.txt'
+Ip_ranges_NA_central_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_NA_central.txt'
+Ip_ranges_NA_West_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_NA_West.txt'
+Ip_ranges_AS_Korea_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_AS_Korea.txt'
+Ip_ranges_AS_1_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_AS_1.txt'
+Ip_ranges_AS_Singapore_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_AS_Singapore.txt'
+Ip_ranges_AS_Taiwan_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_AS_Taiwan.txt'
+Ip_ranges_AS_Japan_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_AS_Japan.txt'
+Ip_ranges_Australia_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_Australia.txt'
+Ip_ranges_Brazil_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_Brazil.txt'
+BlockingConfig_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/BlockingConfig.txt'
 
 updating_state = False
 internet_initialization = False
@@ -120,7 +119,6 @@ def ipSorter():  # Store ip ranges from Ip_ranges_....txt into Ip_ranges diction
                     for line in reader.readlines():
                         line = line.strip('\n')
                         if len(line) > 5:
-                            server = path.splitext(server)[0]
                             temp_list.append(line)
                             temp_list.append(',')
                     Ip_ranges_dic[server] = temp_list
@@ -227,8 +225,6 @@ def checkUpdate(thread_type='mainThread'):  # A function called at the start of 
                         ip_version_request = request_raw_file(ip_version_url, msg_fail)
                         ip_version_request = linesep.join([s for s in ip_version_request.splitlines() if s])
                         line = linesep.join([s for s in line.splitlines() if s])
-                        print("Line length: ", len(line))
-                        print("ip length: ", len(ip_version_request))
                         if ip_version_request == line:
                             update_text = "UPDATED"
                             app.after(250, internetLabel.config(text=update_text, fg='#26ef4c'))
@@ -266,7 +262,7 @@ def ruleMakerBlock(server_exception, np_ips, block_exception=True, rule_name='@O
     size_of_ip_range = 0
     if not block_exception:
         for server in Ip_ranges_dic:
-            if (server in server_exception):
+            if server in server_exception:
                 for ip in Ip_ranges_dic[server]:
                     temp_ip_ranges.append(ip)
                 blockIpRange(temp_ip_ranges, rule_name)
@@ -281,7 +277,7 @@ def ruleMakerBlock(server_exception, np_ips, block_exception=True, rule_name='@O
                 size_of_ip_range += 1
             temp_ip_ranges.append(',')
     size_of_ip_range = int(size_of_ip_range / 2)
-    print(size_of_ip_range)
+    print("Total number of ip ranges: ", size_of_ip_range)
     if size_of_ip_range <= np_ips:
         blockIpRange(temp_ip_ranges, rule_name)
         print("One rule created")
@@ -289,7 +285,7 @@ def ruleMakerBlock(server_exception, np_ips, block_exception=True, rule_name='@O
         temp_ip_ranges.clear()
         for indexServer, server in enumerate(Ip_ranges_dic):
             if not (server in server_exception):
-                print("Server: ", server, "is not: ", server_exception)
+                print("ruleMakerBlock | Debug Info: ", server, "is not: ", server_exception)
                 for indexIp, ip in enumerate(Ip_ranges_dic[server]):
                     temp_ip_ranges.append(ip)
                     if int(len(temp_ip_ranges) / 2) == np_ips:  # /2 because each range separated by ','
@@ -298,9 +294,9 @@ def ruleMakerBlock(server_exception, np_ips, block_exception=True, rule_name='@O
                         temp_ip_ranges.clear()
                     if indexServer == len(Ip_ranges_dic) - 1 and indexIp == len(Ip_ranges_dic[server]) - 1:
                         x += 1
-                        print("Last index")
                         blockIpRange(temp_ip_ranges, rule_name)
-        print(str(x) + " Rules created")
+                        temp_ip_ranges.clear()
+        print('\n', str(x) + " --- Parsed Rules passed to blockIpRange function")
         checkIfActive()
         controlButtons('normal')
 
@@ -428,7 +424,8 @@ def blockingConfig(server_name):
                                     temp_block_config_list.append(line[indexes[-i]:].strip('\n').strip('@'))
                         else:
                             temp_block_config_list.append(line[indexes[0]:].strip('\n').strip('@'))
-                        print("String blocking server: ", server_name, "want to exclude", temp_block_config_list)
+                        print("Blocking Config: ", 'Play on', server_name, "wants to exclude", temp_block_config_list,
+                              "From Blocking")
                         blockingConfigDic[server_name] = temp_block_config_list
 
 
