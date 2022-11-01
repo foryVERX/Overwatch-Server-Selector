@@ -322,7 +322,6 @@ def blockIpRange(ip_list, rule_name):
                    ' Dir=Out Action=Block RemoteIP=' \
                    + ip_string
         shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-        print(len(commands))
         if len(commands) > 8150:
             print("Command is too long")
 
