@@ -258,7 +258,7 @@ def ruleMakerBlock(server_exception, np_ips, block_exception=True, rule_name='@O
     # If block_exception set to false then the server_exception is blocked ONLY
     controlButtons('disabled')
     x = 0
-    temp_ip_ranges = []
+    temp_ip_ranges = list()
     size_of_ip_range = 0
     if not block_exception:
         for server in Ip_ranges_dic:
@@ -283,22 +283,28 @@ def ruleMakerBlock(server_exception, np_ips, block_exception=True, rule_name='@O
         print("One rule created")
     else:
         temp_ip_ranges.clear()
+        full_ip_ranges = list()
         for indexServer, server in enumerate(Ip_ranges_dic):
             if server.strip('.txt') not in str(server_exception):
                 print("ruleMakerBlock | Debug Info: ", server, "is not: ", server_exception)
                 for indexIp, ip in enumerate(Ip_ranges_dic[server]):
-                    temp_ip_ranges.append(ip)
-                    if int(len(temp_ip_ranges) / 2) == np_ips:  # /2 because each range separated by ','
-                        x += 1
-                        blockIpRange(temp_ip_ranges, rule_name)
-                        temp_ip_ranges.clear()
-                    if indexServer == len(Ip_ranges_dic) - 1 and indexIp == len(Ip_ranges_dic[server]) - 1:
-                        x += 1
-                        blockIpRange(temp_ip_ranges, rule_name)
-                        temp_ip_ranges.clear()
-        print('\n', str(x) + " --- Parsed Rules passed to blockIpRange function")
-        checkIfActive()
-        controlButtons('normal')
+                    full_ip_ranges.append(ip)
+        print(int(len(full_ip_ranges)/2))
+        for ip in full_ip_ranges:
+            temp_ip_ranges.append(ip)
+            if (len(temp_ip_ranges)) == np_ips * 2:
+                x += 1
+                full_ip_ranges = full_ip_ranges[len(temp_ip_ranges):]
+                blockIpRange(temp_ip_ranges, rule_name)
+                temp_ip_ranges.clear()
+            elif (len(full_ip_ranges) / 2) < np_ips and not len(full_ip_ranges) == 0:
+                x += 1
+                blockIpRange(full_ip_ranges, rule_name)
+                print('Last List')
+                print('\n', str(x) + " --- Parsed Rules passed to blockIpRange function")
+                checkIfActive()
+                controlButtons('normal')
+                return
 
 
 def blockIpRange(ip_list, rule_name):
@@ -322,6 +328,7 @@ def blockIpRange(ip_list, rule_name):
                    ' Dir=Out Action=Block RemoteIP=' \
                    + ip_string
         shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+        # print(commands)
         if len(commands) > 8150:
             print("Command is too long")
 
