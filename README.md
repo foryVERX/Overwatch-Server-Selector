@@ -30,9 +30,9 @@ Please reach out if you want to help or have a question, discord: VERX#2227
 
 For better experiance run as administrator but it is not manditory, you will have to approve each command in UAC
 
-[HOW TO USE MINA OVERWATCH 2 SERVER SELECTOR V3.0-beta.2](https://youtu.be/PDaShF9Mpjo)
+[HOW TO USE MINA OVERWATCH 2 SERVER SELECTOR](https://youtu.be/PDaShF9Mpjo)
 
-[DOWNLOAD MINA OVERWATCH 2 SERVER SELECTOR V3.0-beta.2](https://github.com/foryVERX/Overwatch-Server-Selector/releases/download/Overwatch2_Server_Selector_V3.0-beta.2/MINA.Overwatch.2.Server.Selector.Beta.Version.3.0-beta.2.exe)
+[DOWNLOAD MINA OVERWATCH 2 SERVER SELECTOR V4.0-test7](https://github.com/foryVERX/Overwatch-Server-Selector/releases/download/Overwatch2SeverSelectorV4-test7/MINA.Overwatch.2.Server.Blocker.V4-test7.exe)
 
 
 # Auto py to exe users
