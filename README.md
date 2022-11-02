@@ -15,7 +15,7 @@ Some times the match making gets you in bad server for you, for example if your 
 Another issue where some EU players want to play on NA. Even if you change the region it gets you back to EU. The solution is to block EU and ME severs and change the region to NA.
 In addtion, some NA players wants to choose from West and East, which will be a feature of the program.
 
-# MINA OVERWATCH SERVER SELECTOR V3.0-beta.2
+# MINA OVERWATCHW 2 SERVER SELECTOR 
 
 <p align="center">
   <img src="https://drive.google.com/uc?id=1sn0HPwEao-43__avo8h_BrzczG0PLeBs">
@@ -26,7 +26,7 @@ In addtion, some NA players wants to choose from West and East, which will be a 
 - Updated servers to work on overwatch 2
 - Added donation button for support ;)
 
-Please reach out if you want to help or have a question, discord: VERX#2227
+Please reach out if you want to help or have a question, [discord](https://discord.gg/8CtV7bkJzB)
 
 For better experiance run as administrator but it is not manditory, you will have to approve each command in UAC
 
