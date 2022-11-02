@@ -81,6 +81,7 @@ How? Press windows button and search for UAC then choose Change User Account Con
 
 [DOWNLOAD MINA OVERWATCH 2 SERVER SELECTOR V4.0-test7](https://github.com/foryVERX/Overwatch-Server-Selector/releases/download/Overwatch2SeverSelectorV4-test7/MINA.Overwatch.2.Server.Blocker.V4-test7.exe)
 
+Please reach out if you want to help or have a question, [discord](https://discord.gg/8CtV7bkJzB)
 
 # Auto py to exe users
 
