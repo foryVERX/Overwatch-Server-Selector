@@ -10,6 +10,7 @@ pywin32 = "*"
 pyinstaller = "*"
 requests = "*"
 pandas = "*"
+checklistcombobox = "*"
 
 [dev-packages]
 
