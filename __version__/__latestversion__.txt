@@ -1,2 +1,2 @@
-__version__=5.1.0
+version=5.1.0
 url=https://github.com/foryVERX/Overwatch-Server-Selector/releases/download/Overwatch2ServerSelectorV5.0.0/MINA.Overwatch.2.Server.Blocker.v5.0.0.exe
