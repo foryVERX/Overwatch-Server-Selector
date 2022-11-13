@@ -1,23 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="75076f97-c39e-4403-8642-fa598ad02966" name="Changes" comment="Update v5.0.0">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.img/ow2/BLOCK_MIDDLE_EAST.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.img/ow2/DESKTOP_ICON.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.img/ow2/Donation_Button.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.img/ow2/Frame 1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.img/ow2/LOGO_SMALL_APPLICATION.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.img/ow2/play_on_australia.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.img/ow2/play_on_eu.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.img/ow2/play_on_na_east.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.img/ow2/play_on_na_west.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.img/ow2/unblock_all.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/LOGO_SMALL_APPLICATION.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/img2byte.py" beforeDir="false" afterPath="$PROJECT_DIR$/img2byte.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/main.exe" beforeDir="false" />
-    </list>
+    <list default="true" id="75076f97-c39e-4403-8642-fa598ad02966" name="Changes" comment="added versions" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -374,7 +358,21 @@
       <option name="project" value="LOCAL" />
       <updated>1668172714829</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="fixed a bug where custom config is not changing perfectly">
+      <created>1668346362926</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1668346362926</updated>
+    </task>
+    <task id="LOCAL-00028" summary="added versions">
+      <created>1668346438511</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1668346438511</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -410,6 +408,8 @@
     <MESSAGE value="Fixed command length was too long for CMD" />
     <MESSAGE value="Rule block was not collecting all ip ranges, lost in for loops" />
     <MESSAGE value="Update v5.0.0" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update v5.0.0" />
+    <MESSAGE value="fixed a bug where custom config is not changing perfectly" />
+    <MESSAGE value="added versions" />
+    <option name="LAST_COMMIT_MESSAGE" value="added versions" />
   </component>
 </project>
