@@ -21,6 +21,8 @@ import datetime
 from urllib3 import Retry
 from requests.adapters import HTTPAdapter
 
+__version__ = '5.1.0'
+
 # Create window object
 app = Tk()
 # Set Properties
@@ -139,15 +141,6 @@ logging.basicConfig(
 
 
 # Functions
-def iconMaker():  # Used to check if there is an icon in the same directory or not it will create the icon if not.
-    if exists("LOGO_SMALL_APPLICATION.ico"):
-        app.iconbitmap("LOGO_SMALL_APPLICATION.ico")
-    else:
-        icon = Image.open(image_data_SMALL_APPLICATION)
-        icon.save("LOGO_SMALL_APPLICATION.ico")
-        app.iconbitmap("LOGO_SMALL_APPLICATION.ico")
-
-
 def check_admin():
     if ctypes.windll.shell32.IsUserAnAdmin() == 0:
         adminLabel.config(text='Restart(run as administrator)', bg='#282828', fg='#ef2626', font=futrabook_font)
@@ -157,71 +150,6 @@ def check_admin():
         logging.info("USER IS ADMIN")
 
 
-def ipSorter():  # Store ip ranges from Ip_ranges_....txt into Ip_ranges dictionary
-    global sorter_initialization
-    userConfigSorter()
-    if exists(localappdata_path) and exists(ip_version_path):  # If those paths exists it means user updated
-        logging.info(localappdata_path + ' FOUND')
-        logging.info(ip_version_path + ' FOUND')
-        controlButtons('disabled')
-        servers_files = listdir(localappdata_path)
-        for server in servers_files:
-            if server.startswith("Ip_ranges"):
-                blockingConfig(path.splitext(server)[0])
-                server_path = localappdata_path + '\\' + server
-                with open(server_path, "r") as reader:
-                    temp_list = []
-                    for line in reader.readlines():
-                        line = line.strip('\n')
-                        if len(line) > 5:
-                            temp_list.append(line)
-                            temp_list.append(',')
-                    Ip_ranges_dic[server] = temp_list
-        update_text = "UPDATED"
-        app.after(250, internetLabel.config(text=update_text, fg='#26ef4c'))
-        sorter_initialization = True
-        logging.info("IP LIST SORTED")
-    else:  # User running first time
-        checkUpdate()
-    controlButtons('normal')
-
-
-def userConfigSorter():
-    global customConfig
-    customConfig.clear()
-    if exists(customConfig_path):  # Handle custom config created by user
-        logging.debug(customConfig_path + "FOUND")
-        with open(customConfig_path, "r") as filenames:
-            for line in filenames.readlines():
-                line = line.strip('\n')
-                if len(line) > 0:
-                    if exists(localappdata_path + "\\" + line):
-                        with open(localappdata_path + "\\" + line, "r") as reader:
-                            for ip_range in reader.readlines():
-                                ip_range = ip_range.strip('\n')
-                                if len(ip_range) > 0:
-                                    customConfig.append(ip_range)
-                                    customConfig.append(',')
-
-
-def controlButtons(command):  # 'disabled' or 'normal' buttons
-    PlayMEButton['state'] = command
-
-    ProgrammableButton['state'] = command
-
-    PlayEUButton['state'] = command
-
-    PlayNAWESTButton['state'] = command
-
-    PlayNAEASTButton['state'] = command
-
-    PlayAustraliaButton['state'] = command
-
-    ClearBlocksButton['state'] = command
-
-    DonationButton['state'] = command
-
-
 def is_connect():
     global internetConnection, internet_initialization
     try:
@@ -229,32 +157,6 @@ def is_connect():
         internetConnection = True
     except OSError:
         internetConnection = False
-
-
-def request_raw_file(url, msg_fail, s):
-    try:
-        # user-agent is just to trick the website that you are using a browser
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0"
-        }
-        r = s.get(url, headers=headers).content.decode('utf-8')
-    except requests.exceptions.RequestException as e:  # This is the correct syntax
-        logging.debug('URL REQUEST FAIL RETRYING: ' + url)
-        logging.debug(str(e))
-        raise SystemExit(e)
-    return r
-
-
-def createTextFile(file_name, contents, progressbar=False):
-    # Contents can be a string or a list of strings must end with \n except last element in the list
-    with open(localappdata_path + '\\' + file_name + '.txt', "w") as text_file:
-        if isinstance(contents, list):
-            text_file.writelines(contents)
-        else:
-            text_file.write(contents)
-    if progressbar:
-        progressBar.place(x=185, y=520)
-        progressBar['value'] += 10
 
 
 def updateIp():
@@ -304,7 +206,7 @@ def updateIp():
         internetLabel.config(text=update_text, fg='#ddee4a')
 
 
-def checkUpdate():  # A function called at the start of the program to check for update
+def check_ip_update():  # A function called at the start of the program to check for update
     global isUpdated, updating_state, checkForUpdate_initialization
     if updating_state:
         return
@@ -348,13 +250,117 @@ def checkUpdate():  # A function called at the start of the program to check for
             controlButtons('disabled')
             update_text = "CONNECTION FAILED... Trying to update"
             app.after(250, internetLabel.config(text=update_text, fg='#ef2626'))
-            app.after(1000, checkUpdate)
+            app.after(1000, check_ip_update)
         else:
             update_text = "NO INTERNET MIGHT BE NOT LATEST IP LIST VERSION"
             app.after(250, internetLabel.config(text=update_text, fg='#ddee4a'))
     updating_state = False
     # if thread_type == 'mainThread':  # If the function is called from main thread call it again after 5 mints
     # app.after(5000 * 60, checkUpdate)
+
+
+def check_version_update():
+    pass
+
+
+def request_raw_file(url, msg_fail, s):
+    try:
+        # user-agent is just to trick the website that you are using a browser
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0"
+        }
+        r = s.get(url, headers=headers).content.decode('utf-8')
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        logging.debug('URL REQUEST FAIL RETRYING: ' + url)
+        logging.debug(str(e))
+        raise SystemExit(e)
+    return r
+
+
+def createTextFile(file_name, contents, progressbar=False):
+    # Contents can be a string or a list of strings must end with \n except last element in the list
+    with open(localappdata_path + '\\' + file_name + '.txt', "w") as text_file:
+        if isinstance(contents, list):
+            text_file.writelines(contents)
+        else:
+            text_file.write(contents)
+    if progressbar:
+        progressBar.place(x=185, y=520)
+        progressBar['value'] += 10
+
+
+def ipSorter():  # Store ip ranges from Ip_ranges_....txt into Ip_ranges dictionary
+    global sorter_initialization
+    userConfigSorter()
+    if exists(localappdata_path) and exists(ip_version_path):  # If those paths exists it means user updated
+        logging.info(localappdata_path + ' FOUND')
+        logging.info(ip_version_path + ' FOUND')
+        controlButtons('disabled')
+        servers_files = listdir(localappdata_path)
+        for server in servers_files:
+            if server.startswith("Ip_ranges"):
+                blockingConfig(path.splitext(server)[0])
+                server_path = localappdata_path + '\\' + server
+                with open(server_path, "r") as reader:
+                    temp_list = []
+                    for line in reader.readlines():
+                        line = line.strip('\n')
+                        if len(line) > 5:
+                            temp_list.append(line)
+                            temp_list.append(',')
+                    Ip_ranges_dic[server] = temp_list
+        update_text = "UPDATED"
+        app.after(250, internetLabel.config(text=update_text, fg='#26ef4c'))
+        sorter_initialization = True
+        logging.info("IP LIST SORTED")
+    else:  # User running first time
+        check_ip_update()
+    controlButtons('normal')
+
+
+def userConfigSorter():
+    global customConfig
+    customConfig.clear()
+    if exists(customConfig_path):  # Handle custom config created by user
+        logging.debug(customConfig_path + "FOUND")
+        with open(customConfig_path, "r") as filenames:
+            for line in filenames.readlines():
+                line = line.strip('\n')
+                if len(line) > 0:
+                    if exists(localappdata_path + "\\" + line):
+                        with open(localappdata_path + "\\" + line, "r") as reader:
+                            for ip_range in reader.readlines():
+                                ip_range = ip_range.strip('\n')
+                                if len(ip_range) > 0:
+                                    customConfig.append(ip_range)
+                                    customConfig.append(',')
+
+
+def iconMaker():  # Used to check if there is an icon in the same directory or not it will create the icon if not.
+    if exists("LOGO_SMALL_APPLICATION.ico"):
+        app.iconbitmap("LOGO_SMALL_APPLICATION.ico")
+    else:
+        icon = Image.open(image_data_SMALL_APPLICATION)
+        icon.save("LOGO_SMALL_APPLICATION.ico")
+        app.iconbitmap("LOGO_SMALL_APPLICATION.ico")
+
+
+def controlButtons(command):  # 'disabled' or 'normal' buttons
+    PlayMEButton['state'] = command
+
+    ProgrammableButton['state'] = command
+
+    PlayEUButton['state'] = command
+
+    PlayNAWESTButton['state'] = command
+
+    PlayNAEASTButton['state'] = command
+
+    PlayAustraliaButton['state'] = command
+
+    ClearBlocksButton['state'] = command
+
+    DonationButton['state'] = command
 
 
 def ruleMakerBlock(server_exception, np_ips, block_exception=True, rule_name='@Overwatch Block'):
@@ -552,11 +558,6 @@ def blockingConfig(server_name):
                         blockingConfigDic[server_name] = temp_block_config_list
 
 
-def blockALL():  # This function is for testing reasons only DO NOT USE.
-    unblockALL()
-    blockingLabel.config(text='ALL BLOCKED', fg='#ef2626')
-
-
 def customSettingsWindow():
     global ip_ranges_files, ip_range_checkboxes, top
     savedSettings = []
@@ -617,14 +618,17 @@ def resetCustomSettings():
 
 def apply():
     global customIpRanges
+    customIpRanges.clear()
     for IP_NAME in ip_ranges_files:
         if ip_range_checkboxes[IP_NAME].get() == 1:
+            print("Server: ", IP_NAME, " Checkbox state: ", str(ip_range_checkboxes[IP_NAME].get()))
             if IP_NAME not in customIpRanges:
                 customIpRanges.append(IP_NAME)
     with open(localappdata_path + '\\customConfig.txt', 'w') as fp:
         for item in customIpRanges:
             # write each item on a new line
             fp.write("%s\n" % item)
+    print(customIpRanges)
     userConfigSorter()
     top.destroy()
 
@@ -632,6 +636,11 @@ def apply():
 def openListFolder():
     if exists(localappdata_path):
         startfile(localappdata_path)
+
+
+def blockALL():  # This function is for testing reasons only DO NOT USE.
+    unblockALL()
+    blockingLabel.config(text='ALL BLOCKED', fg='#ef2626')
 
 
 def blockMEServer():  # It removes any rules added by blockserver function
@@ -706,7 +715,7 @@ app.config(menu=menu)
 options_menu = Menu(menu)
 menu.add_cascade(label="Options", menu=options_menu)
 options_menu.add_command(label="Open config folder", command=openListFolder)
-options_menu.add_command(label="Check for updates", command=checkUpdate)
+options_menu.add_command(label="Check for updates", command=check_ip_update)
 options_menu.add_command(label="Exit", command=app.quit)
 
 # Labels
@@ -777,8 +786,7 @@ check_admin()
 ipSorter_thread = threading.Thread(target=ipSorter, daemon=True).start()  # Follow main thread
 
 checkIfActive_thread = threading.Thread(target=checkIfActive, daemon=True).start()  # Follow main thread
-checkUpdate.thread = threading.Thread(target=checkUpdate, daemon=True).start()  # Follow main thread
-
+check_ip_update.thread = threading.Thread(target=check_ip_update, daemon=True).start()  # Follow main thread
 
 if checkOptions():
     tunnelCheckBox.select()

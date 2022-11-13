@@ -1,16 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="75076f97-c39e-4403-8642-fa598ad02966" name="Changes" comment="added ip lists">
+    <list default="true" id="75076f97-c39e-4403-8642-fa598ad02966" name="Changes" comment="Update v5.0.0">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pipfile" beforeDir="false" afterPath="$PROJECT_DIR$/Pipfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Pipfile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Pipfile.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.img/ow2/BLOCK_MIDDLE_EAST.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.img/ow2/DESKTOP_ICON.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.img/ow2/Donation_Button.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.img/ow2/Frame 1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.img/ow2/LOGO_SMALL_APPLICATION.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.img/ow2/play_on_australia.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.img/ow2/play_on_eu.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.img/ow2/play_on_na_east.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.img/ow2/play_on_na_west.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.img/ow2/unblock_all.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LOGO_SMALL_APPLICATION.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/img2byte.py" beforeDir="false" afterPath="$PROJECT_DIR$/img2byte.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/main.exe" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Rebase.Settings">
+    <option name="NEW_BASE" value="main" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -23,13 +44,13 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "D:/Google Drive/Programing Projects/Overwatch-Server-Selector-1"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Google Drive/Programing Projects/Overwatch-Server-Selector-1&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Google Drive\Programing Projects\Overwatch-Server-Selector-1" />
@@ -61,7 +82,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="IP_sorter" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="img2byte" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Overwatch-Server-Selector-1" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -69,11 +90,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../TkinterOverwatch/Overwatch-Server-Selector" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../TkinterOverwatch/Overwatch-Server-Selector/IP_sorter.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/img2byte.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -103,11 +124,62 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Overwatch-Server-Selector-1" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="testing" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Overwatch-Server-Selector-1" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/testing.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.test" />
+      <item itemvalue="Python.img2byte" />
+      <item itemvalue="Python.IP_sorter (1)" />
+      <item itemvalue="Python.main" />
+      <item itemvalue="Python.testing" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.test" />
+        <item itemvalue="Python.img2byte" />
+        <item itemvalue="Python.testing" />
         <item itemvalue="Python.IP_sorter (1)" />
-        <item itemvalue="Python.IP_sorter" />
       </list>
     </recent_temporary>
   </component>
@@ -141,7 +213,168 @@
       <option name="project" value="LOCAL" />
       <updated>1666564356173</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="So many things">
+      <created>1666651355927</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1666651355927</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Now check for update on launch and each 5 mints. Before it checks each some seconds. Which fixes random crashes since tkinter not threads safe. In addition to code clean up (garbage stuff).">
+      <created>1666681425334</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1666681425334</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Added following functions.&#10;&#10;added tunnelCheckBox allow user to only affecting overwatch when blocking&#10;tunnel() handles option if blocking is only affecting the game or whole system.&#10;checkOptions() check what was the last choice of user">
+      <created>1666735079996</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1666735079996</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Fix lots of things kinda lazy to say them">
+      <created>1666870443560</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1666870443560</updated>
+    </task>
+    <task id="LOCAL-00008" summary="made blocking config to allow configuring rules blocking remotely">
+      <created>1666912955441</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1666912955441</updated>
+    </task>
+    <task id="LOCAL-00009" summary="fixed update bug">
+      <created>1666914318280</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1666914318280</updated>
+    </task>
+    <task id="LOCAL-00010" summary="fixed crashes and ipSort faults">
+      <created>1666928038067</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1666928038067</updated>
+    </task>
+    <task id="LOCAL-00011" summary="label stuff">
+      <created>1666928544597</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1666928544597</updated>
+    </task>
+    <task id="LOCAL-00012" summary="label stuff">
+      <created>1666928655329</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1666928655329</updated>
+    </task>
+    <task id="LOCAL-00013" summary="replaced Popen with subprocess.run">
+      <created>1666930523290</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1666930523290</updated>
+    </task>
+    <task id="LOCAL-00014" summary="disabled buttons when blocking until finished">
+      <created>1666930800011</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1666930800011</updated>
+    </task>
+    <task id="LOCAL-00015" summary="missed a line">
+      <created>1666930925121</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1666930925121</updated>
+    </task>
+    <task id="LOCAL-00016" summary="blockME fixed">
+      <created>1667016732797</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1667016732797</updated>
+    </task>
+    <task id="LOCAL-00017" summary="fixed only affect overwatch">
+      <created>1667055565243</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1667055565243</updated>
+    </task>
+    <task id="LOCAL-00018" summary="fixed only affect overwatch">
+      <created>1667062737126</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1667062737126</updated>
+    </task>
+    <task id="LOCAL-00019" summary="IP SYNC">
+      <created>1667063444749</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1667063444749</updated>
+    </task>
+    <task id="LOCAL-00020" summary="adjusted packages, test.">
+      <created>1667067719186</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1667067719186</updated>
+    </task>
+    <task id="LOCAL-00021" summary="adjusted packages, test.">
+      <created>1667067762834</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1667067762834</updated>
+    </task>
+    <task id="LOCAL-00022" summary="Parsing commands fixed, some servers didn't get blocked">
+      <created>1667116930363</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1667116930363</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Fixed command length was too long for CMD">
+      <created>1667286307903</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1667286307903</updated>
+    </task>
+    <task id="LOCAL-00024" summary="Fixed command length was too long for CMD">
+      <created>1667286335914</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1667286335914</updated>
+    </task>
+    <task id="LOCAL-00025" summary="Rule block was not collecting all ip ranges, lost in for loops">
+      <created>1667310229558</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1667310229558</updated>
+    </task>
+    <task id="LOCAL-00026" summary="Update v5.0.0">
+      <created>1668172714829</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1668172714829</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -158,6 +391,25 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Created ip_lists directory" />
     <MESSAGE value="added ip lists" />
-    <option name="LAST_COMMIT_MESSAGE" value="added ip lists" />
+    <MESSAGE value="So many things" />
+    <MESSAGE value="Now check for update on launch and each 5 mints. Before it checks each some seconds. Which fixes random crashes since tkinter not threads safe. In addition to code clean up (garbage stuff)." />
+    <MESSAGE value="Added following functions.&#10;&#10;added tunnelCheckBox allow user to only affecting overwatch when blocking&#10;tunnel() handles option if blocking is only affecting the game or whole system.&#10;checkOptions() check what was the last choice of user" />
+    <MESSAGE value="Fix lots of things kinda lazy to say them" />
+    <MESSAGE value="made blocking config to allow configuring rules blocking remotely" />
+    <MESSAGE value="fixed update bug" />
+    <MESSAGE value="fixed crashes and ipSort faults" />
+    <MESSAGE value="label stuff" />
+    <MESSAGE value="replaced Popen with subprocess.run" />
+    <MESSAGE value="disabled buttons when blocking until finished" />
+    <MESSAGE value="missed a line" />
+    <MESSAGE value="blockME fixed" />
+    <MESSAGE value="fixed only affect overwatch" />
+    <MESSAGE value="IP SYNC" />
+    <MESSAGE value="adjusted packages, test." />
+    <MESSAGE value="Parsing commands fixed, some servers didn't get blocked" />
+    <MESSAGE value="Fixed command length was too long for CMD" />
+    <MESSAGE value="Rule block was not collecting all ip ranges, lost in for loops" />
+    <MESSAGE value="Update v5.0.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update v5.0.0" />
   </component>
 </project>
