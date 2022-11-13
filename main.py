@@ -1,10 +1,8 @@
-import time
 from tkinter import *
 from tkinter.font import Font
 from tkinter import ttk, filedialog
 import win32com.shell.shell as shell
-from subprocess import run, call
-import subprocess
+from subprocess import run
 from PIL import ImageTk, Image
 from io import BytesIO
 import pic2str
