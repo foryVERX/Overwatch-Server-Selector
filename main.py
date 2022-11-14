@@ -148,12 +148,12 @@ FIREWALL_DIRECTION_IN = 1
 FIREWALL_DIRECTION_OUT = 2
 
 # https://stackoverflow.com/a/27966218
-# DO NOT PAS TO OTHER THREADS
+# DO NOT PASS TO OTHER THREADS
 def dispatchFirewall():
     CoInitialize()
     return DispatchCOMObject("HNetCfg.FwPolicy2")
 
-# DO NOT PAS TO OTHER THREADS
+# DO NOT PASS TO OTHER THREADS
 def dispatchFirewallRule():
     CoInitialize()
     return DispatchCOMObject("HNetCfg.FWRule")
