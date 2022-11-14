@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter.font import Font
 from tkinter import ttk, filedialog
+import win32com.shell.shell as shell
 from win32com.client import Dispatch as DispatchCOMObject
 from pythoncom import CoInitialize
 from itertools import groupby
@@ -110,6 +111,9 @@ Ip_ranges_AS_Japan_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-S
 Ip_ranges_Australia_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_Australia.txt'
 Ip_ranges_Brazil_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_Brazil.txt'
 BlockingConfig_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/BlockingConfig.txt'
+
+DEFAULT_BLOCK_NAME = "_Overwatch Block"
+DEFAULT_GROUPING_NAME = "_MINA Overwatch 2-Server-Selector"
 
 updating_state = False
 internet_initialization = False
@@ -395,7 +399,7 @@ def controlButtons(command):  # 'disabled' or 'normal' buttons
     DonationButton['state'] = command
 
 
-def blockServers(server_exception, block_exception=True, rule_name='_Overwatch Block', rule_grouping='@Overwatch Block'):
+def blockServers(server_exception, block_exception=True, rule_name=DEFAULT_BLOCK_NAME, rule_grouping=DEFAULT_GROUPING_NAME):
     # Used to block IP range
     # server_exception is the only server to not block can be a list or string
     # If block_exception set to false then the server_exception is blocked ONLY
@@ -464,6 +468,19 @@ def deleteRuleGrouping(rule_grouping):
 
     ruleNamesToDelete = [rule.Name for rule in firewall.Rules if rule.Grouping in rule_grouping]
     deleteRule(ruleNamesToDelete)
+
+def checkForAndDeleteLegacyRules():
+    legacyRuleNames = ["@NAEAST_OW_SERVER_BLOCKER", "@EU_OW_SERVER_BLOCKER", "@ME_OW_SERVER_BLOCKER",
+                       "@NAWEST1_OW_SERVER_BLOCKER", "@AU_OW_SERVER_BLOCKER", "@NAWEST2_OW_SERVER_BLOCKER",
+                       "@Overwatch Block", "@NAWEST_OW_SERVER_BLOCKER", "@Australia_OW_SERVER_BLOCKER", "@CUSTOM_BLOCK"]
+    firewall = dispatchFirewall()
+    ruleNamesToDelete = [rule.Name for rule in firewall.Rules if rule.Name in legacyRuleNames]
+    if len(ruleNamesToDelete) > 0:
+        logging.info(f"DELETING RULES: {str(ruleNamesToDelete)}")
+        for ruleName in ruleNamesToDelete:
+            commands = f'advfirewall firewall delete rule name = "{ruleName}"'
+            shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
+        
 
 
 def checkIfActive():  # To check if server is blocked or not
@@ -641,7 +658,7 @@ def blockALL():  # This function is for testing reasons only DO NOT USE.
 def blockMEServer():  # It removes any rules added by blockserver function
     unblockALL()
     blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
-    addNewRuleToFirewall("_ME_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping='@Overwatch Block')
+    addNewRuleToFirewall("_ME_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping=DEFAULT_GROUPING_NAME)
     threading.Thread(target=blockServers, args=(blockingConfigDic['Ip_ranges_ME'],),
                      daemon=True, kwargs={'block_exception': False}).start()  # Follow main thread
 
@@ -649,7 +666,7 @@ def blockMEServer():  # It removes any rules added by blockserver function
 def PlayAustralia_server():
     unblockALL()
     blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
-    addNewRuleToFirewall("_Australia_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping='@Overwatch Block')
+    addNewRuleToFirewall("_Australia_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping=DEFAULT_GROUPING_NAME)
     threading.Thread(target=blockServers, args=(blockingConfigDic['Ip_ranges_Australia'],),
                      daemon=True).start()  # Follow main thread
 
@@ -657,7 +674,7 @@ def PlayAustralia_server():
 def playNAEast_server():
     unblockALL()
     blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
-    addNewRuleToFirewall("_NAEAST_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping='@Overwatch Block')
+    addNewRuleToFirewall("_NAEAST_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping=DEFAULT_GROUPING_NAME)
     threading.Thread(target=blockServers, args=(blockingConfigDic['Ip_ranges_NA_East'],),
                      daemon=True).start()  # Follow main thread
 
@@ -665,7 +682,7 @@ def playNAEast_server():
 def playNAWest_server():
     unblockALL()
     blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
-    addNewRuleToFirewall("_NAWEST_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping='@Overwatch Block')
+    addNewRuleToFirewall("_NAWEST_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping=DEFAULT_GROUPING_NAME)
     threading.Thread(target=blockServers, args=(blockingConfigDic['Ip_ranges_NA_West'],),
                      daemon=True).start()  # Follow main thread
 
@@ -673,7 +690,7 @@ def playNAWest_server():
 def playEU_server():
     unblockALL()
     blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
-    addNewRuleToFirewall("_EU_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping='@Overwatch Block')
+    addNewRuleToFirewall("_EU_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping=DEFAULT_GROUPING_NAME)
     threading.Thread(target=blockServers, args=(blockingConfigDic['Ip_ranges_EU'],),
                      daemon=True).start()  # Follow main thread
 
@@ -681,14 +698,15 @@ def playEU_server():
 def programmableConfig():
     if len(customConfig) >= 1:
         unblockALL()
-        addNewRuleToFirewall("_CUSTOM_BLOCK", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping='@Overwatch Block')
-        blockIpRanges(customConfig, rule_name='_Overwatch Block', rule_grouping='@Overwatch Block')
+        addNewRuleToFirewall("_CUSTOM_BLOCK", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping=DEFAULT_GROUPING_NAME)
+        blockIpRanges(customConfig, rule_name=DEFAULT_BLOCK_NAME, rule_grouping=DEFAULT_GROUPING_NAME)
         blockingLabel.config(text="CUSTOM BLOCK", bg='#282828', fg='#26ef4c', font=futrabook_font)
 
 
 def unblockALL():
     blockingLabel.config(text='ALL UNBLOCKED (DEFAULT SETTINGS)', fg='#ddee4a')
-    deleteRuleGrouping('@Overwatch Block')
+    checkForAndDeleteLegacyRules()
+    deleteRuleGrouping(DEFAULT_GROUPING_NAME)
 
 
 def donationPage():
