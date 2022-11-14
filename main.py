@@ -151,31 +151,36 @@ FIREWALL_ACTION_ALLOW = 1
 FIREWALL_DIRECTION_IN = 1
 FIREWALL_DIRECTION_OUT = 2
 
+
 # https://stackoverflow.com/a/27966218
 # DO NOT PASS TO OTHER THREADS
 def dispatchFirewall():
     CoInitialize()
     return DispatchCOMObject("HNetCfg.FwPolicy2")
 
+
 # DO NOT PASS TO OTHER THREADS
 def dispatchFirewallRule():
     CoInitialize()
     return DispatchCOMObject("HNetCfg.FWRule")
 
-def addNewRuleToFirewall(name, direction, action, remoteAddresses = None , applicationName = None, grouping = None, enabled = True):
+
+def addNewRuleToFirewall(name, direction, action, remoteAddresses=None, applicationName=None, grouping=None,
+                         enabled=True):
     firewall = dispatchFirewall()
     rule = dispatchFirewallRule()
     rule.Name = name
     if remoteAddresses is not None:
         rule.RemoteAddresses = remoteAddresses
-    rule.Direction = direction # Outgoing
-    rule.Action = action # Block
+    rule.Direction = direction  # Outgoing
+    rule.Action = action  # Block
     if applicationName is not None:
         rule.ApplicationName = applicationName
     if grouping is not None:
         rule.Grouping = grouping
     rule.enabled = enabled
     firewall.Rules.Add(rule)
+
 
 # Functions
 def check_admin():
@@ -333,6 +338,7 @@ def readIpRangesByFilename(fileName):
         ipLinesNonZeroLen = filter(lambda line: len(line) > 0, ipLinesStriped)
         return list(ipLinesNonZeroLen)
 
+
 def loadIpRanges():  # Store ip ranges from Ip_ranges_....txt into Ip_ranges dictionary
     global Ip_ranges_dic, sorter_initialization
     loadUserConfig()
@@ -343,8 +349,9 @@ def loadIpRanges():  # Store ip ranges from Ip_ranges_....txt into Ip_ranges dic
         controlButtons('disabled')
         appDataFilenames = listdir(localappdata_path)
         ipRangesFilenames = filter(lambda server: server.startswith("Ip_ranges"), appDataFilenames)
-        Ip_ranges_dic = {path.splitext(ipRangesFilename)[0]: readIpRangesByFilename(ipRangesFilename) for ipRangesFilename in ipRangesFilenames}
-            
+        Ip_ranges_dic = {path.splitext(ipRangesFilename)[0]: readIpRangesByFilename(ipRangesFilename) for
+                         ipRangesFilename in ipRangesFilenames}
+
         update_text = "UPDATED"
         app.after(250, internetLabel.config(text=update_text, fg='#26ef4c'))
         sorter_initialization = True
@@ -399,19 +406,21 @@ def controlButtons(command):  # 'disabled' or 'normal' buttons
     DonationButton['state'] = command
 
 
-def blockServers(server_exception, block_exception=True, rule_name=DEFAULT_BLOCK_NAME, rule_grouping=DEFAULT_GROUPING_NAME):
+def blockServers(server_exception, block_exception=True, rule_name=DEFAULT_BLOCK_NAME,
+                 rule_grouping=DEFAULT_GROUPING_NAME):
     # Used to block IP range
     # server_exception is the only server to not block can be a list or string
     # If block_exception set to false then the server_exception is blocked ONLY
     controlButtons('disabled')
     serversToBlock = Ip_ranges_dic
-    
+
     if not block_exception:
         serverBlockFilter = lambda serverName: serverName in str(server_exception)
     else:
         serverBlockFilter = lambda serverName: serverName not in str(server_exception)
 
-    serversToBlock = {serverName: ipRanges for serverName, ipRanges in serversToBlock.items() if serverBlockFilter(serverName)}
+    serversToBlock = {serverName: ipRanges for serverName, ipRanges in serversToBlock.items() if
+                      serverBlockFilter(serverName)}
     # [ item for key, list in dictionaryoflists for item in list] https://stackoverflow.com/q/1077015
     ipRangesToBlock = [ipRange for serverName, ipRanges in serversToBlock.items() for ipRange in ipRanges]
 
@@ -422,29 +431,32 @@ def blockServers(server_exception, block_exception=True, rule_name=DEFAULT_BLOCK
     controlButtons('normal')
 
 
-
 def blockIpRanges(ip_list, rule_name, rule_grouping):
     # A Windows Firewall Rule supports blocking unique 10_000 IP range entries. (Tested on Windows 8.1 and Windows 10)
-    
+
     applicationName = overwatch_path if tunnel_option else None
 
     if (len(ip_list) <= 10_000):
         ipRangesString = ','.join(ip_list)
-        addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_IN, FIREWALL_ACTION_BLOCK, ipRangesString, applicationName, rule_grouping)
-        addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, ipRangesString, applicationName, rule_grouping)
+        addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_IN, FIREWALL_ACTION_BLOCK, ipRangesString, applicationName,
+                             rule_grouping)
+        addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, ipRangesString, applicationName,
+                             rule_grouping)
         logging.info(f'Made rules "{rule_name} for IN/OUT"')
     else:
         indexedIpRangeList = list(enumerate(ip_list))
-        ipRangesGrouped = groupby(indexedIpRangeList, key=lambda item: item[0] // 10_000) # Make 10_000 chunks
+        ipRangesGrouped = groupby(indexedIpRangeList, key=lambda item: item[0] // 10_000)  # Make 10_000 chunks
         ipRangesGroupedDict = {k: [x[1] for x in v] for k, v in ipRangesGrouped}
         ipRangesStringChunks = {key: ','.join(data) for (key, data) in ipRangesGroupedDict.items()}
-        
+
         for chunkNum, ipStringChunk in ipRangesStringChunks.items():
             if chunkNum > 0:
                 rule_name = f'{rule_name} {chunkNum}'
-                
-            addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_IN, FIREWALL_ACTION_BLOCK, ipStringChunk, applicationName, rule_grouping)
-            addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, ipStringChunk, applicationName, rule_grouping)
+
+            addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_IN, FIREWALL_ACTION_BLOCK, ipStringChunk,
+                                 applicationName, rule_grouping)
+            addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, ipStringChunk,
+                                 applicationName, rule_grouping)
             logging.info(f'Made rules "{rule_name} for IN/OUT"')
 
 
@@ -453,21 +465,22 @@ def deleteRule(rule_name):  # Delete rule by exact name, name must be a string '
     # Ensure its a list
     if type(rule_name) != list:
         rule_name = [rule_name]
-    
     for name in rule_name:
         firewall = dispatchFirewall()
         firewall.Rules.Remove(name)
+
 
 def deleteRuleGrouping(rule_grouping):
     logging.info("DELETING RULE GROUPINGS: " + str(rule_grouping))
     # Ensure its a list
     if type(rule_grouping) != list:
         rule_grouping = [rule_grouping]
-    
+
     firewall = dispatchFirewall()
 
     ruleNamesToDelete = [rule.Name for rule in firewall.Rules if rule.Grouping in rule_grouping]
     deleteRule(ruleNamesToDelete)
+
 
 def checkForAndDeleteLegacyRules():
     legacyRuleNames = ["@NAEAST_OW_SERVER_BLOCKER", "@EU_OW_SERVER_BLOCKER", "@ME_OW_SERVER_BLOCKER",
@@ -480,7 +493,6 @@ def checkForAndDeleteLegacyRules():
         for ruleName in ruleNamesToDelete:
             commands = f'advfirewall firewall delete rule name = "{ruleName}"'
             shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
-        
 
 
 def checkIfActive():  # To check if server is blocked or not
@@ -489,7 +501,6 @@ def checkIfActive():  # To check if server is blocked or not
                                 "_CUSTOM_BLOCK"]
     firewall = dispatchFirewall()
     rules = [x.Name for x in firewall.Rules]
-    
     logging.info("CHECKING IF PREVIOUS RULE IS ACTIVE")
     for rule_name in servers_active_rule_list:
         if rule_name in rules:
@@ -623,6 +634,7 @@ def customSettingsWindow():
 
 
 def resetCustomSettings():
+    customConfig.clear()
     if exists(customConfig_path):
         remove(customConfig_path)
     top.destroy()
@@ -655,10 +667,11 @@ def blockALL():  # This function is for testing reasons only DO NOT USE.
     blockingLabel.config(text='ALL BLOCKED', fg='#ef2626')
 
 
-def blockMEServer():  # It removes any rules added by blockserver function
+def blockMEServer():  # It removes any rules added by block server function
     unblockALL()
     blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
-    addNewRuleToFirewall("_ME_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping=DEFAULT_GROUPING_NAME)
+    addNewRuleToFirewall("_ME_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False,
+                         grouping=DEFAULT_GROUPING_NAME)
     threading.Thread(target=blockServers, args=(blockingConfigDic['Ip_ranges_ME'],),
                      daemon=True, kwargs={'block_exception': False}).start()  # Follow main thread
 
@@ -666,7 +679,8 @@ def blockMEServer():  # It removes any rules added by blockserver function
 def PlayAustralia_server():
     unblockALL()
     blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
-    addNewRuleToFirewall("_Australia_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping=DEFAULT_GROUPING_NAME)
+    addNewRuleToFirewall("_Australia_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False,
+                         grouping=DEFAULT_GROUPING_NAME)
     threading.Thread(target=blockServers, args=(blockingConfigDic['Ip_ranges_Australia'],),
                      daemon=True).start()  # Follow main thread
 
@@ -674,7 +688,8 @@ def PlayAustralia_server():
 def playNAEast_server():
     unblockALL()
     blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
-    addNewRuleToFirewall("_NAEAST_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping=DEFAULT_GROUPING_NAME)
+    addNewRuleToFirewall("_NAEAST_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False,
+                         grouping=DEFAULT_GROUPING_NAME)
     threading.Thread(target=blockServers, args=(blockingConfigDic['Ip_ranges_NA_East'],),
                      daemon=True).start()  # Follow main thread
 
@@ -682,7 +697,8 @@ def playNAEast_server():
 def playNAWest_server():
     unblockALL()
     blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
-    addNewRuleToFirewall("_NAWEST_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping=DEFAULT_GROUPING_NAME)
+    addNewRuleToFirewall("_NAWEST_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False,
+                         grouping=DEFAULT_GROUPING_NAME)
     threading.Thread(target=blockServers, args=(blockingConfigDic['Ip_ranges_NA_West'],),
                      daemon=True).start()  # Follow main thread
 
@@ -690,7 +706,8 @@ def playNAWest_server():
 def playEU_server():
     unblockALL()
     blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
-    addNewRuleToFirewall("_EU_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping=DEFAULT_GROUPING_NAME)
+    addNewRuleToFirewall("_EU_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False,
+                         grouping=DEFAULT_GROUPING_NAME)
     threading.Thread(target=blockServers, args=(blockingConfigDic['Ip_ranges_EU'],),
                      daemon=True).start()  # Follow main thread
 
@@ -698,7 +715,8 @@ def playEU_server():
 def programmableConfig():
     if len(customConfig) >= 1:
         unblockALL()
-        addNewRuleToFirewall("_CUSTOM_BLOCK", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False, grouping=DEFAULT_GROUPING_NAME)
+        addNewRuleToFirewall("_CUSTOM_BLOCK", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False,
+                             grouping=DEFAULT_GROUPING_NAME)
         blockIpRanges(customConfig, rule_name=DEFAULT_BLOCK_NAME, rule_grouping=DEFAULT_GROUPING_NAME)
         blockingLabel.config(text="CUSTOM BLOCK", bg='#282828', fg='#26ef4c', font=futrabook_font)
 
@@ -784,11 +802,10 @@ tunnelCheckBox.place(x=175, y=460)
 
 # Start Program
 iconMaker()
-
 check_admin()
+checkForAndDeleteLegacyRules()
 
 ipSorter_thread = threading.Thread(target=loadIpRanges, daemon=True).start()  # Follow main thread
-
 checkIfActive_thread = threading.Thread(target=checkIfActive, daemon=True).start()  # Follow main thread
 check_ip_update.thread = threading.Thread(target=check_ip_update, daemon=True).start()  # Follow main thread
 
