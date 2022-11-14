@@ -14,8 +14,6 @@ A simple application that allows you to select the servers you want to play on!
 
 - If you want to convert the files to exe yourself without using my provided download, see the [Build section](#build) for a guide to do so. Requires you to have some previous experience with Python. 
 
-  
-
 ## Introduction
 
 The application simply works by blocking Overwatch 2 IP addresses using wf.msc (Firewall with Advance Security). To do this, the application needs to run as administrator. It uses Component Object Model (COM) API to directly add/remove the blocking rules. **The application does not read or write on game files or modify the network traffic of the game!**
@@ -32,8 +30,9 @@ EU players can, with this application, now play on NA servers. The problem is th
 
 NA players are also able to specify whether they prefer to play on NA East or NA West.
 
-
 # MINA OVERWATCH 2 SERVER SELECTOR V5.0
+
+![Screenshot of the application](ReadMeFiles/ServerSelectorScreenshot.PNG)
 
 * Supports
 	* Play on EU
@@ -42,10 +41,6 @@ NA players are also able to specify whether they prefer to play on NA East or NA
 	* Play on Australia
 * Updated servers to work on Overwatch 2
 * Added donation button for support ;)
-
-![Screenshot of the application](ReadMeFiles/ServerSelectorScreenshot.PNG)
-
-
 
 Please reach out if you want to help or have a question, discord: VERX#2227
 
