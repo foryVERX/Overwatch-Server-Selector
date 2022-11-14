@@ -1,9 +1,9 @@
 
 # MINA Overwatch 2 Server Selector
 [![Overwatch-Server-Selector](https://github.com/mr-gh-actions/Overwatch-Server-Selector/actions/workflows/main.yaml/badge.svg)](https://github.com/mr-gh-actions/Overwatch-Server-Selector/actions/workflows/main.yaml)
-
-<img src="ReadMeFiles\Logo.png" alt="Logo of the application" height="100" width="100">
-
+<p align="center">
+	<img src="ReadMeFiles/Logo.png" alt="Logo of the application" height="200" width="200">
+</p>
 A simple application that allows you to select the servers you want to play on!
 
 ## General Information
@@ -43,7 +43,7 @@ NA players are also able to specify whether they prefer to play on NA East or NA
 * Updated servers to work on Overwatch 2
 * Added donation button for support ;)
 
-![Screenshot of the application](ReadMeFiles\ServerSelectorScreenshot.PNG)
+![Screenshot of the application](ReadMeFiles/ServerSelectorScreenshot.PNG)
 
 
 
