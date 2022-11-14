@@ -1,44 +1,67 @@
-# MINA Overwatch 2-Server-Selector
+
+# MINA Overwatch 2 Server Selector
+[![Overwatch-Server-Selector](https://github.com/mr-gh-actions/Overwatch-Server-Selector/actions/workflows/main.yaml/badge.svg)](https://github.com/mr-gh-actions/Overwatch-Server-Selector/actions/workflows/main.yaml)
+<p align="center">
+	<img src="ReadMeFiles/Logo.png" alt="Logo of the application" height="200" width="200">
+</p>
+A simple application that allows you to select the servers you want to play on!
 
 ## General Information
-- DOWNLOAD LINK BELLOW OR USE RELEASE
-- If you want to convert the files to exe your self with out using my download link look at the last section. A guide for those who knows what to do.
 
-## Introduction 
-A simple program allows you to select the server you want to play on.
+- Download link in the Assets of [the latest release](https://github.com/foryVERX/Overwatch-Server-Selector/releases/latest).
 
-The program simply works by adding the block remote ip's rules to wf.msc (Firewall with Advance Security).
-Existing servers for example AU, EU, ME, NA-West, and NA-East.
-If ME is blocked, the match maker of overwatch will test the best ping you have if it is significant it will choose this server for you and search for a game.
-Some times the match making gets you in bad server for you, for example if your best is EU, it gets you to ME one game out of 100.
+- To download the bleeding edge build of this application, built automatically by GitHub, head over to [Actions](https://github.com/foryVERX/Overwatch-Server-Selector/actions/), select the latest build with a green check mark, scroll down to the artifacts section. There is your download.
 
-Another issue where some EU players want to play on NA. Even if you change the region it gets you back to EU. The solution is to block EU and ME severs and change the region to NA.
-In addtion, some NA players wants to choose from West and East, which will be a feature of the program.
+- If you want to convert the files to exe yourself without using my provided download, see the [Build section](#build) for a guide to do so. Requires you to have some previous experience with Python. 
 
-# MINA OVERWATCH SERVER SELECTOR V3.0-beta.2
+## Introduction
 
-<p align="center">
-  <img src="https://drive.google.com/uc?id=1sn0HPwEao-43__avo8h_BrzczG0PLeBs">
-</p>
+The application simply works by blocking Overwatch 2 IP addresses using wf.msc (Firewall with Advance Security). To do this, the application needs to run as administrator. It uses Component Object Model (COM) API to directly add/remove the blocking rules. **The application does not read or write on game files or modify the network traffic of the game!**
 
-- SUPPORT(Play on EU, NA-West, NA-East, and Block ME).
-- Now support Australia region.
-- Updated servers to work on overwatch 2
-- Added donation button for support ;)
+As long as you have a standard firewall (Windows Firewall) and antivirus (Microsoft Defender Antivirus), no further action to make the application work is necessary.
+
+There are predefined buttons to block the server regions AU, EU, ME, NA-West, and NA-East. You can also use the "Custom" button to selectively block regions/servers.
+
+The Overwatch 2 matchmaker will test to find the best server with the best ping. When you block a server in the firewall, the specified server will be inaccessible and get ranked lowest amongst the server. The server with the lowest ping will be selected and used to find you a game.
+
+The block ME option can help in a situation where some times the matchmaker puts you in a bad server, for example if your best is EU, it gets you to ME one game out of 100.
+
+EU players can, with this application, now play on NA servers. The problem is that even if you change the Battle.net region to America, it gives you an European Overwatch 2 server. The server selector enables you pick the region to play on whether its NA East or NA West. It then blocks the connection to all other regions than NA West/East.
+
+NA players are also able to specify whether they prefer to play on NA East or NA West.
+
+# MINA OVERWATCH 2 SERVER SELECTOR V5.0
+
+![Screenshot of the application](ReadMeFiles/ServerSelectorScreenshot.PNG)
+
+* Supports
+	* Play on EU
+	* Play on NA West
+	* Play on NA East
+	* Play on Australia
+* Updated servers to work on Overwatch 2
+* Added donation button for support ;)
 
 Please reach out if you want to help or have a question, discord: VERX#2227
 
-For better experiance run as administrator but it is not manditory, you will have to approve each command in UAC
+**The application has to be ran as administrator to be able to add or remove firewall rules.**
 
 [HOW TO USE MINA OVERWATCH 2 SERVER SELECTOR V3.0-beta.2](https://youtu.be/PDaShF9Mpjo)
 
 [DOWNLOAD MINA OVERWATCH 2 SERVER SELECTOR V3.0-beta.2](https://github.com/foryVERX/Overwatch-Server-Selector/releases/download/Overwatch2_Server_Selector_V3.0-beta.2/MINA.Overwatch.2.Server.Selector.Beta.Version.3.0-beta.2.exe)
 
+# Build 
+To manually build the application
+1. Install latest Python
+2. `pip install pyinstaller`
+3. To build the exe, simply run this in the repository :`pyinstaller Overwatch-Server-Selector.exe.spec`
+4. The exe is now located in `dist\Overwatch-Server-Selector.exe`
 
-# Auto py to exe users
+## Auto py to exe users
 
 If you want to convert py to exe follow the guide.
-note you need to know what are you doing if you are here (smile).
+
+note you need to know what are you doing if you are here 😉.
 
 1. Install Auto py to exe.
 2. Launch the tool.
@@ -47,7 +70,3 @@ note you need to know what are you doing if you are here (smile).
 5. Icon choose icon provided in .img folder.
 6. Additional File (very important), to include pic2str.py which have all the images used in byte format.
 7. CONVERT .PY TO .EXE
-
-
-[![Overwatch-Server-Selector](https://github.com/mr-gh-actions/Overwatch-Server-Selector/actions/workflows/main.yaml/badge.svg)](https://github.com/mr-gh-actions/Overwatch-Server-Selector/actions/workflows/main.yaml)
-
