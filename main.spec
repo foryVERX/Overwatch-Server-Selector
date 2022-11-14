@@ -28,7 +28,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='main',
+    name='Overwatch-Server-Selector.exe',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
