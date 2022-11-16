@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter.font import Font
 from tkinter import ttk, filedialog
+import win32api
 import win32com.shell.shell as shell
 from win32com.client import Dispatch as DispatchCOMObject
 from pythoncom import CoInitialize
@@ -12,7 +13,7 @@ import pic2str
 import base64
 import ctypes
 from os.path import exists, isdir, isfile, join
-from os import getenv, path, mkdir, listdir, linesep, startfile, remove
+from os import getenv, path, mkdir, listdir, linesep, startfile, remove, chmod
 import webbrowser
 import socket
 import threading
@@ -22,12 +23,20 @@ import datetime
 from urllib3 import Retry
 from requests.adapters import HTTPAdapter
 
+# Information
 __version__ = '5.1.0'
+_AppName_ = 'MINA Overwatch 2 Server Selector'
+__author__ = 'Yousef Aljohani'
+__copyright__ = 'Copyright (C) 2022, Yousef Aljohani'
+__credits__ = ['Yousef Aljohani(foryVERX)', 'chhaugen(Carl)']
+__maintainer__ = 'Yousef Aljohani'
+__email__ = 'verrrx@gmail.com'
 
 # Create window object
 app = Tk()
+
 # Set Properties
-app.title('MINA Overwatch 2 Server Selector')
+app.title(_AppName_)
 app.resizable(False, False)
 app.geometry('500x600')
 app.configure(bg='#282828')
@@ -52,6 +61,7 @@ byte_RESET_BUTTON = base64.b64decode(pic2str.RESET_BUTTON)
 byte_OPEN_IP_LIST_BUTTON = base64.b64decode(pic2str.OPEN_IP_LIST_BUTTON)
 byte_APPLY_BUTTON = base64.b64decode(pic2str.APPLY_BUTTON)
 byte_CUSTOM_SETTINGS_BACKGROUND = base64.b64decode(pic2str.CUSTOM_SETTINGS_BACKGROUND)
+byte_INSTALL_UPDATE = base64.b64decode(pic2str.INSTALL_UPDATE)
 
 image_data_SMALL_APPLICATION = BytesIO(byte_LOGO_SMALL_APPLICATION)
 image_data_SQUARE_BACKGROUND_MINA_TEST = BytesIO(byte_SQUARE_BACKGROUND_MINA_TEST)
@@ -68,6 +78,7 @@ image_data_RESET_BUTTON = BytesIO(byte_RESET_BUTTON)
 image_data_OPEN_IP_LIST_BUTTON = BytesIO(byte_OPEN_IP_LIST_BUTTON)
 image_data_APPLY_BUTTON = BytesIO(byte_APPLY_BUTTON)
 image_data_CUSTOM_SETTINGS_BACKGROUND = BytesIO(byte_CUSTOM_SETTINGS_BACKGROUND)
+image_data_INSTALL_UPDATE = BytesIO(byte_INSTALL_UPDATE)
 
 # Add images
 background = ImageTk.PhotoImage(Image.open(image_data_SQUARE_BACKGROUND_MINA_TEST))
@@ -75,7 +86,6 @@ logo = Label(frame, image=background)
 logo.pack()
 
 CUSTOM_SETTINGS_BACKGROUND = ImageTk.PhotoImage(Image.open(image_data_CUSTOM_SETTINGS_BACKGROUND))
-
 button_img_RESET_BUTTON = ImageTk.PhotoImage(Image.open(image_data_RESET_BUTTON))
 button_img_OPEN_IP_LIST_BUTTON = ImageTk.PhotoImage(Image.open(image_data_OPEN_IP_LIST_BUTTON))
 button_img_APPLY_BUTTON = ImageTk.PhotoImage(Image.open(image_data_APPLY_BUTTON))
@@ -88,12 +98,14 @@ button_img_Australia = ImageTk.PhotoImage(Image.open(image_play_on_australia))
 button_img_donation = ImageTk.PhotoImage(Image.open(image_donation))
 button_img_Default = ImageTk.PhotoImage(Image.open(image_UNBLOCK_ALL_MAIN))
 button_img_CUSTOM_SETTINGS = ImageTk.PhotoImage(Image.open(image_CUSTOM_SETTINGS))
+button_img_INSTALL_UPDATE = ImageTk.PhotoImage(Image.open(image_data_INSTALL_UPDATE))
 
 # Add font
 futrabook_font = Font(family="Futura PT Demi", size=10)
 
 # Global variables
 localappdata_path = getenv('APPDATA') + '\\OverwatchServerBlocker'
+temp_path = getenv('APPDATA') + '\\Local\\Temp'
 ip_version_path = localappdata_path + '\\IP_version.txt'
 overwatch_path = 'C:\\Program Files (x86)\\Overwatch\\_retail_\\Overwatch.exe'
 customConfig_path = localappdata_path + '\\customConfig.txt'
@@ -111,6 +123,7 @@ Ip_ranges_AS_Japan_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-S
 Ip_ranges_Australia_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_Australia.txt'
 Ip_ranges_Brazil_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_Brazil.txt'
 BlockingConfig_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/BlockingConfig.txt'
+appVersion_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/__version__/__latestversion__.txt'
 
 DEFAULT_BLOCK_NAME = "_Overwatch Block"
 DEFAULT_GROUPING_NAME = "_MINA Overwatch 2-Server-Selector"
@@ -206,9 +219,9 @@ def updateIp():
     controlButtons('disabled')
     if internetConnection:
         updating_state = True
-        update_text = "UPDATING..."
+        update_text = "UPDATING IP LIST..."
         internetLabel.config(text=update_text, fg='#ddee4a')
-        msg_fail = "CONNECTION FAILED... Trying to update"
+        msg_fail = "CONNECTION FAILED... Trying to update ip list"
         start = datetime.datetime.now()
         with requests.Session() as s:  # Create a session and use it for all requests
             adapter = HTTPAdapter(max_retries=Retry(total=4, backoff_factor=1, allowed_methods=None,
@@ -239,7 +252,7 @@ def updateIp():
         finish = datetime.datetime.now() - start
         logging.info('UPDATING TOOK: ' + str(finish))
         progressBar.lower()
-        logging.info("UPDATED")
+        logging.info("IP LIST UPDATED")
         updating_state = False
         checkForUpdate_initialization = False
         loadIpRanges()
@@ -254,7 +267,7 @@ def check_ip_update():  # A function called at the start of the program to check
         return
     updating_state = True
     is_connect()
-    logging.info("Checking for updates")
+    logging.info("Checking for ip list updates")
     if internetConnection:
         if isdir(localappdata_path) and path.exists(ip_version_path):
             logging.info(localappdata_path + ' FOUND')
@@ -263,7 +276,7 @@ def check_ip_update():  # A function called at the start of the program to check
                 logging.info('Reading Ip_version.txt')
                 for line in reader.readlines():
                     if len(line) > 1:
-                        msg_fail = "Update check failed"
+                        msg_fail = "Ip list update check failed"
                         with requests.Session() as s:
                             adapter = HTTPAdapter(max_retries=Retry(total=4, backoff_factor=1, allowed_methods=None,
                                                                     status_forcelist=[429, 500, 502, 503, 504]))
@@ -272,16 +285,16 @@ def check_ip_update():  # A function called at the start of the program to check
                             ip_version_request = request_raw_file(ip_version_url, msg_fail, s)
                         ip_version_request = linesep.join([s for s in ip_version_request.splitlines() if s])
                         line = linesep.join([s for s in line.splitlines() if s])
-                        logging.debug("VERSION REQUEST DURING CHECK FOR UPDATE: " + str(ip_version_request))
+                        logging.debug("LATEST IP LIST VERSION : " + str(ip_version_request))
                         if ip_version_request == line:
-                            update_text = "UPDATED"
+                            update_text = "IP LIST IS UPDATED"
                             app.after(250, internetLabel.config(text=update_text, fg='#26ef4c'))
                         else:
-                            update_text = "NOT UPDATED"
+                            update_text = "IP LIST IS NOT UPDATED"
                             app.after(250, internetLabel.config(text=update_text, fg='#ef2626'))
                             threading.Thread(target=updateIp, daemon=True).start()
         else:  # Make directory and call updateIp
-            update_text = "FIRST TIME RUNNING.. UPDATING"
+            update_text = "FIRST TIME RUNNING.. DOWNLOADING IP LIST"
             app.after(250, internetLabel.config(text=update_text, fg='#ddee4a'))
             if not exists(localappdata_path):
                 mkdir(localappdata_path)  # Make directory
@@ -290,7 +303,7 @@ def check_ip_update():  # A function called at the start of the program to check
         logging.debug('No internet connection')
         if not exists(ip_version_path):
             controlButtons('disabled')
-            update_text = "CONNECTION FAILED... Trying to update"
+            update_text = "CONNECTION FAILED... Trying to update ip list"
             app.after(250, internetLabel.config(text=update_text, fg='#ef2626'))
             app.after(1000, check_ip_update)
         else:
@@ -301,8 +314,40 @@ def check_ip_update():  # A function called at the start of the program to check
     # app.after(5000 * 60, checkUpdate)
 
 
-def check_version_update():
-    pass
+def check_app_update():
+    # Function request latest app version and compare it with installed one
+    # Pop a "INSTALL UPDATE" button if new app update is detected
+    global latestVersion_path
+    with requests.Session() as s:
+        adapter = HTTPAdapter(max_retries=Retry(total=4, backoff_factor=1, allowed_methods=None,
+                                                status_forcelist=[429, 500, 502, 503, 504]))
+        s.mount("http://", adapter)
+        s.mount("https://", adapter)
+        latestVersion = request_raw_file(appVersion_url, "Getting latest version failed", s).splitlines()
+        latestVersion = [i for i in latestVersion if i]  # To make sure no empty lines
+        latestVer = latestVersion[0].strip()
+        urlDownload = latestVersion[1].strip()
+        logging.info('Reading latest app version from GitHub.txt')
+        logging.info("Latest " + str(latestVer))
+        logging.info("Latest version " + str(urlDownload))
+        latestVer = latestVer.strip("version=")
+        urlDownload = urlDownload.strip("url=")
+        if not __version__ == latestVer:
+            logging.info("APP UPDATE IS AVAILABLE: v" + str(latestVer))
+            latestVersion_path = temp_path.replace('\\Roaming', '') + '\\' + f'{_AppName_} {latestVer}.exe'
+            if not exists(latestVersion_path):
+                downloadedBytes = s.get(urlDownload)
+                open(latestVersion_path, "wb").write(downloadedBytes.content)
+                logging.info("Downloaded installer at " + latestVersion_path)
+            InstallUpdateButton.place(x=135, y=500, height=40, width=230)
+        else:
+            logging.info("APP IS UPDATED")
+
+
+def installUpdate():
+    if exists(latestVersion_path):
+        win32api.ShellExecute(0, 'open', latestVersion_path, None, None, 10)
+        app.destroy()
 
 
 def request_raw_file(url, msg_fail, s):
@@ -600,7 +645,7 @@ def customSettingsWindow():
     frameTop.place(x=-2, y=0)
     backgroundTop = Label(frameTop, image=CUSTOM_SETTINGS_BACKGROUND)
     backgroundTop.pack()
-    top.iconbitmap("LOGO_SMALL_APPLICATION.ico")
+    top.iconbitmap("LOGO_SMALL_APPLICATIONx.ico")
     # Buttons
     applyButton = Button(top, image=button_img_APPLY_BUTTON, font=futrabook_font, command=apply,
                          bg='#404040', fg='#404040', borderwidth=0, activebackground='#404040')
@@ -753,6 +798,10 @@ internetLabel = Label(app, text='', bg='#282828', fg='#26ef4c', font=futrabook_f
 internetLabel.grid(row=0, column=0)
 internetLabel.place(x=250, y=420, anchor="center")
 
+versionLabel = Label(app, text=f'V {__version__}', bg='#282828', fg='#26ef4c', font=futrabook_font)
+versionLabel.grid(row=0, column=0)
+versionLabel.place(x=460, y=590, anchor="center")
+
 progressBar = ttk.Progressbar(app, orient=HORIZONTAL, length=130, mode='determinate')
 
 # Buttons
@@ -790,9 +839,12 @@ DonationButton = Button(app, image=button_img_donation, font=futrabook_font, com
                         bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
 DonationButton.place(x=420, y=480, height=73, width=68)
 
-CustomSettingsSButton = Button(app, image=button_img_CUSTOM_SETTINGS, font=futrabook_font, command=customSettingsWindow,
-                               bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
-CustomSettingsSButton.place(x=370, y=318, height=25, width=25)
+CustomSettingsButton = Button(app, image=button_img_CUSTOM_SETTINGS, font=futrabook_font, command=customSettingsWindow,
+                              bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
+CustomSettingsButton.place(x=370, y=318, height=25, width=25)
+
+InstallUpdateButton = Button(app, image=button_img_INSTALL_UPDATE, font=futrabook_font, command=installUpdate,
+                             bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
 
 # Check box
 tunnelCheckBox_state = IntVar()
@@ -804,12 +856,11 @@ tunnelCheckBox.place(x=175, y=460)
 iconMaker()
 check_admin()
 checkForAndDeleteLegacyRules()
+if checkOptions(): tunnelCheckBox.select()
 
-ipSorter_thread = threading.Thread(target=loadIpRanges, daemon=True).start()  # Follow main thread
+check_app_update_thread = threading.Thread(target=check_app_update, daemon=True).start()  # Follow main thread
+loadIpRanges_thread = threading.Thread(target=loadIpRanges, daemon=True).start()  # Follow main thread
 checkIfActive_thread = threading.Thread(target=checkIfActive, daemon=True).start()  # Follow main thread
 check_ip_update.thread = threading.Thread(target=check_ip_update, daemon=True).start()  # Follow main thread
-
-if checkOptions():
-    tunnelCheckBox.select()
 
 app.mainloop()

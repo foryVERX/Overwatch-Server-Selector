@@ -16,6 +16,7 @@ def pic2str(file, functionName):
 
 
 if __name__ == '__main__':
+    """
     pic2str('BLOCK_MIDDLE_EAST.png', 'BLOCK_MIDDLE_EAST')
     pic2str('DESKTOP_ICON.png', 'DESKTOP_ICON')
     pic2str('play_on_eu.png', 'play_on_eu')
@@ -32,3 +33,5 @@ if __name__ == '__main__':
     pic2str('OPEN_IP_LIST_BUTTON.png', 'OPEN_IP_LIST_BUTTON')
     pic2str('APPLY_BUTTON.png', 'APPLY_BUTTON')
     pic2str('Frame 2.png', 'CUSTOM_SETTINGS_BACKGROUND')
+    """
+    pic2str('INSTALL_UPDATE.png', 'INSTALL_UPDATE')
