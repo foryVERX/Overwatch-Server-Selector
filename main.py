@@ -315,8 +315,12 @@ def check_ip_update():  # A function called at the start of the program to check
 
 
 def check_app_update():
-    # Function request latest app version and compare it with installed one
-    # Pop a "INSTALL UPDATE" button if new app update is detected
+    """
+    Function request the latest app version and compare it with installed one
+    Downloads new version if available at path/temp
+    Pop a "INSTALL UPDATE" button if new app update is detected
+    :return: None
+    """
     global latestVersion_path
     with requests.Session() as s:
         adapter = HTTPAdapter(max_retries=Retry(total=4, backoff_factor=1, allowed_methods=None,
@@ -345,23 +349,37 @@ def check_app_update():
 
 
 def installUpdate():
+    """
+    Function is initiated when install update button is pressed
+    It executes the setup downloaded from check_app_update
+    :return: None
+    """
     if exists(latestVersion_path):
         win32api.ShellExecute(0, 'open', latestVersion_path, None, None, 10)
         app.destroy()
 
 
 def request_raw_file(url, msg_fail, s):
+    """
+    :arg: url, msg_fail, s
+    url: is the url at which raw text exists
+    msg_fail: the message given to log when connection fails
+    s: the session initiated
+
+    :return:
+    result: decoded bytes from source
+    """
     try:
         # user-agent is just to trick the website that you are using a browser
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0"
         }
-        r = s.get(url, headers=headers).content.decode('utf-8')
+        result = s.get(url, headers=headers).content.decode('utf-8')
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         logging.debug('URL REQUEST FAIL RETRYING: ' + url)
         logging.debug(str(e))
         raise SystemExit(e)
-    return r
+    return result
 
 
 def createTextFile(file_name, contents, progressbar=False):

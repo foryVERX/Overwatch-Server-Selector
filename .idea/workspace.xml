@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="75076f97-c39e-4403-8642-fa598ad02966" name="Changes" comment="Initiated checkForAndDeleteLegacyRules() to clean up previous versions on start.&#10;&#10;Also, fixed minor bug when custom config reset button is pressed customConfig list was not cleared.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,6 +22,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GithubProjectSettings">
     <option name="branchProtectionPatterns">
@@ -54,6 +56,7 @@
       <recent name="D:\Google Drive\Programing Projects\TkinterOverwatch\Overwatch-Server-Selector" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Google Drive\Programing Projects\Overwatch-Server-Selector\.img\ow2 v3" />
       <recent name="D:\Google Drive\Programing Projects\Overwatch-Server-Selector-1\ip_lists" />
     </key>
   </component>
@@ -362,7 +365,14 @@
       <option name="project" value="LOCAL" />
       <updated>1668346438511</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="Initiated checkForAndDeleteLegacyRules() to clean up previous versions on start.&#10;&#10;Also, fixed minor bug when custom config reset button is pressed customConfig list was not cleared.">
+      <created>1668641911311</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1668641911311</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -400,6 +410,7 @@
     <MESSAGE value="Update v5.0.0" />
     <MESSAGE value="fixed a bug where custom config is not changing perfectly" />
     <MESSAGE value="added versions" />
-    <option name="LAST_COMMIT_MESSAGE" value="added versions" />
+    <MESSAGE value="Initiated checkForAndDeleteLegacyRules() to clean up previous versions on start.&#10;&#10;Also, fixed minor bug when custom config reset button is pressed customConfig list was not cleared." />
+    <option name="LAST_COMMIT_MESSAGE" value="Initiated checkForAndDeleteLegacyRules() to clean up previous versions on start.&#10;&#10;Also, fixed minor bug when custom config reset button is pressed customConfig list was not cleared." />
   </component>
 </project>
