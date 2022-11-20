@@ -1,12 +1,13 @@
 
 name: Overwatch-Server-Selector
 
-on:
+on: 
   pull_request:
     types:
       - closed
     branches:
       - main
+  workflow_dispatch:
 
 
 jobs:
