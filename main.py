@@ -663,7 +663,7 @@ def customSettingsWindow():
     frameTop.place(x=-2, y=0)
     backgroundTop = Label(frameTop, image=CUSTOM_SETTINGS_BACKGROUND)
     backgroundTop.pack()
-    top.iconbitmap("LOGO_SMALL_APPLICATIONx.ico")
+    top.iconbitmap("LOGO_SMALL_APPLICATION.ico")
     # Buttons
     applyButton = Button(top, image=button_img_APPLY_BUTTON, font=futrabook_font, command=apply,
                          bg='#404040', fg='#404040', borderwidth=0, activebackground='#404040')
