@@ -24,7 +24,7 @@ from urllib3 import Retry
 from requests.adapters import HTTPAdapter
 
 # Information
-__version__ = '5.1.0'
+__version__ = '5.1.1'
 _AppName_ = 'MINA Overwatch 2 Server Selector'
 __author__ = 'Yousef Aljohani'
 __copyright__ = 'Copyright (C) 2022, Yousef Aljohani'
