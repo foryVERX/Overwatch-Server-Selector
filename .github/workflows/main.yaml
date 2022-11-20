@@ -32,7 +32,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: gh_release
         uses: softprops/action-gh-release@v0.1.14
-        if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'pull_request'  }}
+        if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'pull_request'  || {{ steps.gh_tag.outputs.skipped == 'false' }}}}
         with:
           files: dist/windows/Overwatch-Server-Selector.exe
           token: ${{ secrets.GITHUB_TOKEN }}
