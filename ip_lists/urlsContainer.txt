@@ -1,8 +1,4 @@
-cfg - EU - France - CDG1.txt
 https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_EU.txt
-cfg - Other - Bahrain - MES1.txt
 https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_ME.txt
-__latestversion__.txt
 https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/__version__/__latestversion__.txt
-cfg - Other - Brazil 2 - GBR1.txt
 https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_Brazil.txt
