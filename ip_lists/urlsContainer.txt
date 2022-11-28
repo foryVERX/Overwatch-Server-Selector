@@ -1,4 +1,1 @@
-https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_EU.txt
-https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_ME.txt
-https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/__version__/__latestversion__.txt
-https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_Brazil.txt
+https://raw.githubusercontent.com/mr-gh-actions/Overwatch-Server-Selector-CustomSettings/main/ip_lists/cfg%20-%20Other%20-%20Bahrain%20-%20MES1.txt
