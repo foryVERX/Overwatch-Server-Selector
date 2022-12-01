@@ -1,17 +1,20 @@
 
+
 # MINA Overwatch 2 Server Selector
-[![Overwatch-Server-Selector](https://github.com/mr-gh-actions/Overwatch-Server-Selector/actions/workflows/main.yaml/badge.svg)](https://github.com/mr-gh-actions/Overwatch-Server-Selector/actions/workflows/main.yaml)
+[![Overwatch-Server-Selector](https://github.com/mr-gh-actions/Overwatch-Server-Selector/actions/workflows/main.yaml/badge.svg)](https://github.com/foryVERX/Overwatch-Server-Selector/actions/workflows/main.yaml)
 <p align="center">
 	<img src="ReadMeFiles/Logo.png" alt="Logo of the application" height="200" width="200">
 </p>
 A simple application that allows you to select the servers you want to play on!
 
 ## General Information
-
+### Setup Download
 - Download link in the Assets of [the latest release](https://github.com/foryVERX/Overwatch-Server-Selector/releases/latest).
 
+### Portable Download
 - To download the bleeding edge build of this application, built automatically by GitHub, head over to [Actions](https://github.com/foryVERX/Overwatch-Server-Selector/actions/), select the latest build with a green check mark, scroll down to the artifacts section. There is your download.
 
+### Converting python files to exe (optional)
 - If you want to convert the files to exe yourself without using my provided download, see the [Build section](#build) for a guide to do so. Requires you to have some previous experience with Python. 
 
 ## Introduction
@@ -40,17 +43,21 @@ NA players are also able to specify whether they prefer to play on NA East or NA
 	* Play on NA East
 	* Play on Australia
 * Updated servers to work on Overwatch 2
-* Added donation button for support ;)
+* Custom config option, alows you to create your cutom settings.
+* An option that only affect overwatch when blocked
+*  Added donation button for support ;)
 
 Please reach out if you want to help or have a question, discord: VERX#2227
 
 **The application has to be ran as administrator to be able to add or remove firewall rules.**
 
-[HOW TO USE MINA OVERWATCH 2 SERVER SELECTOR V3.0-beta.2](https://youtu.be/PDaShF9Mpjo)
+[HOW TO USE MINA OVERWATCH 2 SERVER (OUTDATED)](https://youtu.be/PDaShF9Mpjo)
 
-[DOWNLOAD MINA OVERWATCH 2 SERVER SELECTOR V3.0-beta.2](https://github.com/foryVERX/Overwatch-Server-Selector/releases/download/Overwatch2_Server_Selector_V3.0-beta.2/MINA.Overwatch.2.Server.Selector.Beta.Version.3.0-beta.2.exe)
+[DOWNLOAD MINA OVERWATCH 2 SERVER SELECTOR](https://github.com/foryVERX/Overwatch-Server-Selector/releases)
 
 # Build 
+
+## Pyinstaller
 To manually build the application
 1. Install latest Python
 2. `pip install pyinstaller`
@@ -63,10 +70,16 @@ If you want to convert py to exe follow the guide.
 
 note you need to know what are you doing if you are here 😉.
 
-1. Install Auto py to exe.
-2. Launch the tool.
-3. Script Location use main.py where ever you locate it.
-4. Choose onefile.
-5. Icon choose icon provided in .img folder.
-6. Additional File (very important), to include pic2str.py which have all the images used in byte format.
-7. CONVERT .PY TO .EXE
+1. Install latest Python
+2. `pip install auto-py-to-exe`
+3. In terminal `auto-py-to-exe`.
+4. Script Location use main.py where ever you locate it.
+5. Choose onefile.
+6. Choose Window based(hide console)
+7. Icon choose icon provided in .img folder.
+8. Additional File (very important), to include `pic2str.py` which have all the images used in byte format.
+9. In advance make sure you do the following:
+	*   `-name Overwatch Server Selector`
+	* `--uac admin: Enable`
+11. CONVERT .PY TO .EXE
+12. The exe is now located in `output\Overwatch Server Selector.exe`
