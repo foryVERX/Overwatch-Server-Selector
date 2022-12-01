@@ -12,7 +12,7 @@ from io import BytesIO
 import pic2str
 import base64
 import ctypes
-from os.path import exists, isdir, isfile, join
+from os.path import exists, isdir, isfile, join, basename
 from os import getenv, path, mkdir, listdir, linesep, startfile, remove, chmod
 import webbrowser
 import socket
@@ -24,7 +24,7 @@ from urllib3 import Retry
 from requests.adapters import HTTPAdapter
 
 # Information
-__version__ = '5.1.1'
+__version__ = '5.2.0'
 _AppName_ = 'MINA Overwatch 2 Server Selector'
 __author__ = 'Yousef Aljohani'
 __copyright__ = 'Copyright (C) 2022, Yousef Aljohani'
@@ -109,32 +109,21 @@ temp_path = getenv('APPDATA') + '\\Local\\Temp'
 ip_version_path = localappdata_path + '\\IP_version.txt'
 overwatch_path = 'C:\\Program Files (x86)\\Overwatch\\_retail_\\Overwatch.exe'
 customConfig_path = localappdata_path + '\\customConfig.txt'
-ip_version_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/IP_version.txt'
-Ip_ranges_ME_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_ME.txt'
-Ip_ranges_EU_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_EU.txt'
-Ip_ranges_NA_East_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_NA_East.txt'
-Ip_ranges_NA_central_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_NA_central.txt'
-Ip_ranges_NA_West_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_NA_West.txt'
-Ip_ranges_AS_Korea_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_AS_Korea.txt'
-Ip_ranges_AS_1_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_AS_1.txt'
-Ip_ranges_AS_Singapore_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_AS_Singapore.txt'
-Ip_ranges_AS_Taiwan_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_AS_Taiwan.txt'
-Ip_ranges_AS_Japan_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_AS_Japan.txt'
-Ip_ranges_Australia_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_Australia.txt'
-Ip_ranges_Brazil_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/Ip_ranges_Brazil.txt'
-BlockingConfig_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/BlockingConfig.txt'
-appVersion_url = 'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/__version__/__latestversion__.txt'
+ip_version_url = \
+    'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/IP_version.txt'
+appVersion_url = \
+    'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/__version__/__latestversion__.txt'
+urlContainer_url = \
+    "https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/urlsContainer.txt"
 
 DEFAULT_BLOCK_NAME = "_Overwatch Block"
 DEFAULT_GROUPING_NAME = "_MINA Overwatch 2-Server-Selector"
 
 updating_state = False
-internet_initialization = False
 sorter_initialization = False
 checkForUpdate_initialization = False
 tunnel_option = False
 isUpdated = ''
-internetConnection = ''
 update_time = 0
 
 # IP Ranges
@@ -205,53 +194,25 @@ def check_admin():
         logging.info("USER IS ADMIN")
 
 
-def is_connect():
-    global internetConnection, internet_initialization
+def internetConnection():
     try:
         socket.create_connection(("www.google.com", 80))
-        internetConnection = True
+        return True
     except OSError:
-        internetConnection = False
+        return False
 
 
-def updateIp():
+def updateIpList():
     global updating_state, sorter_initialization, checkForUpdate_initialization
     controlButtons('disabled')
-    if internetConnection:
+    if internetConnection():
         updating_state = True
         update_text = "UPDATING IP LIST..."
         internetLabel.config(text=update_text, fg='#ddee4a')
-        msg_fail = "CONNECTION FAILED... Trying to update ip list"
         start = datetime.datetime.now()
-        with requests.Session() as s:  # Create a session and use it for all requests
-            adapter = HTTPAdapter(max_retries=Retry(total=4, backoff_factor=1, allowed_methods=None,
-                                                    status_forcelist=[429, 500, 502, 503, 504]))
-            # This is to allow retry on a new connection if it fails
-            s.mount("http://", adapter)
-            s.mount("https://", adapter)
-            createTextFile('BlockingConfig', request_raw_file(BlockingConfig_url, msg_fail, s), progressbar=True)
-            createTextFile('Ip_ranges_EU', request_raw_file(Ip_ranges_EU_url, msg_fail, s), progressbar=True)
-            createTextFile('Ip_ranges_ME', request_raw_file(Ip_ranges_ME_url, msg_fail, s), progressbar=True)
-            createTextFile('Ip_ranges_AS_Singapore', request_raw_file(Ip_ranges_AS_Singapore_url, msg_fail, s),
-                           progressbar=True)
-            createTextFile('Ip_ranges_Australia', request_raw_file(Ip_ranges_Australia_url, msg_fail, s),
-                           progressbar=True)
-            createTextFile('Ip_ranges_Brazil', request_raw_file(Ip_ranges_Brazil_url, msg_fail, s), progressbar=True)
-            createTextFile('Ip_ranges_NA_East', request_raw_file(Ip_ranges_NA_East_url, msg_fail, s), progressbar=True)
-            createTextFile('Ip_ranges_NA_West', request_raw_file(Ip_ranges_NA_West_url, msg_fail, s), progressbar=True)
-            createTextFile('Ip_ranges_NA_central', request_raw_file(Ip_ranges_NA_central_url, msg_fail, s),
-                           progressbar=True)
-            createTextFile('Ip_ranges_AS_Japan', request_raw_file(Ip_ranges_AS_Japan_url, msg_fail, s),
-                           progressbar=True)
-            createTextFile('Ip_ranges_AS_1', request_raw_file(Ip_ranges_AS_1_url, msg_fail, s), progressbar=True)
-            createTextFile('Ip_ranges_AS_Taiwan', request_raw_file(Ip_ranges_AS_Taiwan_url, msg_fail, s),
-                           progressbar=True)
-            createTextFile('Ip_ranges_AS_Korea', request_raw_file(Ip_ranges_AS_Korea_url, msg_fail, s),
-                           progressbar=True)
-            createTextFile('IP_version', request_raw_file(ip_version_url, msg_fail, s), progressbar=True)
+        download_Ip_List()
         finish = datetime.datetime.now() - start
         logging.info('UPDATING TOOK: ' + str(finish))
-        progressBar.lower()
         logging.info("IP LIST UPDATED")
         updating_state = False
         checkForUpdate_initialization = False
@@ -266,14 +227,13 @@ def check_ip_update():  # A function called at the start of the program to check
     if updating_state:
         return
     updating_state = True
-    is_connect()
-    logging.info("Checking for ip list updates")
-    if internetConnection:
+    logging.info("CHECKING LATEST IP LIST VERSION FROM GITHUB")
+    if internetConnection():
         if isdir(localappdata_path) and path.exists(ip_version_path):
             logging.info(localappdata_path + ' FOUND')
             logging.info(ip_version_path + ' FOUND')
             with open(ip_version_path, "r") as reader:  # Read Ip_version.txt from GitHub and analyze
-                logging.info('Reading Ip_version.txt')
+                logging.info('READING CURRENT IP LIST VERSION')
                 for line in reader.readlines():
                     if len(line) > 1:
                         msg_fail = "Ip list update check failed"
@@ -282,23 +242,24 @@ def check_ip_update():  # A function called at the start of the program to check
                                                                     status_forcelist=[429, 500, 502, 503, 504]))
                             s.mount("http://", adapter)
                             s.mount("https://", adapter)
-                            ip_version_request = request_raw_file(ip_version_url, msg_fail, s)
-                        ip_version_request = linesep.join([s for s in ip_version_request.splitlines() if s])
-                        line = linesep.join([s for s in line.splitlines() if s])
-                        logging.debug("LATEST IP LIST VERSION : " + str(ip_version_request))
-                        if ip_version_request == line:
+                            LatestIpListVersion = request_raw_file(ip_version_url, msg_fail, s)
+                        LatestIpListVersion = linesep.join([s for s in LatestIpListVersion.splitlines() if s])
+                        currentIpListVersion = linesep.join([s for s in line.splitlines() if s])
+                        logging.debug("CURRENT IP LIST VERSION : " + str(currentIpListVersion))
+                        logging.debug("LATEST IP LIST VERSION : " + str(LatestIpListVersion))
+                        if LatestIpListVersion == currentIpListVersion:
                             update_text = "IP LIST IS UPDATED"
                             app.after(250, internetLabel.config(text=update_text, fg='#26ef4c'))
                         else:
                             update_text = "IP LIST IS NOT UPDATED"
                             app.after(250, internetLabel.config(text=update_text, fg='#ef2626'))
-                            threading.Thread(target=updateIp, daemon=True).start()
+                            threading.Thread(target=updateIpList, daemon=True).start()
         else:  # Make directory and call updateIp
             update_text = "FIRST TIME RUNNING.. DOWNLOADING IP LIST"
             app.after(250, internetLabel.config(text=update_text, fg='#ddee4a'))
             if not exists(localappdata_path):
                 mkdir(localappdata_path)  # Make directory
-            threading.Thread(target=updateIp, daemon=True).start()
+            threading.Thread(target=updateIpList, daemon=True).start()
     else:
         logging.debug('No internet connection')
         if not exists(ip_version_path):
@@ -322,30 +283,33 @@ def check_app_update():
     :return: None
     """
     global latestVersion_path
-    with requests.Session() as s:
-        adapter = HTTPAdapter(max_retries=Retry(total=4, backoff_factor=1, allowed_methods=None,
-                                                status_forcelist=[429, 500, 502, 503, 504]))
-        s.mount("http://", adapter)
-        s.mount("https://", adapter)
-        latestVersion = request_raw_file(appVersion_url, "Getting latest version failed", s).splitlines()
-        latestVersion = [i for i in latestVersion if i]  # To make sure no empty lines
-        latestVer = latestVersion[0].strip()
-        urlDownload = latestVersion[1].strip()
-        logging.info('Reading latest app version from GitHub.txt')
-        logging.info("Latest " + str(latestVer))
-        logging.info("Latest version " + str(urlDownload))
-        latestVer = latestVer.strip("version=")
-        urlDownload = urlDownload.strip("url=")
-        if not __version__ == latestVer:
-            logging.info("APP UPDATE IS AVAILABLE: v" + str(latestVer))
-            latestVersion_path = temp_path.replace('\\Roaming', '') + '\\' + f'{_AppName_} {latestVer}.exe'
-            if not exists(latestVersion_path):
-                downloadedBytes = s.get(urlDownload)
-                open(latestVersion_path, "wb").write(downloadedBytes.content)
-                logging.info("Downloaded installer at " + latestVersion_path)
-            InstallUpdateButton.place(x=135, y=500, height=40, width=230)
-        else:
-            logging.info("APP IS UPDATED")
+    if internetConnection():
+        with requests.Session() as s:
+            adapter = HTTPAdapter(max_retries=Retry(total=4, backoff_factor=1, allowed_methods=None,
+                                                    status_forcelist=[429, 500, 502, 503, 504]))
+            s.mount("http://", adapter)
+            s.mount("https://", adapter)
+            logging.info('CHECKING LATEST APP VERSION FROM GITHUB')
+            latestVersion = request_raw_file(appVersion_url, "Getting latest version failed", s).splitlines()
+            latestVersion = [i for i in latestVersion if i]  # To make sure no empty lines
+            latestVer = latestVersion[0].strip()
+            urlDownload = latestVersion[1].strip()
+            logging.info(f"LATEST APP VERSION {latestVer}")
+            latestVer = latestVer.strip("version=")
+            urlDownload = urlDownload.strip("url=")
+            if not __version__ == latestVer:
+                logging.info(f"NEW APP UPDATE IS AVAILABLE: v{latestVer}")
+                latestVersion_path = temp_path.replace('\\Roaming', '') + '\\' + f'{_AppName_} {latestVer}.exe'
+                if not exists(latestVersion_path):
+                    logging.info(f"DOWNLOADING APP UPDATE v{latestVer}")
+                    downloadedBytes = s.get(urlDownload)
+                    open(latestVersion_path, "wb").write(downloadedBytes.content)
+                    logging.info(f"APP UPDATE IS DOWNLOADED AT THE LOCATION: {latestVersion_path}" )
+                InstallUpdateButton.place(x=135, y=500, height=40, width=230)
+            else:
+                logging.info("CURRENT VERSION IS UPTODATE")
+    else:
+        logging.info("COULD NOT CHECK FOR APP UPDATE DUE TO NO INTERNET CONNECTION")
 
 
 def installUpdate():
@@ -357,6 +321,104 @@ def installUpdate():
     if exists(latestVersion_path):
         win32api.ShellExecute(0, 'open', latestVersion_path, None, None, 10)
         app.destroy()
+
+
+def parseUrls(textFilePath):
+    """
+    The function used to separate urls that exists in a text file line by line.
+    example in textfile.txt:
+    url1
+    url2
+    ... etc
+    output is a dictionary where the key is the file name extracted from the url and value is the url
+
+    :param textFilePath:
+    :return: list of urls
+    """
+    with open(textFilePath, "r") as urlContainerTextFileReader:
+        urlContainerTextFile = urlContainerTextFileReader.readlines()
+        urlContainerLinesStriped = map(lambda line: line.strip('\n'), urlContainerTextFile)
+        urlContainerNonZeroLen = list(filter(lambda line: len(line) > 0, urlContainerLinesStriped))
+        urlContainerList = urlContainerNonZeroLen
+        # Convert List to dictionary using file name as key
+        urlContainerDictionary = {path.splitext(path.basename(line))[0]: line for line in urlContainerList}
+    return urlContainerDictionary
+
+
+def downloadUrls(filename, urlTarget):
+    """
+    Using url to download file
+
+    :param filename: The name of output file
+    :param urlTarget: The url to download the content
+    :return:
+    """
+    with requests.Session() as s:
+        adapter = HTTPAdapter(max_retries=Retry(total=4, backoff_factor=1, allowed_methods=None,
+                                                status_forcelist=[429, 500, 502, 503, 504]))
+        s.mount("http://", adapter)
+        s.mount("https://", adapter)
+        downloadedBytes = s.get(urlTarget)
+        open(filename, "wb").write(downloadedBytes.content)
+
+
+def url2TextFile(dic, progressBar=False):
+    """
+    Convert dictionary to a text file where:
+     *Key is file name
+     *Value is the url that contains the content
+
+    Output is text files where it's content is fetched from url
+
+    :param
+
+    dic: Dictionary where..
+     *Key is file name
+     *Value is the url that contains the content
+
+    progressBar: if progressbar is true  will be shown at the gui
+    :return: None
+    """
+    lengthProgressBar = 150
+    if progressBar:
+        progressBar = ttk.Progressbar(app, orient=HORIZONTAL, length=lengthProgressBar, mode='determinate')
+        progressBar.grid(row=0, column=0, padx=175, pady=520)
+    with requests.Session() as s:
+        adapter = HTTPAdapter(max_retries=Retry(total=4, backoff_factor=1, allowed_methods=None,
+                                                status_forcelist=[429, 500, 502, 503, 504]))
+        s.mount("http://", adapter)
+        s.mount("https://", adapter)
+        for file_name, url in dic.items():
+            logging.info(f"DOWNLOADING {url}")
+            content = request_raw_file(url, "Requesting contents from url failed", s)
+            createTextFile(file_name.replace("%20", ' '), content)
+            if progressBar:
+                progressBar['value'] += lengthProgressBar / len(dic)
+        progressBar.grid_forget()
+
+
+def download_Ip_List():
+    """
+    Depends on these functions:
+    *downloadUrls
+    Collects the urls from a urlContainer that contains all urls in one text file.
+
+    *parseUrls
+     create a dictionary of urls as value with their tail name as a key, www.whatever.com/text.txt
+     text.txt is the tail in this case.
+
+    *url2TextFile
+     When given the result of parseUrls function, it creates a text file
+    :return:
+    """
+    logging.info("IP LIST UPDATING PROCESS IS INITIATED")
+    urlContainerPath = temp_path.replace('\\Roaming', '') + '\\urlContainer.txt'
+    logging.info("DOWNLOADING URL CONTAINER")
+    downloadUrls(urlContainerPath, urlContainer_url)
+    logging.info("URL CONTAINER DOWNLOADED SUCCESSFULLY")
+    dictionary = parseUrls(urlContainerPath)
+    logging.info("EXTRACTING URLS FROM URL CONTAINER")
+    url2TextFile(dictionary, progressBar=True)
 
 
 def request_raw_file(url, msg_fail, s):
@@ -382,16 +444,15 @@ def request_raw_file(url, msg_fail, s):
     return result
 
 
-def createTextFile(file_name, contents, progressbar=False):
+def createTextFile(file_name, contents):
     # Contents can be a string or a list of strings must end with \n except last element in the list
+    logging.info(f"CREATING TEXT FILE: {file_name}.txt")
     with open(localappdata_path + '\\' + file_name + '.txt', "w") as text_file:
         if isinstance(contents, list):
             text_file.writelines(contents)
         else:
             text_file.write(contents)
-    if progressbar:
-        progressBar.place(x=185, y=520)
-        progressBar['value'] += 10
+    logging.info(f"FILE: {file_name}.txt CREATED")
 
 
 def readIpRangesByFilename(fileName):
@@ -436,10 +497,8 @@ def loadUserConfig():
         configLinesNonZeroLen = filter(lambda line: len(line) > 0, configLinesStriped)
         configLinesFileExists = filter(lambda line: exists(localappdata_path + "\\" + line), configLinesNonZeroLen)
         configIpRangesPerServer = map(lambda line: readIpRangesByFilename(line), configLinesFileExists)
-
         # [ item for list in listoflists for item in list] https://stackoverflow.com/q/1077015
         customConfig = [ipRange for IpRangesChunk in configIpRangesPerServer for ipRange in IpRangesChunk]
-        print()
 
 
 def iconMaker():  # Used to check if there is an icon in the same directory or not it will create the icon if not.
@@ -564,16 +623,18 @@ def checkIfActive():  # To check if server is blocked or not
                                 "_CUSTOM_BLOCK"]
     firewall = dispatchFirewall()
     rules = [x.Name for x in firewall.Rules]
-    logging.info("CHECKING IF PREVIOUS RULE IS ACTIVE")
+    logging.info("CHECKING IF PREVIOUS RULES EXIST")
     for rule_name in servers_active_rule_list:
         if rule_name in rules:
             filtered = rule_name.split('_')[1]
             if filtered == 'ME':
                 blockingLabel.config(text='ME BLOCKED', bg='#282828', fg='#ef2626', font=futrabook_font)
+                logging.info(f"FOUND RULE: {rule_name}")
                 return
             if filtered == 'CUSTOM':
                 blockingLabel.config(text="CUSTOM BLOCK", bg='#282828', fg='#26ef4c',
                                      font=futrabook_font)
+                logging.info(f"FOUND RULE: {rule_name}")
                 return
             else:
                 if len(filtered) < 8:
@@ -581,8 +642,10 @@ def checkIfActive():  # To check if server is blocked or not
                 label_text = 'PLAYING ON ' + filtered
                 blockingLabel.config(text=label_text, bg='#282828', fg='#26ef4c',
                                      font=futrabook_font)
+                logging.info(f"FOUND RULE: {rule_name}")
                 return
     blockingLabel.config(text='ALL UNBLOCKED (DEFAULT SETTINGS)', fg='#ddee4a')
+    logging.info("NO RULES FOUND")
 
 
 def tunnel():  # Handle tunnelling options for Overwatch.exe
@@ -592,7 +655,7 @@ def tunnel():  # Handle tunnelling options for Overwatch.exe
     if checkbotton_state == 1:
         if exists(overwatch_path):
             logging.info("Game detected")
-            createTextFile('Options', 'Tunnel=True', False)
+            createTextFile('Options', 'Tunnel=True')
             tunnel_option = True
         else:
             app.overwatch = filedialog.askopenfilename(initialdir='C:\\',
@@ -604,12 +667,12 @@ def tunnel():  # Handle tunnelling options for Overwatch.exe
                 overwatch_path = app.overwatch.replace('/', "\\")
                 tunnel_option = True
                 logging.debug("Overwatch path is:  " + overwatch_path)
-                createTextFile('Options', ['Tunnel=True\n', overwatch_path], False)
+                createTextFile('Options', ['Tunnel=True\n', overwatch_path])
             else:
-                createTextFile('Options', 'Tunnel=False', False)
+                createTextFile('Options', 'Tunnel=False')
                 tunnelCheckBox_state.set(0)
     else:
-        createTextFile('Options', 'Tunnel=False', False)
+        createTextFile('Options', 'Tunnel=False')
         tunnel_option = False
 
 
@@ -674,11 +737,17 @@ def customSettingsWindow():
     openIpListButton = Button(top, image=button_img_OPEN_IP_LIST_BUTTON, font=futrabook_font, command=openListFolder,
                               bg='#404040', fg='#404040', borderwidth=0, activebackground='#404040')
     openIpListButton.place(x=92 + 55, y=479, anchor="center")
+
+    # Labels
+    informationLabel = Label(top, text='Selected servers will be blocked', bg='#404040', fg='#ef2626',
+                             font=futrabook_font)
+    informationLabel.place(x=150, y=415, anchor="center")
+
     onlyfiles = [f for f in listdir(localappdata_path) if isfile(join(localappdata_path, f))]
     ip_ranges_files = list()
     integersList = list()
     for file in onlyfiles:
-        if file.startswith('Ip_ranges') or file.startswith('usercfg'):
+        if file.startswith('cfg'):
             ip_ranges_files.append(file)
     for i in range(0, len(ip_ranges_files)):
         integerVariable = IntVar()
@@ -686,7 +755,7 @@ def customSettingsWindow():
     ip_range_checkboxes = dict(zip(ip_ranges_files, integersList))
     for index, RANGE in enumerate(ip_range_checkboxes):
         ip_range_checkboxes[RANGE] = IntVar()
-        chk = Checkbutton(top, text=RANGE[:-4], font=futrabook_font,
+        chk = Checkbutton(top, text=RANGE[:-4].strip('cfg -'), font=futrabook_font,
                           activebackground='#ddee4a',
                           bg='#404040', fg='#26ef4c', borderwidth=0, variable=ip_range_checkboxes[RANGE], width=200,
                           anchor="w", selectcolor='black',
@@ -819,8 +888,6 @@ internetLabel.place(x=250, y=420, anchor="center")
 versionLabel = Label(app, text=f'V {__version__}', bg='#282828', fg='#26ef4c', font=futrabook_font)
 versionLabel.grid(row=0, column=0)
 versionLabel.place(x=460, y=590, anchor="center")
-
-progressBar = ttk.Progressbar(app, orient=HORIZONTAL, length=130, mode='determinate')
 
 # Buttons
 y_axis = range(70, 450, 48)
