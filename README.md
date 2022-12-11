@@ -59,7 +59,7 @@ Note: when applying options take care about this
 
 If you apply options while the game is running:
 
-	FROM NO OPTION CHOOSEN TO PLAY ON OPTION 	--->  GAME RESTART REQUIRED
+	FROM NO OPTION CHOSEN TO PLAY ON OPTION 	--->  GAME RESTART REQUIRED
 	FROM PLAY ON OPTION TO UNBLOCK ALL	 	--->  NO RESTART REQUIRED
 
 ## Download
