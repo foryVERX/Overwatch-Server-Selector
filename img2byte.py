@@ -33,5 +33,6 @@ if __name__ == '__main__':
     pic2str('OPEN_IP_LIST_BUTTON.png', 'OPEN_IP_LIST_BUTTON')
     pic2str('APPLY_BUTTON.png', 'APPLY_BUTTON')
     pic2str('Frame 2.png', 'CUSTOM_SETTINGS_BACKGROUND')
+    pic2str('Donation Button.png', 'Donation_Button')
+    pic2str('DISCORD.png', 'Discord_Button')
     """
-    pic2str('INSTALL_UPDATE.png', 'INSTALL_UPDATE')
