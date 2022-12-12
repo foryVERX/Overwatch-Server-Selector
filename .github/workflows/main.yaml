@@ -23,7 +23,7 @@ jobs:
       - name: exe_to_workflow
         uses: actions/upload-artifact@v2
         with:
-          name: Overwatch-Server-Selector.exe
+          name: MINA Overwatch 2 Server Selector.exe
           path: dist
       - name: gh_tag
         id: gh_tag
@@ -34,7 +34,7 @@ jobs:
         uses: softprops/action-gh-release@v0.1.14
         if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'pull_request'}}
         with:
-          files: dist/windows/Overwatch-Server-Selector.exe
+          files: dist/windows/MINA Overwatch 2 Server Selector.exe
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ steps.gh_tag.outputs.tag }}
 
