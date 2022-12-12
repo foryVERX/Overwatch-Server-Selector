@@ -6,5 +6,4 @@ EU - France|37.244.0.0
 NA - USA West|24.105.30.129
 NA - USA Central|24.105.62.129
 Other - Brazil|dynamodb.sa-east-1.amazonaws.com	
-Other - Australia|103.198.33.1
 Other - Bahrain|dynamodb.me-south-1.amazonaws.com
