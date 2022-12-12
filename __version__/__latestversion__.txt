@@ -1,2 +1,2 @@
-version=5.1.1
-url=https://github.com/foryVERX/Overwatch-Server-Selector/releases/download/5.1.1/Setup.MINA.Overwatch.2.Server.Selector-v5.1.1.exe
+version=5.2.0
+url=https://github.com/foryVERX/Overwatch-Server-Selector/releases/download/5.2.0/Setup.MINA.Overwatch.2.Server.Selector-v5.2.0.exe

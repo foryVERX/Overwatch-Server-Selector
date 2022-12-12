@@ -11,7 +11,6 @@ pyinstaller = "*"
 requests = "*"
 pandas = "*"
 checklistcombobox = "*"
-pythonping = "*"
 
 [dev-packages]
 

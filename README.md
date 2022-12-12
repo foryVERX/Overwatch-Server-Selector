@@ -51,8 +51,18 @@ Please reach out if you want to help or have a question, discord: VERX#2227
 
 **The application has to be ran as administrator to be able to add or remove firewall rules.**
 
-[HOW TO USE MINA OVERWATCH 2 SERVER (OUTDATED)](https://youtu.be/PDaShF9Mpjo)
+## Requirements
+### Video Guide
+[HOW TO USE MINA OVERWATCH 2 SERVER](https://youtu.be/ySLK0wW3lDc)
 
+Note: when applying options take care about this
+
+If you apply options while the game is running:
+
+	FROM NO OPTION CHOSEN TO PLAY ON OPTION 	--->  GAME RESTART REQUIRED
+	FROM PLAY ON OPTION TO UNBLOCK ALL	 	--->  NO RESTART REQUIRED
+
+## Download
 [DOWNLOAD MINA OVERWATCH 2 SERVER SELECTOR](https://github.com/foryVERX/Overwatch-Server-Selector/releases)
 
 # Build 

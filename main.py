@@ -6,6 +6,7 @@ import win32com.shell.shell as shell
 from win32com.client import Dispatch as DispatchCOMObject
 from pythoncom import CoInitialize
 from itertools import groupby
+from subprocess import run
 from PIL import ImageTk, Image
 from io import BytesIO
 import pic2str
@@ -21,10 +22,9 @@ import logging
 import datetime
 from urllib3 import Retry
 from requests.adapters import HTTPAdapter
-from pythonping import ping
 
 # Information
-__version__ = '5.3.0'
+__version__ = '5.2.0'
 _AppName_ = 'MINA Overwatch 2 Server Selector'
 __author__ = 'Yousef Aljohani'
 __copyright__ = 'Copyright (C) 2022, Yousef Aljohani'
@@ -62,8 +62,6 @@ byte_OPEN_IP_LIST_BUTTON = base64.b64decode(pic2str.OPEN_IP_LIST_BUTTON)
 byte_APPLY_BUTTON = base64.b64decode(pic2str.APPLY_BUTTON)
 byte_CUSTOM_SETTINGS_BACKGROUND = base64.b64decode(pic2str.CUSTOM_SETTINGS_BACKGROUND)
 byte_INSTALL_UPDATE = base64.b64decode(pic2str.INSTALL_UPDATE)
-byte_TEST_PING = base64.b64decode(pic2str.TEST_PING)
-byte_Discord_Button = base64.b64decode(pic2str.Discord_Button)
 
 image_data_SMALL_APPLICATION = BytesIO(byte_LOGO_SMALL_APPLICATION)
 image_data_SQUARE_BACKGROUND_MINA_TEST = BytesIO(byte_SQUARE_BACKGROUND_MINA_TEST)
@@ -81,8 +79,6 @@ image_data_OPEN_IP_LIST_BUTTON = BytesIO(byte_OPEN_IP_LIST_BUTTON)
 image_data_APPLY_BUTTON = BytesIO(byte_APPLY_BUTTON)
 image_data_CUSTOM_SETTINGS_BACKGROUND = BytesIO(byte_CUSTOM_SETTINGS_BACKGROUND)
 image_data_INSTALL_UPDATE = BytesIO(byte_INSTALL_UPDATE)
-image_data_TEST_PING = BytesIO(byte_TEST_PING)
-image_data_Discord_Button = BytesIO(byte_Discord_Button)
 
 # Add images
 background = ImageTk.PhotoImage(Image.open(image_data_SQUARE_BACKGROUND_MINA_TEST))
@@ -103,8 +99,6 @@ button_img_donation = ImageTk.PhotoImage(Image.open(image_donation))
 button_img_Default = ImageTk.PhotoImage(Image.open(image_UNBLOCK_ALL_MAIN))
 button_img_CUSTOM_SETTINGS = ImageTk.PhotoImage(Image.open(image_CUSTOM_SETTINGS))
 button_img_INSTALL_UPDATE = ImageTk.PhotoImage(Image.open(image_data_INSTALL_UPDATE))
-button_img_TEST_PING = ImageTk.PhotoImage(Image.open(image_data_TEST_PING))
-button_img_Discord_Button = ImageTk.PhotoImage(Image.open(image_data_Discord_Button))
 
 # Add font
 futrabook_font = Font(family="Futura PT Demi", size=10)
@@ -126,7 +120,6 @@ DEFAULT_BLOCK_NAME = "_Overwatch Block"
 DEFAULT_GROUPING_NAME = "_MINA Overwatch 2-Server-Selector"
 
 updating_state = False
-appUpdate_required = False
 sorter_initialization = False
 checkForUpdate_initialization = False
 tunnel_option = False
@@ -151,8 +144,6 @@ logging.basicConfig(
     format='[%(asctime)s] %(levelname)s - %(message)s',
     datefmt='%H:%M:%S'
 )
-
-logging.info(f"Running version v{__version__}")
 
 # FirewallAPI COM objects and constants
 
@@ -212,124 +203,76 @@ def internetConnection():
 
 
 def updateIpList():
-    global updating_state, sorter_initialization
+    global updating_state, sorter_initialization, checkForUpdate_initialization
     controlButtons('disabled')
-    pingButton.place_forget()
-    InstallUpdateButton.place_forget()
-    if not internetConnection():
+    if internetConnection():
+        updating_state = True
+        update_text = "UPDATING IP LIST..."
+        internetLabel.config(text=update_text, fg='#ddee4a')
+        start = datetime.datetime.now()
+        download_Ip_List()
+        finish = datetime.datetime.now() - start
+        logging.info('UPDATING TOOK: ' + str(finish))
+        logging.info("IP LIST UPDATED")
+        updating_state = False
+        checkForUpdate_initialization = False
+        loadIpRanges()
+    else:
         update_text = "Please check your internet connection to download servers ip"
         internetLabel.config(text=update_text, fg='#ddee4a')
-        return
-    updating_state = True
-    update_text = "UPDATING IP LIST..."
-    internetLabel.config(text=update_text, fg='#ddee4a')
-    start = datetime.datetime.now()
-    download_Ip_List()
-    finish = datetime.datetime.now() - start
-    logging.info('UPDATING TOOK: ' + str(finish))
-    logging.info("IP LIST UPDATED")
-    updating_state = False
-    if not appUpdate_required:
-        pingButton.place(x=135, y=500, height=40, width=230)
-    else:
-        InstallUpdateButton.place(x=135, y=500, height=40, width=230)
-    loadIpRanges()
-    update_text = "IP LIST IS UPTODATE"
-    app.after(250, internetLabel.config(text=update_text, fg='#26ef4c'))
 
 
 def check_ip_update():  # A function called at the start of the program to check for update
-    global isUpdated, updating_state
+    global isUpdated, updating_state, checkForUpdate_initialization
     if updating_state:
         return
+    updating_state = True
     logging.info("CHECKING LATEST IP LIST VERSION FROM GITHUB")
-    if not internetConnection():
+    if internetConnection():
+        if isdir(localappdata_path) and path.exists(ip_version_path):
+            logging.info(localappdata_path + ' FOUND')
+            logging.info(ip_version_path + ' FOUND')
+            with open(ip_version_path, "r") as reader:  # Read Ip_version.txt from GitHub and analyze
+                logging.info('READING CURRENT IP LIST VERSION')
+                for line in reader.readlines():
+                    if len(line) > 1:
+                        msg_fail = "Ip list update check failed"
+                        with requests.Session() as s:
+                            adapter = HTTPAdapter(max_retries=Retry(total=4, backoff_factor=1, allowed_methods=None,
+                                                                    status_forcelist=[429, 500, 502, 503, 504]))
+                            s.mount("http://", adapter)
+                            s.mount("https://", adapter)
+                            LatestIpListVersion = request_raw_file(ip_version_url, msg_fail, s)
+                        LatestIpListVersion = linesep.join([s for s in LatestIpListVersion.splitlines() if s])
+                        currentIpListVersion = linesep.join([s for s in line.splitlines() if s])
+                        logging.debug("CURRENT IP LIST VERSION : " + str(currentIpListVersion))
+                        logging.debug("LATEST IP LIST VERSION : " + str(LatestIpListVersion))
+                        if LatestIpListVersion == currentIpListVersion:
+                            update_text = "IP LIST IS UPDATED"
+                            app.after(250, internetLabel.config(text=update_text, fg='#26ef4c'))
+                        else:
+                            update_text = "IP LIST IS NOT UPDATED"
+                            app.after(250, internetLabel.config(text=update_text, fg='#ef2626'))
+                            threading.Thread(target=updateIpList, daemon=True).start()
+        else:  # Make directory and call updateIp
+            update_text = "FIRST TIME RUNNING.. DOWNLOADING IP LIST"
+            app.after(250, internetLabel.config(text=update_text, fg='#ddee4a'))
+            if not exists(localappdata_path):
+                mkdir(localappdata_path)  # Make directory
+            threading.Thread(target=updateIpList, daemon=True).start()
+    else:
         logging.debug('No internet connection')
         if not exists(ip_version_path):
             controlButtons('disabled')
             update_text = "CONNECTION FAILED... Trying to update ip list"
             app.after(250, internetLabel.config(text=update_text, fg='#ef2626'))
             app.after(1000, check_ip_update)
-            return
-        update_text = "NO INTERNET MIGHT BE NOT LATEST IP LIST VERSION"
-        app.after(250, internetLabel.config(text=update_text, fg='#ddee4a'))
-
-    if not isdir(localappdata_path):
-        logging.info(localappdata_path + ' NOT FOUND')
-        update_text = "FIRST TIME RUNNING.. DOWNLOADING IP LIST"
-        app.after(250, internetLabel.config(text=update_text, fg='#ddee4a'))
-        makeApp_directory()
-        threading.Thread(target=updateIpList, daemon=True).start()
-        return
-
-    if not exists(ip_version_path):
-        logging.info(ip_version_path + ' NOT FOUND')
-        threading.Thread(target=updateIpList, daemon=True).start()
-        return
-
-    logging.info(localappdata_path + ' FOUND')
-    logging.info(ip_version_path + ' FOUND')
-    logging.info('READING CURRENT IP LIST VERSION')
-
-    for line in readLine_filtered(ip_version_path):
-        msg_fail = "Ip list update check failed"
-        session = createHTTP_session()
-        LatestIpListVersion = request_raw_file(ip_version_url, msg_fail, session)
-        LatestIpListVersion = filterStrings(LatestIpListVersion, removeSpace=True, removeNewlines=True)
-        currentIpListVersion = filterStrings(line, removeSpace=True, removeNewlines=True)
-        logging.debug("CURRENT IP LIST VERSION : " + str(currentIpListVersion))
-        logging.debug("LATEST IP LIST VERSION : " + str(LatestIpListVersion))
-
-        if not LatestIpListVersion == currentIpListVersion:
-            update_text = "IP LIST IS NOT UPDATED"
-            app.after(250, internetLabel.config(text=update_text, fg='#ef2626'))
-            threading.Thread(target=updateIpList, daemon=True).start()
-            return
-        update_text = "IP LIST IS UPTODATE"
-        app.after(250, internetLabel.config(text=update_text, fg='#26ef4c'))
+        else:
+            update_text = "NO INTERNET MIGHT BE NOT LATEST IP LIST VERSION"
+            app.after(250, internetLabel.config(text=update_text, fg='#ddee4a'))
+    updating_state = False
     # if thread_type == 'mainThread':  # If the function is called from main thread call it again after 5 mints
     # app.after(5000 * 60, checkUpdate)
-
-
-def filterStrings(string, removeSpace=False, removeNewlines=False):
-    if removeSpace:
-        string = string.replace(" ", "")
-    if removeNewlines:
-        string = string.splitlines()
-        string = str([i for i in string if i])  # remove empty lines from each element
-    return string
-
-
-def makeApp_directory():
-    """
-    Makes the app directory
-    :return: None
-    """
-    if not exists(localappdata_path):
-        mkdir(localappdata_path)  # Make directory
-
-
-def readLine_filtered(txt_path):
-    """
-    :param txt_path: the path to the text file
-    :return: Lines striped from \n and nonzero length
-    """
-    with open(txt_path, "r") as lines:  # Read Ip_version.txt from GitHub and analyze
-        lines = lines.readlines()
-        linesStriped = map(lambda line: line.strip('\n'), lines)
-        linesStriped = map(lambda line: line.strip('\t'), linesStriped)
-        linesStripedNonZeroLen = list(filter(lambda line: len(line) > 0, linesStriped))
-        return linesStripedNonZeroLen
-
-
-def createHTTP_session():
-    print("Creating session")
-    with requests.Session() as session:
-        adapter = HTTPAdapter(max_retries=Retry(total=4, backoff_factor=1, allowed_methods=None,
-                                                status_forcelist=[429, 500, 502, 503, 504]))
-        session.mount("http://", adapter)
-        session.mount("https://", adapter)
-    return session
 
 
 def check_app_update():
@@ -339,36 +282,34 @@ def check_app_update():
     Pop a "INSTALL UPDATE" button if new app update is detected
     :return: None
     """
-    global latestVersion_path, appUpdate_required
-    if not internetConnection():
+    global latestVersion_path
+    if internetConnection():
+        with requests.Session() as s:
+            adapter = HTTPAdapter(max_retries=Retry(total=4, backoff_factor=1, allowed_methods=None,
+                                                    status_forcelist=[429, 500, 502, 503, 504]))
+            s.mount("http://", adapter)
+            s.mount("https://", adapter)
+            logging.info('CHECKING LATEST APP VERSION FROM GITHUB')
+            latestVersion = request_raw_file(appVersion_url, "Getting latest version failed", s).splitlines()
+            latestVersion = [i for i in latestVersion if i]  # To make sure no empty lines
+            latestVer = latestVersion[0].strip()
+            urlDownload = latestVersion[1].strip()
+            logging.info(f"LATEST APP VERSION {latestVer}")
+            latestVer = latestVer.strip("version=")
+            urlDownload = urlDownload.strip("url=")
+            if not __version__ == latestVer:
+                logging.info(f"NEW APP UPDATE IS AVAILABLE: v{latestVer}")
+                latestVersion_path = temp_path.replace('\\Roaming', '') + '\\' + f'{_AppName_} {latestVer}.exe'
+                if not exists(latestVersion_path):
+                    logging.info(f"DOWNLOADING APP UPDATE v{latestVer}")
+                    downloadedBytes = s.get(urlDownload)
+                    open(latestVersion_path, "wb").write(downloadedBytes.content)
+                    logging.info(f"APP UPDATE IS DOWNLOADED AT THE LOCATION: {latestVersion_path}" )
+                InstallUpdateButton.place(x=135, y=500, height=40, width=230)
+            else:
+                logging.info("CURRENT VERSION IS UPTODATE")
+    else:
         logging.info("COULD NOT CHECK FOR APP UPDATE DUE TO NO INTERNET CONNECTION")
-        return
-    session = createHTTP_session()
-    logging.info('CHECKING LATEST APP VERSION FROM GITHUB')
-    latestVersion = request_raw_file(appVersion_url, "Getting latest version failed", session).splitlines()
-    # https://www.geeksforgeeks.org/python-remove-empty-strings-from-list-of-strings/
-    latestVersion = [i for i in latestVersion if i]  # To make sure no empty lines
-    latestVer = latestVersion[0].strip()
-    urlDownload = latestVersion[1].strip()
-    logging.info(f"LATEST APP VERSION {latestVer}")
-    latestVer = latestVer.strip("version=")
-    urlDownload = urlDownload.strip("url=")
-    if not __version__ == latestVer:
-        logging.info(f"NEW APP UPDATE IS AVAILABLE: v{latestVer}")
-        latestVersion_path = temp_path.replace('\\Roaming', '') + '\\' + f'{_AppName_} {latestVer}.exe'
-        if not exists(latestVersion_path):
-            logging.info(f"DOWNLOADING APP UPDATE v{latestVer}")
-            downloadedBytes = session.get(urlDownload)
-            open(latestVersion_path, "wb").write(downloadedBytes.content)
-            logging.info(f"APP UPDATE IS DOWNLOADED AT THE LOCATION: {latestVersion_path}")
-        pingButton.place_forget()
-        appUpdate_required = True
-        if not updating_state:
-            InstallUpdateButton.place(x=135, y=500, height=40, width=230)
-        return
-    if not updating_state and not appUpdate_required:
-        pingButton.place(x=135, y=500, height=40, width=230)
-    logging.info("CURRENT VERSION IS UPTODATE")
 
 
 def installUpdate():
@@ -412,9 +353,13 @@ def downloadUrls(filename, urlTarget):
     :param urlTarget: The url to download the content
     :return:
     """
-    session = createHTTP_session()
-    downloadedBytes = session.get(urlTarget)
-    open(filename, "wb").write(downloadedBytes.content)
+    with requests.Session() as s:
+        adapter = HTTPAdapter(max_retries=Retry(total=4, backoff_factor=1, allowed_methods=None,
+                                                status_forcelist=[429, 500, 502, 503, 504]))
+        s.mount("http://", adapter)
+        s.mount("https://", adapter)
+        downloadedBytes = s.get(urlTarget)
+        open(filename, "wb").write(downloadedBytes.content)
 
 
 def url2TextFile(dic, progressBar=False):
@@ -437,15 +382,19 @@ def url2TextFile(dic, progressBar=False):
     lengthProgressBar = 150
     if progressBar:
         progressBar = ttk.Progressbar(app, orient=HORIZONTAL, length=lengthProgressBar, mode='determinate')
-        progressBar.place(x=135, y=510, height=20, width=230)
-    session = createHTTP_session()
-    for file_name, url in dic.items():
-        logging.info(f"DOWNLOADING {url}")
-        content = request_raw_file(url, "Requesting contents from url failed", session)
-        createTextFile(file_name.replace("%20", ' '), content)
-        if progressBar:
-            progressBar['value'] += lengthProgressBar / len(dic)
-    progressBar.place_forget()
+        progressBar.grid(row=0, column=0, padx=175, pady=520)
+    with requests.Session() as s:
+        adapter = HTTPAdapter(max_retries=Retry(total=4, backoff_factor=1, allowed_methods=None,
+                                                status_forcelist=[429, 500, 502, 503, 504]))
+        s.mount("http://", adapter)
+        s.mount("https://", adapter)
+        for file_name, url in dic.items():
+            logging.info(f"DOWNLOADING {url}")
+            content = request_raw_file(url, "Requesting contents from url failed", s)
+            createTextFile(file_name.replace("%20", ' '), content)
+            if progressBar:
+                progressBar['value'] += lengthProgressBar / len(dic)
+        progressBar.grid_forget()
 
 
 def download_Ip_List():
@@ -472,12 +421,12 @@ def download_Ip_List():
     url2TextFile(dictionary, progressBar=True)
 
 
-def request_raw_file(url, msg_fail, session):
+def request_raw_file(url, msg_fail, s):
     """
-    :arg: url, msg_fail, session
+    :arg: url, msg_fail, s
     url: is the url at which raw text exists
     msg_fail: the message given to log when connection fails
-    session: the session initiated
+    s: the session initiated
 
     :return:
     result: decoded bytes from source
@@ -487,7 +436,7 @@ def request_raw_file(url, msg_fail, session):
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0"
         }
-        result = session.get(url, headers=headers).content.decode('utf-8')
+        result = s.get(url, headers=headers).content.decode('utf-8')
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         logging.debug('URL REQUEST FAIL RETRYING: ' + url)
         logging.debug(str(e))
@@ -526,9 +475,14 @@ def loadIpRanges():  # Store ip ranges from Ip_ranges_....txt into Ip_ranges dic
         ipRangesFilenames = filter(lambda server: server.startswith("Ip_ranges"), appDataFilenames)
         Ip_ranges_dic = {path.splitext(ipRangesFilename)[0]: readIpRangesByFilename(ipRangesFilename) for
                          ipRangesFilename in ipRangesFilenames}
+
+        update_text = "UPDATED"
+        app.after(250, internetLabel.config(text=update_text, fg='#26ef4c'))
         sorter_initialization = True
         logging.info("IP LIST LOADED")
-        controlButtons('normal')
+    else:  # User running first time
+        check_ip_update()
+    controlButtons('normal')
 
 
 def loadUserConfig():
@@ -754,50 +708,44 @@ def loadBlockingConfig():
 
 
 def customSettingsWindow():
-    global ip_ranges_files, ip_range_checkboxes, customWindow
+    global ip_ranges_files, ip_range_checkboxes, top
     savedSettings = []
     if exists(customConfig_path):
-        logging.debug(f"{customConfig_path} FOUND")
-        logging.debug(f"READING customConfig.txt")
         with open(customConfig_path, 'r') as reader:
             for line in reader.readlines():
                 if len(line) > 0:
                     savedSettings.append(line.strip())
-    logging.debug(f"CREATING CUSTOM WINDOW")
-    customWindow = Toplevel()
+    top = Toplevel()
     # Set Properties
-    customWindow.title('Custom Config')
-    customWindow.resizable(False, False)
-    customWindow.geometry('300x500')
-    customWindow.configure(bg='#404040')
-    frameTop = Frame(customWindow, width=300, height=500)
+    top.title('Custom Config')
+    top.resizable(False, False)
+    top.geometry('300x500')
+    top.configure(bg='#404040')
+    frameTop = Frame(top, width=300, height=500)
     frameTop.pack()
     frameTop.place(x=-2, y=0)
     backgroundTop = Label(frameTop, image=CUSTOM_SETTINGS_BACKGROUND)
     backgroundTop.pack()
-    customWindow.iconbitmap("LOGO_SMALL_APPLICATION.ico")
+    top.iconbitmap("LOGO_SMALL_APPLICATION.ico")
     # Buttons
-    applyButton = Button(customWindow, image=button_img_APPLY_BUTTON, font=futrabook_font, command=apply,
+    applyButton = Button(top, image=button_img_APPLY_BUTTON, font=futrabook_font, command=apply,
                          bg='#404040', fg='#404040', borderwidth=0, activebackground='#404040')
     applyButton.place(x=177 + 55, y=448, anchor="center")
-    resetButton = Button(customWindow, image=button_img_RESET_BUTTON, font=futrabook_font, command=resetCustomSettings,
+    resetButton = Button(top, image=button_img_RESET_BUTTON, font=futrabook_font, command=resetCustomSettings,
                          bg='#404040', fg='#404040', borderwidth=0, activebackground='#404040')
     resetButton.place(x=11 + 55, y=448, anchor="center")
-    openIpListButton = Button(customWindow, image=button_img_OPEN_IP_LIST_BUTTON, font=futrabook_font,
-                              command=openListFolder,
+    openIpListButton = Button(top, image=button_img_OPEN_IP_LIST_BUTTON, font=futrabook_font, command=openListFolder,
                               bg='#404040', fg='#404040', borderwidth=0, activebackground='#404040')
     openIpListButton.place(x=92 + 55, y=479, anchor="center")
 
     # Labels
-    informationLabel = Label(customWindow, text='Selected servers will be blocked', bg='#404040', fg='#ef2626',
+    informationLabel = Label(top, text='Selected servers will be blocked', bg='#404040', fg='#ef2626',
                              font=futrabook_font)
     informationLabel.place(x=150, y=415, anchor="center")
 
-    logging.debug(f"LISTING FILES IN APP DIRECTORY")
     onlyfiles = [f for f in listdir(localappdata_path) if isfile(join(localappdata_path, f))]
     ip_ranges_files = list()
     integersList = list()
-    logging.debug(f"READING CFG FILES")
     for file in onlyfiles:
         if file.startswith('cfg'):
             ip_ranges_files.append(file)
@@ -807,7 +755,7 @@ def customSettingsWindow():
     ip_range_checkboxes = dict(zip(ip_ranges_files, integersList))
     for index, RANGE in enumerate(ip_range_checkboxes):
         ip_range_checkboxes[RANGE] = IntVar()
-        chk = Checkbutton(customWindow, text=RANGE[:-4].strip('cfg -'), font=futrabook_font,
+        chk = Checkbutton(top, text=RANGE[:-4].strip('cfg -'), font=futrabook_font,
                           activebackground='#ddee4a',
                           bg='#404040', fg='#26ef4c', borderwidth=0, variable=ip_range_checkboxes[RANGE], width=200,
                           anchor="w", selectcolor='black',
@@ -817,77 +765,11 @@ def customSettingsWindow():
         chk.pack()
 
 
-def createPing_labels(windowLevel, dictionary):
-    for index, (serverName, pingValue) in enumerate(dictionary.items()):
-        logging.debug(f"CREATING LABELS AT {windowLevel} LABEL: {serverName}  {pingValue}")
-        serverLabel = Label(windowLevel, text=f"{serverName}", activebackground='#ddee4a',
-                            bg='#404040', fg='#26ef4c', font=futrabook_font)
-        serverLabel.grid(row=index + 2, column=0, sticky="EW")
-        pingLabel = Label(windowLevel, text=f"{pingValue} ms", activebackground='#ddee4a',
-                          bg='#404040', fg='#26ef4c', font=futrabook_font)
-        pingLabel.grid(row=index + 2, column=1, sticky="EW")
-
-
-def pingServers(windowLevel):
-    pingList_path = localappdata_path + '\\pinglist.txt'
-    severNames = list()
-    serverIp = list()
-    resultList = list()
-    pingValueCompensation = 10  # To compensate for ICMP vs GAME ping difference
-    loadingLabel = Label(windowLevel, text='Please wait for ping test...',
-                         bg='#404040', fg='#ef2626', font=futrabook_font)
-    loadingLabel.grid(row=1, column=0, columnspan=2, sticky="EW")
-    logging.debug(f"PING PROCESS STARTED")
-    if not exists(pingList_path):
-        return
-    logging.debug(f"{pingList_path} FOUND")
-    pingList = readLine_filtered(pingList_path)
-
-    for server in pingList:
-        severNames.append(server.split('|')[0])
-        serverIp.append(server.split('|')[1])
-    for ip in serverIp:
-        logging.debug(f"Measuring ping to {ip}")
-        response_list = ping(ip, count=3, timeout=1)
-        resultList.append(str(int(response_list.rtt_avg_ms) + pingValueCompensation))
-        logging.debug(f"Result of ping to {ip} = {round(response_list.rtt_avg_ms, 2)}")
-    pingDictionary = dict(zip(severNames, resultList))
-    createPing_labels(windowLevel, pingDictionary)
-    loadingLabel.grid_forget()
-    logging.debug(f"PING PROCESS IS OVER")
-
-
-def pingMenu():
-    logging.debug(f"CREATING PING MENU")
-    pingWindow = Toplevel()
-    # Set Properties
-    pingWindow.title('Ping')
-    pingWindow.resizable(False, False)
-    # pingWindow.geometry('300x500')
-    pingWindow.configure(bg='#404040')
-    frameTop = Frame(pingWindow, width=300, height=500)
-    frameTop.pack()
-    frameTop.place(x=-2, y=0)
-    backgroundTop = Label(frameTop, image=CUSTOM_SETTINGS_BACKGROUND)
-    backgroundTop.pack()
-    pingWindow.iconbitmap("LOGO_SMALL_APPLICATION.ico")
-    # Labels
-    informationLabel = Label(pingWindow, text='Ping values are estimates they might be not accurate',
-                             bg='#404040', fg='#ef2626', font=futrabook_font)
-    informationLabel.grid(row=0, column=0, columnspan=2, sticky="EW")
-    # informationLabel.place(x=150, y=415, anchor="center")
-    logging.debug(f"LAUNCHING pingServers THREAD WITH args: pingWindow")
-    threading.Thread(target=pingServers, args=(pingWindow,), daemon=True).start()  # Follow main thread
-
-
 def resetCustomSettings():
-    logging.debug(f"RESETTING CUSTOM CONFIG")
     customConfig.clear()
     if exists(customConfig_path):
-        logging.debug(f"REMOVING PATH {customConfig_path}")
         remove(customConfig_path)
-    logging.debug(f"CLOSING --> CUSTOM WINDOW")
-    customWindow.destroy()
+    top.destroy()
 
 
 def apply():
@@ -895,31 +777,21 @@ def apply():
     customIpRanges.clear()
     for IP_NAME in ip_ranges_files:
         if ip_range_checkboxes[IP_NAME].get() == 1:
-            logging.debug(f"CUSTOM CONFIG STATES: {IP_NAME} CHECKBOX STATE: {str(ip_range_checkboxes[IP_NAME].get())}")
+            print("Server: ", IP_NAME, " Checkbox state: ", str(ip_range_checkboxes[IP_NAME].get()))
             if IP_NAME not in customIpRanges:
                 customIpRanges.append(IP_NAME)
     with open(localappdata_path + '\\customConfig.txt', 'w') as fp:
         for item in customIpRanges:
             # write each item on a new line
             fp.write("%s\n" % item)
+    print(customIpRanges)
     loadUserConfig()
-    customWindow.destroy()
+    top.destroy()
 
 
 def openListFolder():
     if exists(localappdata_path):
         startfile(localappdata_path)
-
-
-def reinstallIp_list():
-    logging.debug(f"REINSTALLING IP LIST")
-    internetLabel.config(text="REINSTALLING IP LIST", fg='#ef2626')
-    pingButton.place_forget()
-    if exists(ip_version_path):
-        remove(ip_version_path)
-    updateIpList()
-    if not appUpdate_required:
-        pingButton.place(x=135, y=500, height=40, width=230)
 
 
 def blockALL():  # This function is for testing reasons only DO NOT USE.
@@ -991,29 +863,13 @@ def donationPage():
     webbrowser.open("https://paypal.me/vantverx?country.x=SA&locale.x=en_US")
 
 
-def discordInvite():
-    webbrowser.open("https://discord.gg/8CtV7bkJzB")
-
-
-def checkUpdate():
-    """
-    Used to check for update for both  IP and APP version.
-
-    :return: None
-    """
-    check_ip_update()
-    check_app_update()
-
-
 # Menus
 menu = Menu(app)
 app.config(menu=menu)
 options_menu = Menu(menu)
 menu.add_cascade(label="Options", menu=options_menu)
 options_menu.add_command(label="Open config folder", command=openListFolder)
-options_menu.add_command(label="Check for updates", command=lambda: threading.Thread(target=checkUpdate).start())
-# lambda to create the thread each time the option is pressed
-options_menu.add_command(label="Reinstall IP List", command=lambda: threading.Thread(target=reinstallIp_list).start())
+options_menu.add_command(label="Check for updates", command=check_ip_update)
 options_menu.add_command(label="Exit", command=app.quit)
 
 # Labels
@@ -1066,11 +922,7 @@ ClearBlocksButton.place(x=135, y=y_axis[6], height=40, width=230)
 
 DonationButton = Button(app, image=button_img_donation, font=futrabook_font, command=donationPage,
                         bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
-DonationButton.place(x=254, y=550, height=28, width=110)
-
-DiscordButton = Button(app, image=button_img_Discord_Button, font=futrabook_font, command=discordInvite,
-                       bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
-DiscordButton.place(x=136, y=550, height=28, width=110)
+DonationButton.place(x=420, y=480, height=73, width=68)
 
 CustomSettingsButton = Button(app, image=button_img_CUSTOM_SETTINGS, font=futrabook_font, command=customSettingsWindow,
                               bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
@@ -1078,9 +930,6 @@ CustomSettingsButton.place(x=370, y=318, height=25, width=25)
 
 InstallUpdateButton = Button(app, image=button_img_INSTALL_UPDATE, font=futrabook_font, command=installUpdate,
                              bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
-
-pingButton = Button(app, image=button_img_TEST_PING, font=futrabook_font, command=pingMenu,
-                    bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
 
 # Check box
 tunnelCheckBox_state = IntVar()
@@ -1094,8 +943,9 @@ check_admin()
 checkForAndDeleteLegacyRules()
 if checkOptions(): tunnelCheckBox.select()
 
+check_app_update_thread = threading.Thread(target=check_app_update, daemon=True).start()  # Follow main thread
 loadIpRanges_thread = threading.Thread(target=loadIpRanges, daemon=True).start()  # Follow main thread
 checkIfActive_thread = threading.Thread(target=checkIfActive, daemon=True).start()  # Follow main thread
-check_for_update_thread = threading.Thread(target=checkUpdate, daemon=True).start()  # Follow main thread
+check_ip_update.thread = threading.Thread(target=check_ip_update, daemon=True).start()  # Follow main thread
 
 app.mainloop()
