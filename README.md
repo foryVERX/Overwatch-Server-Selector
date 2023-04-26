@@ -110,6 +110,6 @@ It should be odd when this happens, but this is usefull when having the followin
 4. Press on open config folder.
 5. Paste content of ip_list.
 6. Restart the app.
-7. 
+
 Note. For each ip list update you have to update manually if it doesn't work again.
 
