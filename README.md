@@ -93,3 +93,21 @@ note you need to know what are you doing if you are here 😉.
 	* `--uac admin: Enable`
 11. CONVERT .PY TO .EXE
 12. The exe is now located in `output\Overwatch Server Selector.exe`
+
+# Manually Install IP List
+
+This is usefull when having the following issues
+1. Not able to update the app.
+2. IP List is not installing.
+3. It says working on it and stuck.
+4. Shows no internet connection while you have internet.
+
+
+## How to
+1. [Download the project from this link](https://github.com/foryVERX/Overwatch-Server-Selector/archive/refs/heads/main.zip)
+2. Unzip and copy the content of ip_list folder.
+2. Open the app installed at your system navigate to OPTIONS.
+3. Press on open config folder.
+4. Paste content of ip_list.
+5. Restart the app.
+
