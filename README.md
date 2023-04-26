@@ -95,19 +95,21 @@ note you need to know what are you doing if you are here 😉.
 12. The exe is now located in `output\Overwatch Server Selector.exe`
 
 # Manually Install IP List
+It should be odd when this happens, but this is usefull when having the following issues such as.
 
-This is usefull when having the following issues
 1. Not able to update the app.
 2. IP List is not installing.
 3. It says working on it and stuck.
 4. Shows no internet connection while you have internet.
 
 
-## How to
+### How to
 1. [Download the project from this link](https://github.com/foryVERX/Overwatch-Server-Selector/archive/refs/heads/main.zip)
 2. Unzip and copy the content of ip_list folder.
-2. Open the app installed at your system navigate to OPTIONS.
-3. Press on open config folder.
-4. Paste content of ip_list.
-5. Restart the app.
+3. Open the app installed at your system navigate to OPTIONS.
+4. Press on open config folder.
+5. Paste content of ip_list.
+6. Restart the app.
+7. 
+Note. For each ip list update you have to update manually if it doesn't work again.
 
