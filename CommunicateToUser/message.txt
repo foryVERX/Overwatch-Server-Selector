@@ -2,11 +2,11 @@ Here is an improved version of the paragraph:
 
 Welcome to the 5.3.1-beta version of the MINA Overwatch Server Selector! Here’s what’s new:
 
-⚫ The NA EAST option has been removed due to the server no longer existing in-game.
-⚫ A new NA Central option has been added.
-⚫ NA West is no longer linked with NA Central.
-⚫ A new messaging feature has been implemented, allowing me to send messages like this one to keep you updated or report any issues.
+- The NA EAST option has been removed due to the server no longer existing in-game.
+- A new NA Central option has been added.
+- NA West is no longer linked with NA Central.
+- A new messaging feature has been implemented, allowing me to send messages like this one to keep you updated or report any issues.
 
-🟡 Please note that this is a BETA version under development. Use with caution and consider using Quick Play to test the stability of this version.
+Please note that this is a BETA version under development. Use with caution and consider using Quick Play to test the stability of this version.
 
 Don’t forget to report any issues you encounter on our Discord server. Thank you for your support!
