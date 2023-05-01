@@ -34,7 +34,7 @@ ipRangeName::Ip_ranges_NA_East@Ip_ranges_NA_East@Ip_ranges_NA_central@Ip_ranges_
 
 
 
-ipRangeName::Ip_ranges_NA_West@Ip_ranges_NA_West@Ip_ranges_NA_central
+ipRangeName::Ip_ranges_NA_West@Ip_ranges_NA_West
 
 
 
