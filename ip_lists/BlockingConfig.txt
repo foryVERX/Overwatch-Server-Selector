@@ -18,7 +18,7 @@ ipRangeName::Ip_ranges_AS_Taiwan
 
 
 
-ipRangeName::Ip_ranges_Australia@Ip_ranges_Australia
+ipRangeName::Ip_ranges_Australia@Ip_ranges_Australia@Ip_ranges_EU
 
 
 
