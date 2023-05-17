@@ -5,5 +5,6 @@ EU - Netherlands|185.60.114.159
 EU - France|37.244.0.0
 NA - USA West|24.105.30.129
 NA - USA Central|24.105.62.129
+Other - Australia |172.105.168.123
 Other - Brazil|dynamodb.sa-east-1.amazonaws.com	
 Other - Bahrain|dynamodb.me-south-1.amazonaws.com
