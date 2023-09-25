@@ -28,4 +28,5 @@ https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lis
 https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists_betaVersions/cfg%20-%20Other%20-%20Australia%203%20-%20SYD2.txt
 https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists_betaVersions/cfg%20-%20Other%20-%20Bahrain%20-%20MES1.txt
 https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists_betaVersions/cfg%20-%20Other%20-%20Brazil%202%20-%20GBR1.txt
+https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists_betaVersions/cfg%20-%20Other%20-%20Dubai%20-%20GMEC1.txt
 https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists_betaVersions/pinglist.txt
