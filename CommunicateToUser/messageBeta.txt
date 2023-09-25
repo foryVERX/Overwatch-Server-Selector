@@ -1,16 +1,25 @@
-Welcome to the 5.3.1-beta build 1.1 version of the MINA Overwatch Server Selector! Here’s what’s new:
+Welcome to the 5.3.1-beta build 1.2 of the MINA Overwatch Server Selector! Here’s what’s new:
+
+New Features:
+-Removed the NA EAST option due to the server’s in-game absence.
+-Added a new NA Central option.
+-Decoupled NA West from NA Central.
+-Implemented a messaging feature for updates and issue reporting (available on GitHub under the CommunicateToUser folder).
+-Introduced auto-detection for game location for the tunneling option (previously known as Only Affect Overwatch). The program now automatically detects both Steam and Battle.net versions installed in common locations. If not found, users can manually select the game location.
+-Implemented an options.ini configurator.
+-Optimized code for better performance.
+-Modified image regeneration from bytes.
+-Separated beta version updates from stable version updates (for IP list and other dependencies).
+-The app now checks if your firewall is disabled and will not proceed if it is. This should reduce user reports significantly as most reports are about rules being added but still connecting to blocked servers.
+-The app now checks if rules weren’t added due to software errors and displays an error message if so.
+-Tooltips have been added to buttons to provide information about their functionality.
 
 
-Added features:
-- The NA EAST option has been removed due to the server no longer existing in-game.
-- A new NA Central option has been added.
-- NA West is no longer linked with NA Central.
-- A new messaging feature has been implemented, allowing me to send messages like this one to keep you updated or report any issues.
+Fixes in Build 1.1:
+-Resolved issue where NA Central button was stuck on “Working on it”.
+-Added troubleshooting debugs to log issues.
+-Fixed non-functional Custom Config.
 
-Fixed on build 1.1
-- NA Central button was stuck on " Working on it ".
-- Added troubleshooting debugs to log such issues.
+Please note that this is a BETA version under development. Use with caution and consider using Quick Play to test stability.
 
-Please note that this is a BETA version under development. Use with caution and consider using Quick Play to test the stability of this version.
-
-Don’t forget to report any issues you encounter on our Discord server. Thank you for your support!
+Report any issues you encounter on our Discord server. Thank you for your support!
