@@ -20,6 +20,8 @@ Fixes in Build 1.1:
 -Added troubleshooting debugs to log issues.
 -Fixed non-functional Custom Config.
 
+test
+
 Please note that this is a BETA version under development. Use with caution and consider using Quick Play to test stability.
 
 Report any issues you encounter on our Discord server. Thank you for your support!
