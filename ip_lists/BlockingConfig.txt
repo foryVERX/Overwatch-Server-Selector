@@ -94,7 +94,7 @@ ipRangeName::Ip_ranges_NA_central
 
 
 
-ipRangeName::Ip_ranges_NA_East@Ip_ranges_NA_central
+ipRangeName::Ip_ranges_NA_East@Ip_ranges_NA_central@Ip_ranges_NA_West
 
 
 
@@ -106,7 +106,7 @@ ipRangeName::Ip_ranges_NA_East@Ip_ranges_NA_central
 
 
 
-ipRangeName::Ip_ranges_NA_West@Ip_ranges_NA_West
+ipRangeName::Ip_ranges_NA_West@Ip_ranges_NA_West@Ip_ranges_NA_central
 
 
 
