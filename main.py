@@ -1,18 +1,19 @@
+import time
 from tkinter import *
 from tkinter.font import Font
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, messagebox, Listbox, END
 import win32api
-import win32com.shell.shell as shell
+import win32com.client
+import win32serviceutil
 from win32com.client import Dispatch as DispatchCOMObject
-from pythoncom import CoInitialize
+import pythoncom
 from itertools import groupby
-from PIL import ImageTk, Image
-from io import BytesIO
+from PIL import ImageTk
 import pic2str
-import base64
 import ctypes
-from os.path import exists, isdir, isfile, join, basename
-from os import getenv, path, mkdir, listdir, linesep, startfile, remove, chmod
+from os.path import exists, isdir, isfile, join
+from os import getenv, path, mkdir, listdir, startfile, remove, walk, environ, makedirs
+import subprocess
 import webbrowser
 import socket
 import threading
@@ -22,12 +23,23 @@ import datetime
 from urllib3 import Retry
 from requests.adapters import HTTPAdapter
 from pythonping import ping
+import tooltip
+import configparser
+import fnmatch
+import string
+from ctypes import windll
+from resolve_images import byteToTkImage
+
+# Dispatch shell
+shell = win32com.client.Dispatch("WScript.Shell")
+# Create a config parser
+config = configparser.ConfigParser()
 
 # Information
-__version__ = '5.3.0'
+__version__ = '5.3.1'
 _AppName_ = 'MINA Overwatch 2 Server Selector'
 __author__ = 'Yousef Aljohani'
-__copyright__ = 'Copyright (C) 2022, Yousef Aljohani'
+__copyright__ = 'Copyright (C) 2023, Yousef Aljohani'
 __credits__ = ['Yousef Aljohani(foryVERX)', 'chhaugen(Carl)']
 __maintainer__ = 'Yousef Aljohani'
 __email__ = 'verrrx@gmail.com'
@@ -44,67 +56,33 @@ frame = Frame(app, width=500, height=94)
 frame.pack()
 frame.place(x=-2, y=0)
 
-# For images
-# Load byte data
-byte_LOGO_SMALL_APPLICATION = base64.b64decode(pic2str.LOGO_SMALL_APPLICATION)
-byte_SQUARE_BACKGROUND_MINA_TEST = base64.b64decode(pic2str.SQUARE_BACKGROUND_MINA_TEST)
-byte_play_on_eu = base64.b64decode(pic2str.play_on_eu)
-byte_programmable_button = base64.b64decode(pic2str.PROGRAMABLE_BUTTON)
-byte_play_on_na_east = base64.b64decode(pic2str.play_on_na_east)
-byte_play_on_na_west = base64.b64decode(pic2str.play_on_na_west)
-byte_BLOCK_MIDDLE_EAST = base64.b64decode(pic2str.BLOCK_MIDDLE_EAST)
-byte_play_on_australia = base64.b64decode(pic2str.play_on_australia)
-byte_donation = base64.b64decode(pic2str.Donation_Button)
-byte_CUSTOM_SETTINGS = base64.b64decode(pic2str.CUSTOM_SETTINGS)
-byte_UNBLOCK_ALL_MAIN = base64.b64decode(pic2str.UNBLOCK_ALL_MAIN)
-byte_RESET_BUTTON = base64.b64decode(pic2str.RESET_BUTTON)
-byte_OPEN_IP_LIST_BUTTON = base64.b64decode(pic2str.OPEN_IP_LIST_BUTTON)
-byte_APPLY_BUTTON = base64.b64decode(pic2str.APPLY_BUTTON)
-byte_CUSTOM_SETTINGS_BACKGROUND = base64.b64decode(pic2str.CUSTOM_SETTINGS_BACKGROUND)
-byte_INSTALL_UPDATE = base64.b64decode(pic2str.INSTALL_UPDATE)
-byte_TEST_PING = base64.b64decode(pic2str.TEST_PING)
-byte_Discord_Button = base64.b64decode(pic2str.Discord_Button)
-
-image_data_SMALL_APPLICATION = BytesIO(byte_LOGO_SMALL_APPLICATION)
-image_data_SQUARE_BACKGROUND_MINA_TEST = BytesIO(byte_SQUARE_BACKGROUND_MINA_TEST)
-image_play_on_eu = BytesIO(byte_play_on_eu)
-image_programmable_button = BytesIO(byte_programmable_button)
-image_play_on_na_east = BytesIO(byte_play_on_na_east)
-image_play_on_na_west = BytesIO(byte_play_on_na_west)
-image_BLOCK_MIDDLE_EAST = BytesIO(byte_BLOCK_MIDDLE_EAST)
-image_play_on_australia = BytesIO(byte_play_on_australia)
-image_donation = BytesIO(byte_donation)
-image_CUSTOM_SETTINGS = BytesIO(byte_CUSTOM_SETTINGS)
-image_UNBLOCK_ALL_MAIN = BytesIO(byte_UNBLOCK_ALL_MAIN)
-image_data_RESET_BUTTON = BytesIO(byte_RESET_BUTTON)
-image_data_OPEN_IP_LIST_BUTTON = BytesIO(byte_OPEN_IP_LIST_BUTTON)
-image_data_APPLY_BUTTON = BytesIO(byte_APPLY_BUTTON)
-image_data_CUSTOM_SETTINGS_BACKGROUND = BytesIO(byte_CUSTOM_SETTINGS_BACKGROUND)
-image_data_INSTALL_UPDATE = BytesIO(byte_INSTALL_UPDATE)
-image_data_TEST_PING = BytesIO(byte_TEST_PING)
-image_data_Discord_Button = BytesIO(byte_Discord_Button)
-
 # Add images
-background = ImageTk.PhotoImage(Image.open(image_data_SQUARE_BACKGROUND_MINA_TEST))
+background = byteToTkImage(pic2str.SQUARE_BACKGROUND_MINA_TEST)
 logo = Label(frame, image=background)
 logo.pack()
 
-CUSTOM_SETTINGS_BACKGROUND = ImageTk.PhotoImage(Image.open(image_data_CUSTOM_SETTINGS_BACKGROUND))
-button_img_RESET_BUTTON = ImageTk.PhotoImage(Image.open(image_data_RESET_BUTTON))
-button_img_OPEN_IP_LIST_BUTTON = ImageTk.PhotoImage(Image.open(image_data_OPEN_IP_LIST_BUTTON))
-button_img_APPLY_BUTTON = ImageTk.PhotoImage(Image.open(image_data_APPLY_BUTTON))
-button_img_programmable_button = ImageTk.PhotoImage(Image.open(image_programmable_button))
-button_img_ME = ImageTk.PhotoImage(Image.open(image_BLOCK_MIDDLE_EAST))
-button_img_EU = ImageTk.PhotoImage(Image.open(image_play_on_eu))
-button_img_NA_WEST = ImageTk.PhotoImage(Image.open(image_play_on_na_west))
-button_img_ME_EAST = ImageTk.PhotoImage(Image.open(image_play_on_na_east))
-button_img_Australia = ImageTk.PhotoImage(Image.open(image_play_on_australia))
-button_img_donation = ImageTk.PhotoImage(Image.open(image_donation))
-button_img_Default = ImageTk.PhotoImage(Image.open(image_UNBLOCK_ALL_MAIN))
-button_img_CUSTOM_SETTINGS = ImageTk.PhotoImage(Image.open(image_CUSTOM_SETTINGS))
-button_img_INSTALL_UPDATE = ImageTk.PhotoImage(Image.open(image_data_INSTALL_UPDATE))
-button_img_TEST_PING = ImageTk.PhotoImage(Image.open(image_data_TEST_PING))
-button_img_Discord_Button = ImageTk.PhotoImage(Image.open(image_data_Discord_Button))
+# For images
+# Load byte data
+logo_small_application = byteToTkImage(pic2str.LOGO_SMALL_APPLICATION)
+CUSTOM_SETTINGS_BACKGROUND = byteToTkImage(pic2str.CUSTOM_SETTINGS_BACKGROUND)
+button_img_RESET_BUTTON = byteToTkImage(pic2str.RESET_BUTTON)
+button_img_OPEN_IP_LIST_BUTTON = byteToTkImage(pic2str.OPEN_IP_LIST_BUTTON)
+button_img_APPLY_BUTTON = byteToTkImage(pic2str.APPLY_BUTTON)
+button_img_programmable_button = byteToTkImage(pic2str.PROGRAMABLE_BUTTON)
+button_img_ME = byteToTkImage(pic2str.BLOCK_MIDDLE_EAST)
+button_img_EU = byteToTkImage(pic2str.play_on_eu)
+button_img_NA_WEST = byteToTkImage(pic2str.play_on_na_west)
+button_img_NA_CENTRAL = byteToTkImage(pic2str.play_on_na_central)
+button_img_ME_EAST = byteToTkImage(pic2str.play_on_na_east)
+button_img_Australia = byteToTkImage(pic2str.play_on_australia)
+button_img_donation = byteToTkImage(pic2str.Donation_Button)
+button_img_Default = byteToTkImage(pic2str.UNBLOCK_ALL_MAIN)
+button_img_CUSTOM_SETTINGS = byteToTkImage(pic2str.CUSTOM_SETTINGS)
+button_img_INSTALL_UPDATE = byteToTkImage(pic2str.INSTALL_UPDATE)
+button_img_TEST_PING = byteToTkImage(pic2str.TEST_PING)
+button_img_Discord_Button = byteToTkImage(pic2str.Discord_Button)
+button_img_cancel = byteToTkImage(pic2str.CANCEL)
+button_img_manually_locate = byteToTkImage(pic2str.MANUALLY_LOCATE)
 
 # Add font
 futrabook_font = Font(family="Futura PT Demi", size=10)
@@ -112,15 +90,36 @@ futrabook_font = Font(family="Futura PT Demi", size=10)
 # Global variables
 localappdata_path = getenv('APPDATA') + '\\OverwatchServerBlocker'
 temp_path = getenv('APPDATA') + '\\Local\\Temp'
-ip_version_path = localappdata_path + '\\IP_version.txt'
-overwatch_path = 'C:\\Program Files (x86)\\Overwatch\\_retail_\\Overwatch.exe'
-customConfig_path = localappdata_path + '\\customConfig.txt'
-ip_version_url = \
-    'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/IP_version.txt'
-appVersion_url = \
-    'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/__version__/__latestversion__.txt'
-urlContainer_url = \
-    "https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/urlsContainer.txt"
+desktop_path = path.join(environ['USERPROFILE'], 'Desktop')
+program_files_path = environ['PROGRAMFILES']
+program_files_x86_path = environ['PROGRAMFILES(X86)']
+options_path = path.join(localappdata_path, 'options.ini')
+config_path = path.join(localappdata_path, "options.ini")
+
+if "beta" in __version__:
+    ip_version_path = localappdata_path + '\\IP_versionBeta.txt'
+    customConfig_path = localappdata_path + '\\customConfig.txt'
+    message_path = localappdata_path + '\\messageBeta.txt'
+    ip_version_url = \
+        'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists_betaVersions/IP_version.txt'
+    appVersion_url = \
+        'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/__version__/__latestversion__.txt'
+    urlContainer_url = \
+        "https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists_betaVersions/urlsContainer.txt"
+    msg_url = \
+        "https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/CommunicateToUser/messageBeta.txt"
+else:
+    ip_version_path = localappdata_path + '\\IP_version.txt'
+    customConfig_path = localappdata_path + '\\customConfig.txt'
+    message_path = localappdata_path + '\\message.txt'
+    ip_version_url = \
+        'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/IP_version.txt'
+    appVersion_url = \
+        'https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/__version__/__latestversion__.txt'
+    urlContainer_url = \
+        "https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/urlsContainer.txt"
+    msg_url = \
+        "https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/CommunicateToUser/message.txt"
 
 DEFAULT_BLOCK_NAME = "_Overwatch Block"
 DEFAULT_GROUPING_NAME = "_MINA Overwatch 2-Server-Selector"
@@ -130,6 +129,7 @@ appUpdate_required = False
 sorter_initialization = False
 checkForUpdate_initialization = False
 tunnel_option = False
+steamVersion_option = False
 isUpdated = ''
 update_time = 0
 
@@ -166,31 +166,70 @@ FIREWALL_DIRECTION_OUT = 2
 # https://stackoverflow.com/a/27966218
 # DO NOT PASS TO OTHER THREADS
 def dispatchFirewall():
-    CoInitialize()
+    pythoncom.CoInitialize()
     return DispatchCOMObject("HNetCfg.FwPolicy2")
 
 
 # DO NOT PASS TO OTHER THREADS
 def dispatchFirewallRule():
-    CoInitialize()
+    pythoncom.CoInitialize()
     return DispatchCOMObject("HNetCfg.FWRule")
 
 
-def addNewRuleToFirewall(name, direction, action, remoteAddresses=None, applicationName=None, grouping=None,
+def dispatchFirewallMngr():
+    pythoncom.CoInitialize()
+    return DispatchCOMObject("HNetCfg.FwMgr")
+
+
+def restart_FirewallService():
+    # Not working due to permittions
+    logging.debug("Restarting Windows Firewall Service")
+    service_name = "MpsSvc"
+    try:
+        # Stop the service
+        win32serviceutil.StopService(service_name)
+        logging.debug(f"Stopped {service_name} service")
+    except Exception as e:
+        logging.error(f"Error stopping {service_name} service: {e}")
+
+    try:
+        # Start the service
+        win32serviceutil.StartService(service_name)
+        logging.debug(f"Started {service_name} service")
+    except Exception as e:
+        logging.error(f"Error starting {service_name} service: {e}")
+
+
+def addNewRuleToFirewall(name, direction, action, port=None, protocol=None, remoteAddresses=None, applicationName=None,
+                         grouping=None,
                          enabled=True):
     firewall = dispatchFirewall()
     rule = dispatchFirewallRule()
     rule.Name = name
     if remoteAddresses is not None:
         rule.RemoteAddresses = remoteAddresses
-    rule.Direction = direction  # Outgoing
     rule.Action = action  # Block
+    rule.Direction = direction  # Outgoing
     if applicationName is not None:
         rule.ApplicationName = applicationName
     if grouping is not None:
         rule.Grouping = grouping
+    config = configparser.ConfigParser()
+    config.read(config_path)
+    exclude_port = get_state('exclude_udp_port_3724')
+    if protocol is not None:
+        if exclude_port:
+            rule.Protocol = protocol  # For TCP use 6, for UDP use 17
+    if port is not None:
+        if exclude_port:
+            rule.RemotePorts = str(port)
     rule.enabled = enabled
-    firewall.Rules.Add(rule)
+    logging.debug(f"addNewRuleToFirewall adding rule {name}")
+    logging.info(f"IPs: {remoteAddresses}")
+    try:
+        firewall.Rules.Add(rule)
+    except Exception as e:
+        logging.error(f"Error adding rule {name} reason: {e}")
 
 
 # Functions
@@ -198,9 +237,32 @@ def check_admin():
     if ctypes.windll.shell32.IsUserAnAdmin() == 0:
         adminLabel.config(text='Restart(run as administrator)', bg='#282828', fg='#ef2626', font=futrabook_font)
         logging.info("USER IS NOT AN ADMIN")
+        return False
     else:
         adminLabel.config(text='Running as administrator', bg='#282828', fg='#26ef4c', font=futrabook_font)
         logging.info("USER IS ADMIN")
+        return True
+
+
+def check_firewall():
+    firewallmngr = dispatchFirewallMngr()
+    # Get the current profile
+    profile = firewallmngr.LocalPolicy.CurrentProfile
+    # Check if the firewall is enabled
+    if profile.FirewallEnabled:
+        logging.debug("Windows Firewall is enabled for public and private networks")
+        return True
+    else:
+        result = messagebox.askretrycancel("Error", "Windows Firewall is not enabled for public and private networks."
+                                                    "\n\nPlease enable Windows Firewall from Control Panel\System and Security\Windows Defender Firewall"
+                                                    "\Turn Windows Defender Firewall ON or OFF."
+                                                    "\n\n"
+                                                    "This app doesn't work with 3rd Party AntiVirus. App requires Windows Firewall"
+                                                    "\n\nPress retry after enabling Windows Firewall or Cancle to close")
+        if not result:
+            app.destroy()
+        else:
+            check_firewall()
 
 
 def internetConnection():
@@ -339,6 +401,8 @@ def check_app_update():
     Pop a "INSTALL UPDATE" button if new app update is detected
     :return: None
     """
+    if "beta" in __version__:
+        return
     global latestVersion_path, appUpdate_required
     if not internetConnection():
         logging.info("COULD NOT CHECK FOR APP UPDATE DUE TO NO INTERNET CONNECTION")
@@ -497,6 +561,9 @@ def request_raw_file(url, msg_fail, session):
 
 def createTextFile(file_name, contents):
     # Contents can be a string or a list of strings must end with \n except last element in the list
+    if 'beta' in __version__:
+        if 'IP_version' in file_name:
+            file_name = file_name + 'Beta'
     logging.info(f"CREATING TEXT FILE: {file_name}.txt")
     with open(localappdata_path + '\\' + file_name + '.txt', "w") as text_file:
         if isinstance(contents, list):
@@ -535,6 +602,7 @@ def loadUserConfig():
     global customConfig
     customConfig.clear()
     if not exists(customConfig_path):
+        logging.debug(f'{customConfig_path} NOT FOUND')
         return
     logging.debug(f'{customConfig_path} FOUND')
     with open(customConfig_path, "r") as customConfigFile:
@@ -551,7 +619,8 @@ def iconMaker():  # Used to check if there is an icon in the same directory or n
     if exists("LOGO_SMALL_APPLICATION.ico"):
         app.iconbitmap("LOGO_SMALL_APPLICATION.ico")
     else:
-        icon = Image.open(image_data_SMALL_APPLICATION)
+        icon = logo_small_application
+        icon = ImageTk.getimage(icon)
         icon.save("LOGO_SMALL_APPLICATION.ico")
         app.iconbitmap("LOGO_SMALL_APPLICATION.ico")
 
@@ -567,6 +636,8 @@ def controlButtons(command):  # 'disabled' or 'normal' buttons
 
     PlayNAEASTButton['state'] = command
 
+    PlayNACENTRALButton['state'] = command
+
     PlayAustraliaButton['state'] = command
 
     ClearBlocksButton['state'] = command
@@ -581,7 +652,7 @@ def blockServers(server_exception, block_exception=True, rule_name=DEFAULT_BLOCK
     # If block_exception set to false then the server_exception is blocked ONLY
     controlButtons('disabled')
     serversToBlock = Ip_ranges_dic
-
+    logging.debug(f"blockServers function")
     if not block_exception:
         serverBlockFilter = lambda serverName: serverName in str(server_exception)
     else:
@@ -595,21 +666,32 @@ def blockServers(server_exception, block_exception=True, rule_name=DEFAULT_BLOCK
     blockIpRanges(ipRangesToBlock, rule_name, rule_grouping)
     serversBlockedString = ', '.join(serversToBlock.keys())
     logging.info(f'Blocked {serversBlockedString}')
-    checkIfActive()
+    if not checkIfActive():
+        logging.debug(f"Unable to add rule to firewall {DEFAULT_BLOCK_NAME}")
+        messagebox.showerror("Error", f"Unable to add {DEFAULT_BLOCK_NAME} Rule to the firewall"
+                                      f"\n\n It could be the advanced windows defender firewall not functioning, "
+                                      f"restart your system")
+
     controlButtons('normal')
 
 
 def blockIpRanges(ip_list, rule_name, rule_grouping):
     # A Windows Firewall Rule supports blocking unique 10_000 IP range entries. (Tested on Windows 8.1 and Windows 10)
-
-    applicationName = overwatch_path if tunnel_option else None
-
+    overwatch_path = get_state("overwatch_path", as_boolean=False) if detectTunnelOption() else None
+    print(detectTunnelOption())
+    applicationName = overwatch_path if detectTunnelOption() else None
+    logging.debug("blockIpRanges function")
     if (len(ip_list) <= 10_000):
         ipRangesString = ','.join(ip_list)
-        addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_IN, FIREWALL_ACTION_BLOCK, ipRangesString, applicationName,
-                             rule_grouping)
-        addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, ipRangesString, applicationName,
-                             rule_grouping)
+        addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_IN, FIREWALL_ACTION_BLOCK, "0-3723,3725-65535", 6,
+                             ipRangesString, applicationName, rule_grouping)
+        addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, "0-3723,3725-65535", 6
+                             , ipRangesString, applicationName, rule_grouping)
+        if get_state('exclude_udp_port_3724'):
+            addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_IN, FIREWALL_ACTION_BLOCK, "0-3723,3725-65535", 17,
+                                 ipRangesString, applicationName, rule_grouping)
+            addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, "0-3723,3725-65535", 17
+                                 , ipRangesString, applicationName, rule_grouping)
         logging.info(f'Made rules "{rule_name} for IN/OUT"')
     else:
         indexedIpRangeList = list(enumerate(ip_list))
@@ -620,11 +702,15 @@ def blockIpRanges(ip_list, rule_name, rule_grouping):
         for chunkNum, ipStringChunk in ipRangesStringChunks.items():
             if chunkNum > 0:
                 rule_name = f'{rule_name} {chunkNum}'
-
             addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_IN, FIREWALL_ACTION_BLOCK, ipStringChunk,
-                                 applicationName, rule_grouping)
+                                 applicationName, rule_grouping, "0-3723,3725-65535", 6)
             addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, ipStringChunk,
-                                 applicationName, rule_grouping)
+                                 applicationName, rule_grouping, "0-3723,3725-65535", 6)
+            if get_state('exclude_udp_port_3724'):
+                addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_IN, FIREWALL_ACTION_BLOCK, ipStringChunk,
+                                     applicationName, rule_grouping, "0-3723,3725-65535", 17)
+                addNewRuleToFirewall(rule_name, FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, ipStringChunk,
+                                     applicationName, rule_grouping, "0-3723,3725-65535", 17)
             logging.info(f'Made rules "{rule_name} for IN/OUT"')
 
 
@@ -666,7 +752,7 @@ def checkForAndDeleteLegacyRules():
 def checkIfActive():  # To check if server is blocked or not
     servers_active_rule_list = ['_ME_OW_SERVER_BLOCKER', '_NAEAST_OW_SERVER_BLOCKER', '_NAWEST_OW_SERVER_BLOCKER',
                                 '_EU_OW_SERVER_BLOCKER', '_AU_OW_SERVER_BLOCKER', '_Australia_OW_SERVER_BLOCKER',
-                                "_CUSTOM_BLOCK"]
+                                '_NACENTRAL_OW_SERVER_BLOCKER', "_CUSTOM_BLOCK"]
     firewall = dispatchFirewall()
     rules = [x.Name for x in firewall.Rules]
     logging.info("CHECKING IF PREVIOUS RULES EXIST")
@@ -676,12 +762,12 @@ def checkIfActive():  # To check if server is blocked or not
             if filtered == 'ME':
                 blockingLabel.config(text='ME BLOCKED', bg='#282828', fg='#ef2626', font=futrabook_font)
                 logging.info(f"FOUND RULE: {rule_name}")
-                return
+                return True
             if filtered == 'CUSTOM':
                 blockingLabel.config(text="CUSTOM BLOCK", bg='#282828', fg='#26ef4c',
                                      font=futrabook_font)
                 logging.info(f"FOUND RULE: {rule_name}")
-                return
+                return True
             else:
                 if len(filtered) < 8:
                     filtered = filtered[0:2] + ' ' + filtered[2:]
@@ -689,54 +775,317 @@ def checkIfActive():  # To check if server is blocked or not
                 blockingLabel.config(text=label_text, bg='#282828', fg='#26ef4c',
                                      font=futrabook_font)
                 logging.info(f"FOUND RULE: {rule_name}")
-                return
+                return True
     blockingLabel.config(text='ALL UNBLOCKED (DEFAULT SETTINGS)', fg='#ddee4a')
     logging.info("NO RULES FOUND")
+    return False
+
+
+def add_option(option, value):
+    logging.info(f"Adding {option} setting to configrator with value of {value}")
+    # Create a config parser
+    config = configparser.ConfigParser()
+    # Read the options.ini file
+    config.read(options_path)
+    # Check if the OPTIONS section exists
+    if not config.has_section('OPTIONS'):
+        config.add_section('OPTIONS')
+    # Set the option value
+    config.set('OPTIONS', str(option), str(value))
+    # Save the changes to the file
+    with open(options_path, 'w') as configfile:
+        config.write(configfile)
+
+
+def remove_option(option):
+    # Read the options.ini file
+    config.read('options.ini')
+    # Check if the OPTIONS section exists
+    if config.has_section('OPTIONS'):
+        # Remove the option
+        config.remove_option('OPTIONS', option)
+        # Save the changes to the file
+        with open('options.ini', 'w') as configfile:
+            config.write(configfile)
+
+
+def get_state(checkbox_name, as_boolean=True):
+    if not exists(config_path):
+        return False
+
+    config = configparser.ConfigParser()
+    config.read(config_path)
+    try:
+        if as_boolean:
+            state = config.getboolean('OPTIONS', checkbox_name)
+            logging.info(f"State of {checkbox_name} is {state} from get_state function")
+        else:
+            state = config.get('OPTIONS', checkbox_name)
+            logging.info(f"State of {checkbox_name} is {state} from get_state function")
+        return state
+    except (configparser.NoOptionError, configparser.NoSectionError):
+        return False
 
 
 def tunnel():  # Handle tunnelling options for Overwatch.exe
     global overwatch_path, tunnel_option
-    checkbotton_state = tunnelCheckBox_state.get()
-    logging.info("Check buttons state =  " + str(checkbotton_state))
-    if checkbotton_state == 1:
+    tunnel_button_state = get_state("tunnel")
+    steam_version_state = get_state("steamversion")
+    title = 'Select Overwatch\_retail_\Overwatch.exe '
+    filetypes = "Select Overwatch\_retail_\Overwatch.exe"
+    findPath = "/_retail_/Overwatch.exe"
+    if steam_version_state:
+        title = '\steamapps\common\Overwatch\Overwatch.exe '
+        filetypes = "\common\Overwatch\Overwatch.exe"
+        findPath = "/Overwatch/Overwatch.exe"
+    logging.info("Tunnel buttons state =  " + str(tunnel_button_state))
+    if tunnel_button_state == 1:
         if exists(overwatch_path):
             logging.info("Game detected")
-            createTextFile('Options', 'Tunnel=True')
             tunnel_option = True
         else:
             app.overwatch = filedialog.askopenfilename(initialdir='C:\\',
-                                                       title='Select Overwatch\_retail_\Overwatch.exe ',
-                                                       filetypes=(("Select Overwatch\_retail_\Overwatch.exe",
+                                                       title=title,
+                                                       filetypes=((filetypes,
                                                                    "Overwatch.exe"),))
-            existance_overwatch = app.overwatch.find("/_retail_/Overwatch.exe")
+            existance_overwatch = app.overwatch.find(findPath)
             if existance_overwatch > 0:
                 overwatch_path = app.overwatch.replace('/', "\\")
                 tunnel_option = True
                 logging.debug("Overwatch path is:  " + overwatch_path)
-                createTextFile('Options', ['Tunnel=True\n', overwatch_path])
+                add_option('overwatch_path', overwatch_path)
+                # createTextFile('Options', ['Tunnel=True\n', overwatch_path])
             else:
-                createTextFile('Options', 'Tunnel=False')
+                # createTextFile('Options', 'Tunnel=False')
                 tunnelCheckBox_state.set(0)
+                # save_state()
     else:
-        createTextFile('Options', 'Tunnel=False')
+        # createTextFile('Options', 'Tunnel=False')
         tunnel_option = False
+    # save_state()
 
 
-def checkOptions():
-    global tunnel_option, overwatch_path
-    if exists(localappdata_path + '\\Options.txt'):
-        with open(localappdata_path + '\\Options.txt', "r") as reader:
-            options = reader.readlines()
-        if options[0].strip() == 'Tunnel=True':
-            tunnel_option = True
-        if len(options) > 1:
-            temp_path = options[1].strip()
-            overwatch_path = temp_path
-            tunnel_option = True
+def searchForGamePath(patterns, start_paths):
+    matches = []
+    threads = []
+    filters = ['steamapps\\common\\Overwatch\\Overwatch.exe', 'Overwatch\\_retail_\\Overwatch.exe']
 
+    def search_path(start_path):
+        start_time = time.time()
+        i = 0
+        # time.sleep(3.1)
+        for root, dirs, files in walk(start_path):
+            i += 1
+            if i % 10 == 0:
+                if stop_flag.is_set():
+                    return False
+            matches.extend(
+                [path.join(root, filename) for pattern in patterns for filename in fnmatch.filter(files, pattern)])
+        filtered_list = [item for item in matches if not any(string in item for string in filters)]
+        for item in filtered_list:
+            matches.remove(item)
+        end_time = time.time()
+        print(f"execution time of thread = {end_time - start_time}s")
+
+    stop_flag = threading.Event()
+    for start_path in start_paths:
+        thread = threading.Thread(target=search_path, args=(start_path,))
+        thread.start()
+        threads.append(thread)
+
+    thread_timeout = 3.0
+    for thread in threads:
+        thread.join(thread_timeout)  # Wait for the thread to finish for at most 3 seconds
+        if thread.is_alive():
+            stop_flag.set()
+
+    return matches
+
+
+def get_drives():
+    '''
+    :return: All drives locations except C drives
+    '''
+    drives = []
+    bitmask = windll.kernel32.GetLogicalDrives()
+    for letter in string.ascii_uppercase:
+        if bitmask & 1 and letter != 'C':
+            drives.append(f'{letter}:\\')
+        bitmask >>= 1
+    return drives
+
+
+def choose_option(root, options):
+    max_length = max(len(s) for s in options)
+    top = Toplevel(root)
+    # Set Properties
+    top.title('Custom Config')
+    top.resizable(True, True)
+    top.geometry('800' + 'x' + '300')
+    top.configure(bg='#404040')
+    frameTop = Frame(top, width=800, height=300, bg='#404040')
+    frameTop.pack()
+    frameTop.place(x=-2, y=0)
+    top.iconbitmap("LOGO_SMALL_APPLICATION.ico")
+    choice = None
+
+    def on_select(event):
+        nonlocal choice
+        selection = event.widget.curselection()
+        if selection:
+            index = selection[0]
+            choice = event.widget.get(index)
+
+    def on_confirm():
+        top.destroy()
+
+    def on_cancel():
+        nonlocal choice
+        choice = None
+        top.destroy()
+
+    def on_manually_locate():
+        nonlocal choice
+        choice = 'usr_manual_locate'
+        top.destroy()
+        checkbox_tunnel(skip_auto_detect=True)
+
+    def exit_window():
+        nonlocal choice
+        choice = None
+        top.destroy()
+
+    choose_label = Label(top, text='Please choose the game location', bg='#404040', fg='#ddee4a', font=futrabook_font)
+    choose_label.grid(row=0, column=0)
+    choose_label.place(x=400, y=13, anchor="center")
+    listbox = Listbox(top, bg="white",
+                      highlightcolor="#404040",
+                      width=int(max_length + (max_length / 10)),
+                      height=10)
+    for option in options:
+        listbox.insert(END, option)
+    listbox_width_in_px = int(
+        (max_length + (max_length / 10)) * 6.06)  # conversion factor from tkinter shit dimensions to pixels
+    logging.info(f"Some callculations to set listbox in the middle max{max_length} "
+                 + f"calc{listbox_width_in_px} "
+                 + f"middle position is {int((800 - listbox_width_in_px) / 2)}")
+    LB_middle_position = int((800 - listbox_width_in_px) / 2)
+    listbox.place(x=LB_middle_position, y=30)
+    listbox.bind('<<ListboxSelect>>', on_select)
+
+    confirm_button = Button(top, image=button_img_APPLY_BUTTON, font=futrabook_font, command=on_confirm,
+                            bg='#404040', fg='#404040', borderwidth=0, activebackground='#404040')
+    CB_position = (800 / 2) - 75
+    confirm_button.place(x=CB_position, y=240, anchor="center")
+
+    cancel_button = Button(top, image=button_img_cancel, command=on_cancel,
+                           bg='#404040', fg='#404040', borderwidth=0, activebackground='#404040')
+    cancel_button.place(x=CB_position + 75, y=232)
+
+    manually_locate_button = Button(top, image=button_img_manually_locate, command=on_manually_locate,
+                                    bg='#404040', fg='#404040', borderwidth=0, activebackground='#404040')
+    manually_locate_button.place(x=CB_position + 85 * 4, y=270)
+
+    top.transient(root)
+    top.grab_set()
+    top.protocol("WM_DELETE_WINDOW", exit_window)
+    root.wait_window(top)
+    return choice
+
+
+def askUserToChooseAfile():
+    root = Tk()
+    root.withdraw()  # Hide the main window
+    title = 'Select Overwatch\_retail_\Overwatch.exe or \common\Overwatch\Overwatch.exe for steam'
+    path1 = "/_retail_/Overwatch.exe"
+    path2 = "/steamapps/common/Overwatch/Overwatch.exe"
+    filetypes = (
+        ("/_retail_/Overwatch.exe", "Overwatch.exe"), ("/steamapps/common/Overwatch/Overwatch.exe", "Overwatch.exe"))
+    app.overwatch = filedialog.askopenfilename(
+        title=title,
+        initialdir='C:\\',
+        filetypes=filetypes
+    )
+    if not app.overwatch:
+        return None
+    print(f'Manually chosen path {app.overwatch}')
+    if app.overwatch.find(path1) == -1 and app.overwatch.find(path2) == -1:
+        messagebox.showwarning("Invalid file selected", "Please choose a file from one of the specified paths.")
+        checkbox_tunnel()
+        return "invalid_selection"
     else:
-        tunnel_option = False
-    return tunnel_option
+        return app.overwatch.replace('/', '\\')
+
+
+def checkbox_tunnel(skip_auto_detect=False):
+    tunnel_checkbox_state = tunnelCheckBox_state.get()
+    # Add the option tunnel with its value
+    add_option('tunnel', tunnel_checkbox_state)
+    if not tunnel_checkbox_state:
+        logging.info("Tunnel Option Was Disabled")
+        return
+    logging.info("Tunnel Option Enabled")
+    if skip_auto_detect:
+        logging.debug("User choose to pick the game location manually")
+        user_selection = askUserToChooseAfile()
+        add_option('overwatch_path', str(user_selection))
+        if user_selection is None:
+            tunnelCheckBox.deselect()
+            add_option('tunnel', False)
+        return
+    drives = get_drives()
+    patterns = ['Overwatch.exe']
+    start_path = [desktop_path, program_files_path, program_files_x86_path]
+    start_path.extend(drives)  # Add the drives to the start paths
+    logging.info(f"Searching for the game in \n"
+                 f"{desktop_path}\n"
+                 f"{program_files_path}\n"
+                 f"{program_files_x86_path}\n"
+                 f"The following drives {drives}")
+    matches = searchForGamePath(patterns, start_path)
+    if not matches:
+        logging.debug("searchForGamePath function took too long time")
+        logging.debug("User will pick the game location manually")
+        user_selection = askUserToChooseAfile()
+        add_option('overwatch_path', str(user_selection))
+        if user_selection is None:
+            tunnelCheckBox.deselect()
+            add_option('tunnel', False)
+            return
+        return user_selection
+    if len(matches) > 0:
+        user_selected_path = choose_option(app, matches)
+        if not user_selected_path == 'usr_manual_locate':
+            add_option('overwatch_path', str(user_selected_path))
+        if user_selected_path is None:
+            tunnelCheckBox.deselect()
+            add_option('tunnel', False)
+            logging.debug("User didn't select any game path --> exiting")
+            return
+        return
+
+
+'''
+def checkbox_steamVersion():
+    save_state()
+'''
+
+
+def detectTunnelOption():
+    global tunnel_option
+    if exists(options_path):
+        config = configparser.ConfigParser()
+        config.read(options_path)
+        try:
+            tunnel_value = get_state("tunnel")
+            if tunnel_value:
+                logging.info(f"detectTunnelOption found tunnel = {tunnel_value}")
+                return True
+            else:
+                return False
+        except configparser.NoOptionError:
+            logging.debug("Option tunnel was not found")
+            return False
 
 
 def loadBlockingConfig():
@@ -755,6 +1104,12 @@ def loadBlockingConfig():
 
 def customSettingsWindow():
     global ip_ranges_files, ip_range_checkboxes, customWindow
+    if not messagebox.askyesno("Custom Window Warning",
+                               "Custom config might not work as pre-defined options,"
+                               " test it in QP multiple times before using it in competitive game."
+                               " If you are not welling to take the risk of connection failure "
+                               "press NO and use pre-defined settings"):
+        return
     savedSettings = []
     if exists(customConfig_path):
         logging.debug(f"{customConfig_path} FOUND")
@@ -763,6 +1118,8 @@ def customSettingsWindow():
             for line in reader.readlines():
                 if len(line) > 0:
                     savedSettings.append(line.strip())
+    else:
+        logging.debug(f"{customConfig_path} NOT FOUND")
     logging.debug(f"CREATING CUSTOM WINDOW")
     customWindow = Toplevel()
     # Set Properties
@@ -922,6 +1279,38 @@ def reinstallIp_list():
         pingButton.place(x=135, y=500, height=40, width=230)
 
 
+def format_message(message):
+    # Remove leading and trailing whitespaces
+    message = message.strip()
+    # Capitalize the first letter of the sentence
+    message = message[0].upper() + message[1:]
+    # Replace dashes with bullet points
+    message = message.replace('-', '• ')
+    # Consider double new lines as new paragraphs
+    message = message.replace('\n\n', '\n---\n')
+    return message
+
+
+def display_message():
+    url = msg_url
+    response = requests.get(url)
+    message = response.text
+    if not exists(message_path):
+        messagebox.showinfo("Info", message)
+        with open(message_path, 'w') as f:
+            f.write(message)
+    else:
+        with open(message_path, 'r') as f:
+            old_message = f.read()
+        old_msg = ''.join(old_message.split())
+        new_msg = ''.join(message.split())
+        if old_msg != new_msg:
+            message = message
+            messagebox.showinfo("Info", message)
+            with open(message_path, 'w') as f:
+                f.write(message)
+
+
 def blockALL():  # This function is for testing reasons only DO NOT USE.
     unblockALL()
     blockingLabel.config(text='ALL BLOCKED', fg='#ef2626')
@@ -951,6 +1340,15 @@ def playNAEast_server():
     addNewRuleToFirewall("_NAEAST_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False,
                          grouping=DEFAULT_GROUPING_NAME)
     threading.Thread(target=blockServers, args=(blockingConfigDic['Ip_ranges_NA_East'],),
+                     daemon=True).start()  # Follow main thread
+
+
+def playNACENTRAL_server():
+    unblockALL()
+    blockingLabel.config(text='WORKING ON IT', fg='#26ef4c')
+    addNewRuleToFirewall("_NACENTRAL_OW_SERVER_BLOCKER", FIREWALL_DIRECTION_OUT, FIREWALL_ACTION_BLOCK, enabled=False,
+                         grouping=DEFAULT_GROUPING_NAME)
+    threading.Thread(target=blockServers, args=(blockingConfigDic['Ip_ranges_NA_central'],),
                      daemon=True).start()  # Follow main thread
 
 
@@ -1005,15 +1403,159 @@ def checkUpdate():
     check_app_update()
 
 
+def create_tooltip(widget, text):
+    tool_tip = tooltip.ToolTip(widget)
+
+    def enter(event):
+        tool_tip.show_tip(text)
+
+    def leave(event):
+        tool_tip.hide_tip()
+
+    widget.bind('<Enter>', enter)
+    widget.bind('<Leave>', leave)
+
+
+def create_options_ini():
+    global options_path
+    options_path = path.join(localappdata_path, 'options.ini')
+    if not exists(options_path):
+        config = configparser.ConfigParser()
+        with open(options_path, 'w') as configfile:
+            config.write(configfile)
+
+
+def exclude_udp():
+    state = exclude_udp_in_block_state.get()
+    if state:
+        exclude_udp_in_block_state.set(True)
+        add_option('exclude_udp_port_3724', True)
+    else:
+        exclude_udp_in_block_state.set(False)
+        add_option('exclude_udp_port_3724', False)
+
+
+def delete_files(directory):
+    for filename in listdir(directory):
+        if filename.endswith('.txt') or filename.endswith('.ini'):
+            remove(path.join(directory, filename))
+
+
+def restart_program():
+    # Path to the executable
+    exe_path = path.join(localappdata_path, "Bin\\MINA Overwatch 2 Server Selector.exe")
+    # Start a new instance
+    subprocess.Popen([exe_path])
+    # Close the current instance
+    app.destroy()
+
+
+def create_bat(filename, cmd_command):
+    # Define the directory and file
+    directory = "resources"
+    filename = filename
+    filepath = path.join(localappdata_path, directory, filename)
+    # Create the directory if it doesn't exist
+    makedirs(path.join(localappdata_path, directory), exist_ok=True)
+    # Define the content of the .bat file
+    content = cmd_command
+    # Write the content to the file
+    with open(filepath, 'w') as file:
+        file.write(content)
+    logging.info(f"'{filename}' has been created in the '{directory}' directory.")
+
+
+def bat_adminrun(bat_file_path):
+    result = windll.shell32.ShellExecuteW(
+        None,  # handle to parent window
+        'runas',  # verb
+        'cmd.exe',  # file on which verb acts
+        ' '.join(['/c', bat_file_path]),  # parameters
+        None,  # working directory (default is cwd)
+        0,  # show window normally
+    )
+    if result > 32:
+        result = "No Error"
+    else:
+        result = f"Error: {result}"
+    logging.debug(f'running bat file {bat_file_path} as admin, result: {result}')
+    return result
+
+
+def reset_firewall():
+    create_bat(filename="resetFirewall.bat", cmd_command="netsh advfirewall reset")
+    logging.debug(f'Resetting Firewall')
+    bat_file_path = path.join(localappdata_path, "resources", "resetFirewall.bat")  # from OP
+    bat_adminrun(bat_file_path)
+
+
+def time_it(func):
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        logging.info(f"Time taken by {func.__name__} function: {end - start} seconds")
+        return result
+    return wrapper
+
+
+@time_it
+def repair():
+    time.time()
+    proceed = messagebox.askokcancel("Repairing Warning", "The app settings will be reset")
+    if proceed:
+        with_firewall_reset = messagebox.askyesno("Firewall Reset", "Do you want to reset the firewall also?")
+        delete_files(localappdata_path)
+        reinstallIp_list()
+        check_firewall()
+        if with_firewall_reset:
+            doublecheck_firewall_reset = messagebox.askyesno("Double Checking Firewall Reset",
+                                                             "Remember, resetting the firewall"
+                                                             " will remove all the settings you’ve"
+                                                             " configured in your Windows Firewall."
+                                                             " So, use this with caution and make sure"
+                                                             " to backup any necessary settings before"
+                                                             " you reset the firewall press NO to cancel")
+            if doublecheck_firewall_reset:
+                reset_firewall()
+        unblockALL()
+        restart_program()
+
+def uninstall():
+    if not messagebox.askyesno("Clean Uninstall", "If you want to uninstall the app press YES to confirm or NO to cancel"):
+        return
+    if not messagebox.askyesno("Confirm Uninstall", "Confirm Uninstalling by pressing yes"):
+        return
+    unblockALL()
+    create_bat("uninstall.bat",
+               "@echo off"
+               '\ntaskkill /IM "MINA Overwatch 2 Server Blocker v5.3.1.exe" /F'
+               f'\nrmdir /S /Q "{localappdata_path}"'
+               )
+    bat_file_path = join(localappdata_path, "resources", "uninstall.bat")
+    bat_adminrun(bat_file_path)
+
+
 # Menus
 menu = Menu(app)
 app.config(menu=menu)
 options_menu = Menu(menu)
-menu.add_cascade(label="Options", menu=options_menu)
+menu.add_cascade(label="Settings", menu=options_menu)
 options_menu.add_command(label="Open config folder", command=openListFolder)
+options_menu.add_command(label="Repair [Will reset the settings]",
+                         command=lambda: threading.Thread(target=repair).start())
 options_menu.add_command(label="Check for updates", command=lambda: threading.Thread(target=checkUpdate).start())
-# lambda to create the thread each time the option is pressed
-options_menu.add_command(label="Reinstall IP List", command=lambda: threading.Thread(target=reinstallIp_list).start())
+
+# Create settings choices
+exclude_udp_in_block_state = BooleanVar()
+config = configparser.ConfigParser()
+config.read(config_path)
+exclude_udp_in_block_state.set(get_state('exclude_udp_port_3724'))  # Unchecked by default
+# Add a check menu item to the options menu
+options_menu.add_checkbutton(label='Exclude UDP Port 3724 from Blocking [Experimental]',
+                             variable=exclude_udp_in_block_state,
+                             command=lambda: threading.Thread(target=exclude_udp).start())
+options_menu.add_command(label="Uninstall Me", command=uninstall)
 options_menu.add_command(label="Exit", command=app.quit)
 
 # Labels
@@ -1031,7 +1573,7 @@ internetLabel.place(x=250, y=420, anchor="center")
 
 versionLabel = Label(app, text=f'V {__version__}', bg='#282828', fg='#26ef4c', font=futrabook_font)
 versionLabel.grid(row=0, column=0)
-versionLabel.place(x=460, y=590, anchor="center")
+versionLabel.place(x=415, y=15, anchor="center")
 
 # Buttons
 y_axis = range(70, 450, 48)
@@ -1048,9 +1590,16 @@ PlayNAWESTButton = Button(app, image=button_img_NA_WEST, font=futrabook_font, co
                           bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
 PlayNAWESTButton.place(x=135, y=y_axis[2], height=40, width=230)
 
+# Removed by Blizard
 PlayNAEASTButton = Button(app, image=button_img_ME_EAST, font=futrabook_font, command=playNAEast_server,
                           bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
-PlayNAEASTButton.place(x=135, y=y_axis[3], height=40, width=230)
+"""
+PlayNAEASTButton.place(x=135, y=y_axis[3], height=40, width=230)                          
+"""
+
+PlayNACENTRALButton = Button(app, image=button_img_NA_CENTRAL, font=futrabook_font, command=playNACENTRAL_server,
+                             bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
+PlayNACENTRALButton.place(x=135, y=y_axis[3], height=40, width=230)
 
 PlayAustraliaButton = Button(app, image=button_img_Australia, font=futrabook_font, command=PlayAustralia_server,
                              bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
@@ -1060,9 +1609,15 @@ ProgrammableButton = Button(app, image=button_img_programmable_button, font=futr
                             bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
 ProgrammableButton.place(x=135, y=y_axis[5], height=40, width=230)
 
+create_tooltip(ProgrammableButton, "Make your own settings, what server is blocked and what not!"
+                                   "\n !! Custom settings might not work as good as predefined settings"
+                                   "\n USE WITH CAUTION")
+
 ClearBlocksButton = Button(app, image=button_img_Default, font=futrabook_font, command=unblockALL,
                            bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
 ClearBlocksButton.place(x=135, y=y_axis[6], height=40, width=230)
+
+create_tooltip(ClearBlocksButton, "Remove any block commands made")
 
 DonationButton = Button(app, image=button_img_donation, font=futrabook_font, command=donationPage,
                         bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
@@ -1076,26 +1631,46 @@ CustomSettingsButton = Button(app, image=button_img_CUSTOM_SETTINGS, font=futrab
                               bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
 CustomSettingsButton.place(x=370, y=318, height=25, width=25)
 
+create_tooltip(CustomSettingsButton, "Make your own settings, what server is blocked and what not!"
+                                     "\n !! Custom settings might not work as good as predefined settings"
+                                     "\n USE WITH CAUTION")
+
 InstallUpdateButton = Button(app, image=button_img_INSTALL_UPDATE, font=futrabook_font, command=installUpdate,
                              bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
 
 pingButton = Button(app, image=button_img_TEST_PING, font=futrabook_font, command=pingMenu,
                     bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
+pingButton.place(x=135, y=500, height=40, width=230)
 
 # Check box
-tunnelCheckBox_state = IntVar()
-tunnelCheckBox = Checkbutton(app, text="Only affect Overwatch ", font=futrabook_font, activebackground='#282828',
-                             bg='#282828', fg='#26ef4c', borderwidth=0, variable=tunnelCheckBox_state, command=tunnel)
-tunnelCheckBox.place(x=175, y=460)
+tunnelCheckBox_state = BooleanVar()
 
-# Start Program
-iconMaker()
-check_admin()
-checkForAndDeleteLegacyRules()
-if checkOptions(): tunnelCheckBox.select()
+tunnelCheckBox = Checkbutton(app, text="Tunnel Overwatch", font=futrabook_font, activebackground='white',
+                             bg='#282828', fg='#26ef4c', selectcolor='#282828', borderwidth=0,
+                             variable=tunnelCheckBox_state,
+                             command=checkbox_tunnel)
 
-loadIpRanges_thread = threading.Thread(target=loadIpRanges, daemon=True).start()  # Follow main thread
-checkIfActive_thread = threading.Thread(target=checkIfActive, daemon=True).start()  # Follow main thread
-check_for_update_thread = threading.Thread(target=checkUpdate, daemon=True).start()  # Follow main thread
+tunnelCheckBox.place(x=175, y=455)
 
+create_tooltip(tunnelCheckBox, "If checked, the servers blocking will only affect overwatch game."
+                               "\n  This can be helpful when games share similar servers ip ranges")
+
+@time_it
+def pre_processes():
+    # Start Program
+    iconMaker()
+    check_admin()
+    check_firewall()
+    checkForAndDeleteLegacyRules()
+    create_options_ini()
+    if detectTunnelOption():
+        tunnelCheckBox.select()
+
+    loadIpRanges_thread = threading.Thread(target=loadIpRanges, daemon=True).start()  # Follow main thread
+    checkIfActive_thread = threading.Thread(target=checkIfActive, daemon=True).start()  # Follow main thread
+    check_for_update_thread = threading.Thread(target=checkUpdate, daemon=True).start()  # Follow main thread
+    msg_thread = threading.Thread(target=display_message, daemon=True).start()
+
+
+pre_processes()
 app.mainloop()

@@ -22,12 +22,12 @@ if __name__ == '__main__':
     pic2str('play_on_eu.png', 'play_on_eu')
     pic2str('PROGRAMABLE_BUTTON.png', 'PROGRAMABLE_BUTTON')
     pic2str('play_on_na_east.png', 'play_on_na_east')
+    pic2str('play_on_na_central.png', 'play_on_na_central')
     pic2str('play_on_na_west.png', 'play_on_na_west')
     pic2str('play_on_australia.png', 'play_on_australia')
     pic2str('Frame 1.png', 'SQUARE_BACKGROUND_MINA_TEST')
     pic2str('UNBLOCK_ALL.png', 'UNBLOCK_ALL_MAIN')
     pic2str('LOGO_SMALL_APPLICATION.png', 'LOGO_SMALL_APPLICATION')
-    pic2str('Donation_Button.png', 'Donation_Button')
     pic2str('CUSTOM_SETTINGS.png', 'CUSTOM_SETTINGS')
     pic2str('RESET_BUTTON.png', 'RESET_BUTTON')
     pic2str('OPEN_IP_LIST_BUTTON.png', 'OPEN_IP_LIST_BUTTON')
@@ -35,4 +35,9 @@ if __name__ == '__main__':
     pic2str('Frame 2.png', 'CUSTOM_SETTINGS_BACKGROUND')
     pic2str('Donation Button.png', 'Donation_Button')
     pic2str('DISCORD.png', 'Discord_Button')
+    pic2str('INSTALL_UPDATE.png', 'INSTALL_UPDATE')
+    pic2str('TEST PING.png', 'TEST_PING')
     """
+    pic2str('.img/ow2 v5/CANCEL.png', 'CANCEL')
+    pic2str('.img/ow2 v5/MANUALLY LOCATE.png', 'MANUALLY LOCATE')
+
