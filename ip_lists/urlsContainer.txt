@@ -20,4 +20,9 @@ https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lis
 https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/cfg%20-%20NA%20-%20USA%20West%20-%20LAX1.txt
 https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/cfg%20-%20NA%20-%20USA%20West%202%20-%20GUW2.txt
 https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/cfg%20-%20Other%20-%20Australia%203%20-%20SYD2.txt
+https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/cfg%20-%20Other%20-%20Brazil%202%20-%20GBR1.txt
+https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/cfg%20-%20Other%20-%20Qatar%20-%20GMEC1.txt
+https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/cfg%20-%20EU%20-%20Finland%202%20-%20GEN1.txt
+https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/cfg%20-%20Asia%20-%20Singapore%202%20-%20GSG1.txt
+https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/cfg%20-%20Asia%20-%20Japan%202%20-%20GTK1.txt
 https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/pinglist.txt
