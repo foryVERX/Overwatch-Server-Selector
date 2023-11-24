@@ -705,11 +705,10 @@ def tunnel():  # Handle tunnelling options for Overwatch.exe
             tunnel_option = True
         else:
             app.overwatch = filedialog.askopenfilename(initialdir='C:\\',
-                                                       title='Select Overwatch\_retail_\Overwatch.exe ',
-                                                       filetypes=(("Select Overwatch\_retail_\Overwatch.exe",
-                                                                   "Overwatch.exe"),))
-            existance_overwatch = app.overwatch.find("/_retail_/Overwatch.exe")
-            if existance_overwatch > 0:
+                                           title='Select Overwatch Executable',
+                                           filetypes=(("Overwatch Executable", "Overwatch.exe"),))
+
+            if app.overwatch:
                 overwatch_path = app.overwatch.replace('/', "\\")
                 tunnel_option = True
                 logging.debug("Overwatch path is:  " + overwatch_path)
