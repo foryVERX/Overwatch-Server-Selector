@@ -1,1 +1,26 @@
-test
+Welcome to the 5.3.1 of the MINA Overwatch 2 Server Selector! Here’s what’s new:
+
+New Features:
+-Removed the NA EAST option due to the server’s in-game absence.
+-Added a new NA Central option.
+-Implemented a messaging feature for updates and issue reporting or warnings (available on GitHub under the CommunicateToUser folder).
+-Introduced auto-detection for game location for the tunneling option (previously known as Only Affect Overwatch). The program now automatically detects both Steam and Battle.net versions installed in common locations. If not found, users can manually select the game location.
+-The app now checks if your firewall is disabled and will not proceed if it is. This should reduce user reports significantly as most reports are about rules being added but still connecting to blocked servers.
+-Tooltips have been added to buttons to provide information about their functionality.
+-Repair option to resolve when the program get stuck or solving general windows firewalls hangs this might help.
+-Added Uninstall Me option under settings to completely delete the app incase you don't want it anymore (Better than uninstalling the app from windows it self, because the app will remove assosiated folders for the app and remove any settings made to the firewall).
+-Added an option named Exclude port ...etc under settings to help for users that can't connect to the game MENUE due to the block implemented. Currently this issue happens when user uses steam version and live in Asia. In addition it can help if user doesn't want to change the region from battle.net to EU or AM.
+-Added warning message when using custom config.
+-Implemented an options.ini configurator.
+-Optimized code for better performance.
+-Modified image regeneration from bytes.
+-Separated beta version updates from stable version updates (for IP list and other dependencies).
+
+Fixes in Build 1.1:
+-Resolved issue where NA Central button was stuck on “Working on it”.
+-Added troubleshooting debugs to log issues.
+-Fixed non-functional Custom Config.
+
+Please note that this is a first stable build version. Consider using Quick Play to test stability.
+
+Report any issues you encounter on our Discord server. Thank you for your support!
