@@ -2,7 +2,6 @@ Asia - South Korea|211.234.110.1
 Asia - Japan|dynamodb.ap-northeast-1.amazonaws.com
 Asia - Singapore|dynamodb.ap-southeast-1.amazonaws.com
 EU - Netherlands|185.60.114.159
-EU - France|37.244.0.0
 NA - USA West|24.105.30.129
 NA - USA Central|24.105.62.129
 Other - Australia |172.105.168.123
