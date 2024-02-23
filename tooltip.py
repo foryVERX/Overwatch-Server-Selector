@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 
+
 class ToolTip(object):
     def __init__(self, widget):
         self.widget = widget
@@ -16,7 +17,9 @@ class ToolTip(object):
         self.tip_window = tw = tk.Toplevel(self.widget)
         tw.wm_overrideredirect(True)
         tw.wm_geometry(f"+{x}+{y}")
-        label = tk.Label(tw, text=tip_text, background="#ffffe0", relief=tk.SOLID, borderwidth=1)
+        label = tk.Label(
+            tw, text=tip_text, background="#ffffe0", relief=tk.SOLID, borderwidth=1
+        )
         label.pack()
 
     def hide_tip(self):
