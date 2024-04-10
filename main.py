@@ -1,3 +1,4 @@
+import ast
 import time
 from tkinter import *
 from tkinter.font import Font
@@ -29,6 +30,7 @@ import fnmatch
 import string
 from ctypes import windll
 from resolve_images import byteToTkImage
+import subprocess
 
 # Dispatch shell
 shell = win32com.client.Dispatch("WScript.Shell")
@@ -40,7 +42,7 @@ __version__ = '5.3.1'
 _AppName_ = 'MINA Overwatch 2 Server Selector'
 __author__ = 'Yousef Aljohani'
 __copyright__ = 'Copyright (C) 2023, Yousef Aljohani'
-__credits__ = ['Yousef Aljohani(foryVERX)', 'chhaugen(Carl)']
+__credits__ = ['Yousef Aljohani(foryVERX)', 'chhaugen(Carl)', 'Abdulaziz Alsalman(AziSal)']
 __maintainer__ = 'Yousef Aljohani'
 __email__ = 'verrrx@gmail.com'
 
@@ -67,6 +69,8 @@ logo_small_application = byteToTkImage(pic2str.LOGO_SMALL_APPLICATION)
 CUSTOM_SETTINGS_BACKGROUND = byteToTkImage(pic2str.CUSTOM_SETTINGS_BACKGROUND)
 button_img_RESET_BUTTON = byteToTkImage(pic2str.RESET_BUTTON)
 button_img_OPEN_IP_LIST_BUTTON = byteToTkImage(pic2str.OPEN_IP_LIST_BUTTON)
+button_img_ADD_BUTTON = byteToTkImage(pic2str.ADD_BUTTON)
+button_img_DETECT_BUTTON = byteToTkImage(pic2str.DETECT_BUTTON)
 button_img_APPLY_BUTTON = byteToTkImage(pic2str.APPLY_BUTTON)
 button_img_programmable_button = byteToTkImage(pic2str.PROGRAMABLE_BUTTON)
 button_img_ME = byteToTkImage(pic2str.BLOCK_MIDDLE_EAST)
@@ -254,8 +258,8 @@ def check_firewall():
         return True
     else:
         result = messagebox.askretrycancel("Error", "Windows Firewall is not enabled for public and private networks."
-                                                    "\n\nPlease enable Windows Firewall from Control Panel\System and Security\Windows Defender Firewall"
-                                                    "\Turn Windows Defender Firewall ON or OFF."
+                                                    "\n\nPlease enable Windows Firewall from Control Panel\\System and Security\\Windows Defender Firewall"
+                                                    "\\Turn Windows Defender Firewall ON or OFF."
                                                     "\n\n"
                                                     "This app doesn't work with 3rd Party AntiVirus. App requires Windows Firewall"
                                                     "\n\nPress retry after enabling Windows Firewall or Cancle to close")
@@ -749,13 +753,20 @@ def checkForAndDeleteLegacyRules():
             shell.ShellExecuteEx(lpVerb='runas', lpFile='netsh.exe', lpParameters=commands)
 
 
-def checkIfActive():  # To check if server is blocked or not
+def checkIfActive(active_rule_list = False):  # To check if server is blocked or not
     servers_active_rule_list = ['_ME_OW_SERVER_BLOCKER', '_NAEAST_OW_SERVER_BLOCKER', '_NAWEST_OW_SERVER_BLOCKER',
                                 '_EU_OW_SERVER_BLOCKER', '_AU_OW_SERVER_BLOCKER', '_Australia_OW_SERVER_BLOCKER',
                                 '_NACENTRAL_OW_SERVER_BLOCKER', "_CUSTOM_BLOCK"]
     firewall = dispatchFirewall()
     rules = [x.Name for x in firewall.Rules]
     logging.info("CHECKING IF PREVIOUS RULES EXIST")
+    # Check which rule is active if any
+    if active_rule_list:
+        active_rules = [rule for rule in servers_active_rule_list if rule in rules]
+        # If any of the custom rules are active return active_rules
+        if len(active_rules) > 0:
+            return active_rules
+        return False
     for rule_name in servers_active_rule_list:
         if rule_name in rules:
             filtered = rule_name.split('_')[1]
@@ -783,6 +794,8 @@ def checkIfActive():  # To check if server is blocked or not
 
 def add_option(option, value):
     logging.info(f"Adding {option} setting to configrator with value of {value}")
+    if option.endswith('array') and not isinstance(value, list):
+        value = [value]
     # Create a config parser
     config = configparser.ConfigParser()
     # Read the options.ini file
@@ -831,12 +844,12 @@ def tunnel():  # Handle tunnelling options for Overwatch.exe
     global overwatch_path, tunnel_option
     tunnel_button_state = get_state("tunnel")
     steam_version_state = get_state("steamversion")
-    title = 'Select Overwatch\_retail_\Overwatch.exe '
-    filetypes = "Select Overwatch\_retail_\Overwatch.exe"
+    title = 'Select Overwatch\\_retail_\\Overwatch.exe '
+    filetypes = "Select Overwatch\\_retail_\\Overwatch.exe"
     findPath = "/_retail_/Overwatch.exe"
     if steam_version_state:
-        title = '\steamapps\common\Overwatch\Overwatch.exe '
-        filetypes = "\common\Overwatch\Overwatch.exe"
+        title = '\\steamapps\\common\\Overwatch\\Overwatch.exe '
+        filetypes = "\\common\\Overwatch\\Overwatch.exe"
         findPath = "/Overwatch/Overwatch.exe"
     logging.info("Tunnel buttons state =  " + str(tunnel_button_state))
     if tunnel_button_state == 1:
@@ -914,6 +927,34 @@ def get_drives():
         bitmask >>= 1
     return drives
 
+def run_powershell_command(command):
+    # Construct PowerShell command
+    ps_command = ["powershell", "-Command", command]
+    
+    try:
+        # Execute the command and capture output
+        result = subprocess.run(ps_command, capture_output=True, text=True, check=True)
+        print("Command output:", result.stdout)
+        if result.stderr:
+            print("Command error:", result.stderr)
+    except subprocess.CalledProcessError as e:
+        print(f"Command failed with error: {e.stderr}")
+    
+def editFirewallRuleApplicationName(rule_name, new_application_name):
+    firewall = dispatchFirewall()
+    rules = firewall.Rules
+    rule = rules.Item(rule_name)
+    if rule.ApplicationName == new_application_name:
+        logging.debug(f"Rule {rule_name} application name is already {new_application_name}")
+        return
+    if not new_application_name or new_application_name is None:
+        # use command to set the application to Any
+        command = f'Set-NetFirewallRule -DisplayName "{rule_name}" -Program Any'
+        run_powershell_command(command)
+        return
+
+    rule.ApplicationName = new_application_name
+    logging.debug(f"Edited rule {rule_name} application name to {new_application_name}")
 
 def choose_option(root, options):
     max_length = max(len(s) for s in options)
@@ -928,20 +969,79 @@ def choose_option(root, options):
     frameTop.place(x=-2, y=0)
     top.iconbitmap("LOGO_SMALL_APPLICATION.ico")
     choice = None
-
-    def on_select(event):
+    config = configparser.ConfigParser()
+    
+    listbox_width_in_px = int(
+        (max_length + (max_length / 10)) * 6.06)  # conversion factor from tkinter shit dimensions to pixels
+    logging.info(f"Some callculations to set listbox in the middle max{max_length} "
+                 + f"calc{listbox_width_in_px} "
+                 + f"middle position is {int((800 - listbox_width_in_px) / 2)}")
+    LB_middle_position = int((800 - listbox_width_in_px) / 2)
+    
+    def create_radio_button(options):
+        option_y_position = 32
+        for option in options:
+            radiobutton = Radiobutton(top, text=option, variable=selected_option, value=option, bg="white",
+                                      command=lambda option=option: on_select(option), highlightcolor="#404040")
+            radiobutton.pack()
+            radiobutton.place(x=LB_middle_position + 2, y=option_y_position)
+            option_y_position += 30
+        
+    def on_select(value):
         nonlocal choice
-        selection = event.widget.curselection()
-        if selection:
-            index = selection[0]
-            choice = event.widget.get(index)
-
+        choice = value
+    servers_active_rule_list = ['_ME_OW_SERVER_BLOCKER', '_NAEAST_OW_SERVER_BLOCKER', '_NAWEST_OW_SERVER_BLOCKER',
+                                '_EU_OW_SERVER_BLOCKER', '_AU_OW_SERVER_BLOCKER', '_Australia_OW_SERVER_BLOCKER',
+                                '_NACENTRAL_OW_SERVER_BLOCKER', "_CUSTOM_BLOCK"]
     def on_confirm():
+        nonlocal choice
+        if choice is None:
+            choice = config.get('OPTIONS', 'overwatch_path')
+        add_option('overwatch_path', choice)
+        active_rule_list = checkIfActive(True)
+        if active_rule_list:
+            editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, choice)
+        
         top.destroy()
+        
+    def on_detect():
+        matches = detect_path()
+
+        if not isinstance(matches, list):
+            matches = [matches]
+        config.read(options_path)
+        if config.has_option('OPTIONS', 'overwatch_path_array'):
+            overwatch_path_array = config.get('OPTIONS', 'overwatch_path_array')
+            overwatch_path_array = ast.literal_eval(overwatch_path_array)
+            # check if the detected path is already in the list
+            new_path = 0
+            for match in matches:
+                if match not in overwatch_path_array:
+                    overwatch_path_array.append(match)
+                    new_path+=1
+            if new_path > 0:
+                add_option('overwatch_path_array', str(overwatch_path_array))
+                # Delete all existing radio buttons
+                for widget in top.winfo_children():
+                    if isinstance(widget, Radiobutton):
+                        widget.destroy()
+                # Create new radio buttons
+                create_radio_button(overwatch_path_array)
+                messagebox.showinfo("Path detected", f"Detected {new_path} new paths")
+            else:
+                messagebox.showinfo("Path detected", "No new paths detected")
+        else:
+            add_option('overwatch_path_array', str(matches))
+            # Delete all existing radio buttons
+            for widget in top.winfo_children():
+                if isinstance(widget, Radiobutton):
+                    widget.destroy()
+            # Create new radio buttons
+            create_radio_button(matches)
+            messagebox.showinfo("Path detected", f"Detected {len(matches)} paths")
+            
 
     def on_cancel():
-        nonlocal choice
-        choice = None
         top.destroy()
 
     def on_manually_locate():
@@ -951,8 +1051,6 @@ def choose_option(root, options):
         checkbox_tunnel(skip_auto_detect=True)
 
     def exit_window():
-        nonlocal choice
-        choice = None
         top.destroy()
 
     choose_label = Label(top, text='Please choose the game location', bg='#404040', fg='#ddee4a', font=futrabook_font)
@@ -962,25 +1060,30 @@ def choose_option(root, options):
                       highlightcolor="#404040",
                       width=int(max_length + (max_length / 10)),
                       height=10)
-    for option in options:
-        listbox.insert(END, option)
-    listbox_width_in_px = int(
-        (max_length + (max_length / 10)) * 6.06)  # conversion factor from tkinter shit dimensions to pixels
-    logging.info(f"Some callculations to set listbox in the middle max{max_length} "
-                 + f"calc{listbox_width_in_px} "
-                 + f"middle position is {int((800 - listbox_width_in_px) / 2)}")
-    LB_middle_position = int((800 - listbox_width_in_px) / 2)
-    listbox.place(x=LB_middle_position, y=30)
-    listbox.bind('<<ListboxSelect>>', on_select)
+    
+    config.read(options_path)
+    overwatch_path = config.get('OPTIONS', 'overwatch_path')
+    choice = overwatch_path
 
+    selected_option = StringVar(value=overwatch_path)
+    create_radio_button(options)
+    
+    listbox.place(x=LB_middle_position, y=30)
+
+    detect_button = Button(top, image=button_img_DETECT_BUTTON, font=futrabook_font, command=on_detect,
+                            bg='#404040', fg='#404040', borderwidth=0, activebackground='#404040')
+    
     confirm_button = Button(top, image=button_img_APPLY_BUTTON, font=futrabook_font, command=on_confirm,
                             bg='#404040', fg='#404040', borderwidth=0, activebackground='#404040')
-    CB_position = (800 / 2) - 75
-    confirm_button.place(x=CB_position, y=240, anchor="center")
+    CB_position = (1200 / 3) - 75
+    
+    detect_button.place(x=CB_position - 65, y=240, anchor="center")
+    
+    confirm_button.place(x=CB_position + 75, y=240, anchor="center")
 
     cancel_button = Button(top, image=button_img_cancel, command=on_cancel,
                            bg='#404040', fg='#404040', borderwidth=0, activebackground='#404040')
-    cancel_button.place(x=CB_position + 75, y=232)
+    cancel_button.place(x=CB_position + 150, y=232)
 
     manually_locate_button = Button(top, image=button_img_manually_locate, command=on_manually_locate,
                                     bg='#404040', fg='#404040', borderwidth=0, activebackground='#404040')
@@ -996,7 +1099,7 @@ def choose_option(root, options):
 def askUserToChooseAfile():
     root = Tk()
     root.withdraw()  # Hide the main window
-    title = 'Select Overwatch\_retail_\Overwatch.exe or \common\Overwatch\Overwatch.exe for steam'
+    title = 'Select Overwatch\\_retail_\\Overwatch.exe or \\common\\Overwatch\\Overwatch.exe for steam'
     path1 = "/_retail_/Overwatch.exe"
     path2 = "/steamapps/common/Overwatch/Overwatch.exe"
     filetypes = (
@@ -1006,6 +1109,7 @@ def askUserToChooseAfile():
         initialdir='C:\\',
         filetypes=filetypes
     )
+    root.destroy()
     if not app.overwatch:
         return None
     print(f'Manually chosen path {app.overwatch}')
@@ -1016,23 +1120,7 @@ def askUserToChooseAfile():
     else:
         return app.overwatch.replace('/', '\\')
 
-
-def checkbox_tunnel(skip_auto_detect=False):
-    tunnel_checkbox_state = tunnelCheckBox_state.get()
-    # Add the option tunnel with its value
-    add_option('tunnel', tunnel_checkbox_state)
-    if not tunnel_checkbox_state:
-        logging.info("Tunnel Option Was Disabled")
-        return
-    logging.info("Tunnel Option Enabled")
-    if skip_auto_detect:
-        logging.debug("User choose to pick the game location manually")
-        user_selection = askUserToChooseAfile()
-        add_option('overwatch_path', str(user_selection))
-        if user_selection is None:
-            tunnelCheckBox.deselect()
-            add_option('tunnel', False)
-        return
+def detect_path():
     drives = get_drives()
     patterns = ['Overwatch.exe']
     start_path = [desktop_path, program_files_path, program_files_x86_path]
@@ -1043,26 +1131,91 @@ def checkbox_tunnel(skip_auto_detect=False):
                  f"{program_files_x86_path}\n"
                  f"The following drives {drives}")
     matches = searchForGamePath(patterns, start_path)
-    if not matches:
-        logging.debug("searchForGamePath function took too long time")
-        logging.debug("User will pick the game location manually")
-        user_selection = askUserToChooseAfile()
-        add_option('overwatch_path', str(user_selection))
-        if user_selection is None:
-            tunnelCheckBox.deselect()
-            add_option('tunnel', False)
-            return
-        return user_selection
     if len(matches) > 0:
-        user_selected_path = choose_option(app, matches)
+        return matches
+    return None
+
+def checkbox_tunnel(skip_auto_detect=False):
+    
+    # Create a config parser
+    config = configparser.ConfigParser()
+    # Read the options.ini file
+    config.read(options_path)
+    
+    if skip_auto_detect:
+        user_selection = askUserToChooseAfile()
+        # make sure the user selected a file
+        if user_selection is None:
+            return
+        add_option('overwatch_path', str(user_selection))
+        add_option('tunnel', True)
+        editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, user_selection)
+        
+        if config.has_option('OPTIONS', 'overwatch_path_array'):
+            overwatch_path_array = config.get('OPTIONS', 'overwatch_path_array')
+            overwatch_path_array = ast.literal_eval(overwatch_path_array)
+            if user_selection not in overwatch_path_array:
+            # check if the detected path is already in the list
+                overwatch_path_array.append(user_selection)
+                add_option('overwatch_path_array', str(overwatch_path_array))
+            else:
+                messagebox.showinfo("Path detected", "Path already exists")
+            return
+        else:
+            add_option('overwatch_path_array', str([user_selection]))
+            return
+    # Check if the tunnel option is already set
+    if not config.has_option('OPTIONS', 'overwatch_path_array') or config.get('OPTIONS', 'overwatch_path_array') is None:
+
+        matches = detect_path()
+        if len(matches) > 0:
+            add_option('overwatch_path_array', str(matches))
+        if not matches:
+            user_selection = askUserToChooseAfile()
+            if user_selection is None:
+                tunnelCheckBox.deselect()
+                add_option('tunnel', False)
+                return
+            add_option('overwatch_path', str(user_selection))
+            add_option('overwatch_path_array', str([user_selection]))
+            editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, user_selection)
+            return user_selection
+        # Reload the config file
+        config.read(options_path)
+    
+    overwatch_path_array = config.get('OPTIONS', 'overwatch_path_array')
+    overwatch_path_array = ast.literal_eval(overwatch_path_array)
+    if len(overwatch_path_array) > 0:
+        user_selected_path = choose_option(app, overwatch_path_array)
         if not user_selected_path == 'usr_manual_locate':
             add_option('overwatch_path', str(user_selected_path))
+            editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, user_selected_path)
+            tunnelCheckBox.select()
         if user_selected_path is None:
             tunnelCheckBox.deselect()
             add_option('tunnel', False)
             logging.debug("User didn't select any game path --> exiting")
             return
         return
+
+def checkbox_switch():
+    tunnel_checkbox_state = tunnelCheckBox_state.get()
+    # Add the option tunnel with its value
+    add_option('tunnel', tunnel_checkbox_state)
+    if not tunnel_checkbox_state:
+        editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, None)
+        return
+    
+    # Create a config parser
+    config = configparser.ConfigParser()
+    # Read the options.ini file
+    config.read(options_path)
+    overwatch_path = config.get('OPTIONS', 'overwatch_path')
+    editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, overwatch_path)
+    if not overwatch_path or overwatch_path == 'None':
+        logging.debug("Overwatch path is not found")
+        # call checkbox_tunnel function
+        checkbox_tunnel()
 
 
 '''
@@ -1648,12 +1801,17 @@ tunnelCheckBox_state = BooleanVar()
 tunnelCheckBox = Checkbutton(app, text="Tunnel Overwatch", font=futrabook_font, activebackground='white',
                              bg='#282828', fg='#26ef4c', selectcolor='#282828', borderwidth=0,
                              variable=tunnelCheckBox_state,
-                             command=checkbox_tunnel)
+                             command=checkbox_switch)
 
 tunnelCheckBox.place(x=175, y=455)
 
 create_tooltip(tunnelCheckBox, "If checked, the servers blocking will only affect overwatch game."
                                "\n  This can be helpful when games share similar servers ip ranges")
+
+manageTunnelButton = Button(app, image=button_img_CUSTOM_SETTINGS, font=futrabook_font, command=checkbox_tunnel,
+                            bg='#282828', fg='#282828', borderwidth=0, activebackground='#282828')
+
+manageTunnelButton.place(x=370, y=455, height=25, width=25)
 
 @time_it
 def pre_processes():
