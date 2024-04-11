@@ -962,7 +962,6 @@ def editFirewallRuleApplicationName(rule_name, new_application_name):
     logging.debug(f"Edited rule {rule_name} application name to {new_application_name}")
 
 def choose_option(root, options):
-    print(options)
     max_length = max(len(s) for s in options)
     top = Toplevel(root)
     # Set Properties
@@ -974,8 +973,9 @@ def choose_option(root, options):
     frameTop.pack()
     frameTop.place(x=-2, y=0)
     top.iconbitmap("LOGO_SMALL_APPLICATION.ico")
-    choice = None
     config = configparser.ConfigParser()
+    config.read(options_path)
+    choice = config.get('OPTIONS', 'overwatch_path')
     
     listbox_width_in_px = int(
         (max_length + (max_length / 10)) * 6.06)  # conversion factor from tkinter shit dimensions to pixels
@@ -999,8 +999,6 @@ def choose_option(root, options):
 
     def on_confirm():
         nonlocal choice
-        if choice is None:
-            choice = config.get('OPTIONS', 'overwatch_path')
         add_option('overwatch_path', choice)
         active_rule_list = checkIfActive(True)
         if active_rule_list:
@@ -1073,8 +1071,6 @@ def choose_option(root, options):
     choice = overwatch_path
 
     selected_option = StringVar(value=overwatch_path)
-    # print options
-    print(options)
     create_radio_button(options)
     
     listbox.place(x=LB_middle_position, y=30)
@@ -1148,13 +1144,14 @@ def checkbox_tunnel(skip_auto_detect=False):
     
     # Create a config parser
     config = configparser.ConfigParser()
+    config.read(options_path)
+    
     # Read the options.ini file
     if not config.has_section('OPTIONS'):
         config.add_section('OPTIONS')
         add_option('tunnel', False)
         add_option('overwatch_path', 'None')
         
-    config.read(options_path)
     
     if skip_auto_detect:
         user_selection = askUserToChooseAfile()
