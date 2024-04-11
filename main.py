@@ -794,6 +794,11 @@ def checkIfActive(active_rule_list = False):  # To check if server is blocked or
 
 def add_option(option, value):
     logging.info(f"Adding {option} setting to configrator with value of {value}")
+    # see if it can be converted to a list using ast
+    try:
+        value = ast.literal_eval(value)
+    except (ValueError, SyntaxError):
+        pass
     if option.endswith('array') and not isinstance(value, list):
         value = [value]
     # Create a config parser
@@ -957,6 +962,7 @@ def editFirewallRuleApplicationName(rule_name, new_application_name):
     logging.debug(f"Edited rule {rule_name} application name to {new_application_name}")
 
 def choose_option(root, options):
+    print(options)
     max_length = max(len(s) for s in options)
     top = Toplevel(root)
     # Set Properties
@@ -990,9 +996,7 @@ def choose_option(root, options):
     def on_select(value):
         nonlocal choice
         choice = value
-    servers_active_rule_list = ['_ME_OW_SERVER_BLOCKER', '_NAEAST_OW_SERVER_BLOCKER', '_NAWEST_OW_SERVER_BLOCKER',
-                                '_EU_OW_SERVER_BLOCKER', '_AU_OW_SERVER_BLOCKER', '_Australia_OW_SERVER_BLOCKER',
-                                '_NACENTRAL_OW_SERVER_BLOCKER', "_CUSTOM_BLOCK"]
+
     def on_confirm():
         nonlocal choice
         if choice is None:
@@ -1010,6 +1014,9 @@ def choose_option(root, options):
         if not isinstance(matches, list):
             matches = [matches]
         config.read(options_path)
+        # check if OPTIONS section exists
+        if not config.has_section('OPTIONS'):
+            config.add_section('OPTIONS')
         if config.has_option('OPTIONS', 'overwatch_path_array'):
             overwatch_path_array = config.get('OPTIONS', 'overwatch_path_array')
             overwatch_path_array = ast.literal_eval(overwatch_path_array)
@@ -1066,6 +1073,8 @@ def choose_option(root, options):
     choice = overwatch_path
 
     selected_option = StringVar(value=overwatch_path)
+    # print options
+    print(options)
     create_radio_button(options)
     
     listbox.place(x=LB_middle_position, y=30)
@@ -1140,6 +1149,11 @@ def checkbox_tunnel(skip_auto_detect=False):
     # Create a config parser
     config = configparser.ConfigParser()
     # Read the options.ini file
+    if not config.has_section('OPTIONS'):
+        config.add_section('OPTIONS')
+        add_option('tunnel', False)
+        add_option('overwatch_path', 'None')
+        
     config.read(options_path)
     
     if skip_auto_detect:
@@ -1155,21 +1169,31 @@ def checkbox_tunnel(skip_auto_detect=False):
             overwatch_path_array = config.get('OPTIONS', 'overwatch_path_array')
             overwatch_path_array = ast.literal_eval(overwatch_path_array)
             if user_selection not in overwatch_path_array:
-            # check if the detected path is already in the list
-                overwatch_path_array.append(user_selection)
+                # check if the detected path is already in the list
+                if not isinstance(user_selection, list):
+                    user_selection = [user_selection]
+                for match in user_selection:
+                    if match not in overwatch_path_array:
+                        overwatch_path_array.append(match)
+                print(f"Detected paths: {str(overwatch_path_array)}")
                 add_option('overwatch_path_array', str(overwatch_path_array))
             else:
                 messagebox.showinfo("Path detected", "Path already exists")
             return
         else:
-            add_option('overwatch_path_array', str([user_selection]))
+            if not isinstance(user_selection, list):
+                user_selection = [user_selection]
+            add_option('overwatch_path_array', str(user_selection))
             return
     # Check if the tunnel option is already set
     if not config.has_option('OPTIONS', 'overwatch_path_array') or config.get('OPTIONS', 'overwatch_path_array') is None:
 
         matches = detect_path()
         if len(matches) > 0:
+            print(f"Detected paths1: {str(matches)}")
             add_option('overwatch_path_array', str(matches))
+            config.read(options_path)
+            print(f"Detected paths2: {str(config.get('OPTIONS', 'overwatch_path_array'))}")
         if not matches:
             user_selection = askUserToChooseAfile()
             if user_selection is None:
@@ -1179,7 +1203,6 @@ def checkbox_tunnel(skip_auto_detect=False):
             add_option('overwatch_path', str(user_selection))
             add_option('overwatch_path_array', str([user_selection]))
             editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, user_selection)
-            return user_selection
         # Reload the config file
         config.read(options_path)
     
