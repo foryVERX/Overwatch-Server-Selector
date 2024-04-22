@@ -12,8 +12,8 @@ from itertools import groupby
 from PIL import ImageTk
 import pic2str
 import ctypes
-from os.path import exists, isdir, isfile, join
-from os import getenv, path, mkdir, listdir, startfile, remove, walk, environ, makedirs
+from os.path import exists, isdir, isfile, join, islink
+from os import getenv, path, mkdir, listdir, startfile, remove, scandir, environ, makedirs, cpu_count
 import subprocess
 import webbrowser
 import socket
@@ -30,6 +30,7 @@ import fnmatch
 import string
 from ctypes import windll
 from resolve_images import byteToTkImage
+from concurrent.futures import ThreadPoolExecutor, as_completed, wait
 
 # Dispatch shell
 shell = win32com.client.Dispatch("WScript.Shell")
@@ -882,39 +883,56 @@ def tunnel():  # Handle tunnelling options for Overwatch.exe
 
 
 def searchForGamePath(patterns, start_paths):
+    start_time_main = time.time()
     matches = []
-    threads = []
-    filters = ['steamapps\\common\\Overwatch\\Overwatch.exe', 'Overwatch\\_retail_\\Overwatch.exe']
-
+    filters = ['common\\Overwatch\\Overwatch.exe', 'Overwatch\\_retail_\\Overwatch.exe', 'Overwatch\\_beta_\\Overwatch.exe']
+    relevant_parents = ['Blizzard', 'steamapps']
+    max_depth = 2  # Maximum directory depth to search
+    
     def search_path(start_path):
-        start_time = time.time()
-        i = 0
-        # time.sleep(3.1)
-        for root, dirs, files in walk(start_path):
-            i += 1
-            if i % 10 == 0:
-                if stop_flag.is_set():
-                    return False
-            matches.extend(
-                [path.join(root, filename) for pattern in patterns for filename in fnmatch.filter(files, pattern)])
-        filtered_list = [item for item in matches if not any(string in item for string in filters)]
-        for item in filtered_list:
-            matches.remove(item)
-        end_time = time.time()
-        print(f"execution time of thread = {end_time - start_time}s")
+        try:
+            def traverse_directory(dir_entry, current_depth=0):
+                if current_depth >= max_depth:
+                    return
+                if any(parent in dir_entry.path for parent in relevant_parents):
+                    for filter_path in filters:
+                        full_path = path.join(dir_entry.path, filter_path)
+                        if path.exists(full_path):
+                            matches.append(full_path)
+                try:
+                    with scandir(dir_entry.path) as it:
+                        for entry in it:
+                            if entry.is_dir():
+                                traverse_directory(entry, current_depth + 1)
+                            elif entry.is_file():
+                                for pattern in patterns:
+                                    if fnmatch.fnmatch(entry.name, pattern) and not any(f in entry.path for f in filters):
+                                        matches.append(entry.path)
+                except PermissionError as e:
+                    logging.error(f"Error while searching {dir_entry.path}: {e}")
+                    
+            with scandir(start_path) as it:
+                for entry in it:
+                    if entry.is_dir():
+                        traverse_directory(entry)
+        except Exception as e:
+            logging.error(f"Error while searching {start_path}: {e}")
 
-    stop_flag = threading.Event()
-    for start_path in start_paths:
-        thread = threading.Thread(target=search_path, args=(start_path,))
-        thread.start()
-        threads.append(thread)
 
-    thread_timeout = 3.0
-    for thread in threads:
-        thread.join(thread_timeout)  # Wait for the thread to finish for at most 3 seconds
-        if thread.is_alive():
-            stop_flag.set()
+    # Get the number of CPU cores
+    num_cores = cpu_count()
 
+    # Set the number of workers to twice the number of cores
+    num_workers = 2 * num_cores
+    print(f"Number of workers = {num_workers}")
+
+    with ThreadPoolExecutor(max_workers=num_workers) as executor:
+        futures = {executor.submit(search_path, start_path): start_path for start_path in start_paths}
+        wait(futures)
+
+    end_time_main = time.time()
+    logging.info(f"Execution time of main function = {end_time_main - start_time_main}s")
+    print(f"Execution time of main function = {end_time_main - start_time_main}s")
     return matches
 
 
@@ -925,7 +943,7 @@ def get_drives():
     drives = []
     bitmask = windll.kernel32.GetLogicalDrives()
     for letter in string.ascii_uppercase:
-        if bitmask & 1 and letter != 'C':
+        if bitmask & 1:
             drives.append(f'{letter}:\\')
         bitmask >>= 1
     return drives
@@ -1001,7 +1019,9 @@ def choose_option(root, options):
     top.iconbitmap("LOGO_SMALL_APPLICATION.ico")
     config = configparser.ConfigParser()
     config.read(options_path)
-    choice = config.get('OPTIONS', 'overwatch_path')
+    choice = None
+    if config.has_option('OPTIONS', 'overwatch_path'):
+        choice = config.get('OPTIONS', 'overwatch_path')
     
     listbox_width_in_px = int(
         (max_length + (max_length / 10)) * 6.06)  # conversion factor from tkinter shit dimensions to pixels
@@ -1026,6 +1046,8 @@ def choose_option(root, options):
     def on_confirm():
         nonlocal choice
         add_option('overwatch_path', choice)
+        if choice is not None:
+            add_option('tunnel', True)
         active_rule_list = checkIfActive(True)
         if active_rule_list:
             editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, choice)
@@ -1034,7 +1056,9 @@ def choose_option(root, options):
         
     def on_detect():
         matches = detect_path()
-
+        if matches is None:
+            messagebox.showinfo("Path detected", "No new paths detected")
+            return
         if not isinstance(matches, list):
             matches = [matches]
         config.read(options_path)
@@ -1073,15 +1097,23 @@ def choose_option(root, options):
             
 
     def on_cancel():
+        nonlocal choice
+        config.read(options_path)
+        if config.has_option('OPTIONS', 'overwatch_path'):
+            choice = config.get('OPTIONS', 'overwatch_path')
         top.destroy()
 
     def on_manually_locate():
         nonlocal choice
-        choice = 'usr_manual_locate'
         top.destroy()
-        checkbox_tunnel(skip_auto_detect=True)
+        user_selection = checkbox_tunnel(skip_auto_detect=True)
+        choice = user_selection
 
     def exit_window():
+        nonlocal choice
+        config.read(options_path)
+        if config.has_option('OPTIONS', 'overwatch_path'):
+            choice = config.get('OPTIONS', 'overwatch_path')
         top.destroy()
 
     choose_label = Label(top, text='Please choose the game location', bg='#404040', fg='#ddee4a', font=futrabook_font)
@@ -1154,14 +1186,9 @@ def askUserToChooseAfile():
 def detect_path():
     drives = get_drives()
     patterns = ['Overwatch.exe']
-    start_path = [desktop_path, program_files_path, program_files_x86_path]
-    start_path.extend(drives)  # Add the drives to the start paths
     logging.info(f"Searching for the game in \n"
-                 f"{desktop_path}\n"
-                 f"{program_files_path}\n"
-                 f"{program_files_x86_path}\n"
                  f"The following drives {drives}")
-    matches = searchForGamePath(patterns, start_path)
+    matches = searchForGamePath(patterns, drives)
     if len(matches) > 0:
         return matches
     return None
@@ -1183,7 +1210,7 @@ def checkbox_tunnel(skip_auto_detect=False):
         user_selection = askUserToChooseAfile()
         # make sure the user selected a file
         if user_selection is None:
-            return
+            return None
         add_option('overwatch_path', str(user_selection))
         add_option('tunnel', True)
         editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, user_selection)
@@ -1192,29 +1219,22 @@ def checkbox_tunnel(skip_auto_detect=False):
             overwatch_path_array = config.get('OPTIONS', 'overwatch_path_array')
             overwatch_path_array = ast.literal_eval(overwatch_path_array)
             if user_selection not in overwatch_path_array:
-                # check if the detected path is already in the list
-                if not isinstance(user_selection, list):
-                    user_selection = [user_selection]
-                for match in user_selection:
-                    if match not in overwatch_path_array:
-                        overwatch_path_array.append(match)
+                overwatch_path_array.append(user_selection)
                 print(f"Detected paths: {str(overwatch_path_array)}")
                 add_option('overwatch_path_array', str(overwatch_path_array))
+                return user_selection
             else:
                 messagebox.showinfo("Path detected", "Path already exists")
-            return
+            return None
         else:
             if not isinstance(user_selection, list):
-                user_selection = [user_selection]
-            add_option('overwatch_path_array', str(user_selection))
-            return
+                user_selection_list = [user_selection]
+            add_option('overwatch_path_array', str(user_selection_list))
+            return user_selection
     # Check if the tunnel option is already set
     if not config.has_option('OPTIONS', 'overwatch_path_array') or config.get('OPTIONS', 'overwatch_path_array') is None:
 
         matches = detect_path()
-        if len(matches) > 0:
-            add_option('overwatch_path_array', str(matches))
-            config.read(options_path)
         if not matches:
             user_selection = askUserToChooseAfile()
             if user_selection is None:
@@ -1224,6 +1244,9 @@ def checkbox_tunnel(skip_auto_detect=False):
             add_option('overwatch_path', str(user_selection))
             add_option('overwatch_path_array', str([user_selection]))
             editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, user_selection)
+        if len(matches) > 0:
+            add_option('overwatch_path_array', str(matches))
+            config.read(options_path)
         # Reload the config file
         config.read(options_path)
     
@@ -1231,29 +1254,32 @@ def checkbox_tunnel(skip_auto_detect=False):
     overwatch_path_array = ast.literal_eval(overwatch_path_array)
     if len(overwatch_path_array) > 0:
         user_selected_path = choose_option(app, overwatch_path_array)
-        if not user_selected_path == 'usr_manual_locate':
-            add_option('overwatch_path', str(user_selected_path))
-            editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, user_selected_path)
-            tunnelCheckBox.select()
-        if user_selected_path is None:
+        if user_selected_path is None or user_selected_path == "None":
             tunnelCheckBox.deselect()
             add_option('tunnel', False)
-            logging.debug("User didn't select any game path --> exiting")
+            logging.debug("User didn't select any game path")
             return
+        add_option('overwatch_path', str(user_selected_path))
+        editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, user_selected_path)
+        tunnelCheckBox.select()
+        add_option('tunnel', True)
         return
 
 def checkbox_switch():
     tunnel_checkbox_state = tunnelCheckBox_state.get()
-    # Add the option tunnel with its value
-    add_option('tunnel', tunnel_checkbox_state)
-    if not tunnel_checkbox_state:
-        editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, None)
-        return
-    
     # Create a config parser
     config = configparser.ConfigParser()
     # Read the options.ini file
     config.read(options_path)
+    if not config.has_section('OPTIONS'):
+        config.add_section('OPTIONS')
+        # Add the option tunnel with its value
+        add_option('tunnel', tunnel_checkbox_state)
+        add_option('overwatch_path', 'None')
+        config.read(options_path)
+    if not tunnel_checkbox_state:
+        editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, None)
+        return
     overwatch_path = config.get('OPTIONS', 'overwatch_path')
     editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, overwatch_path)
     if not overwatch_path or overwatch_path == 'None':
