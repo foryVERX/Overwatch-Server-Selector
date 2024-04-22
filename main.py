@@ -30,7 +30,6 @@ import fnmatch
 import string
 from ctypes import windll
 from resolve_images import byteToTkImage
-import subprocess
 
 # Dispatch shell
 shell = win32com.client.Dispatch("WScript.Shell")
@@ -302,7 +301,6 @@ def updateIpList():
     loadIpRanges()
     update_text = "IP LIST IS UPTODATE"
     app.after(250, internetLabel.config(text=update_text, fg='#26ef4c'))
-
 
 def check_ip_update():  # A function called at the start of the program to check for update
     global isUpdated, updating_state
@@ -931,36 +929,64 @@ def get_drives():
             drives.append(f'{letter}:\\')
         bitmask >>= 1
     return drives
-
-def run_powershell_command(command):
-    # Construct PowerShell command
-    ps_command = ["powershell", "-Command", command]
-    
-    try:
-        # Execute the command and capture output
-        result = subprocess.run(ps_command, capture_output=True, text=True, check=True)
-        print("Command output:", result.stdout)
-        if result.stderr:
-            print("Command error:", result.stderr)
-    except subprocess.CalledProcessError as e:
-        print(f"Command failed with error: {e.stderr}")
     
 def editFirewallRuleApplicationName(rule_name, new_application_name):
     firewall = dispatchFirewall()
     rules = firewall.Rules
-    rule = rules.Item(rule_name)
+    rule = None
+    try:
+        rule = rules.Item(rule_name)
+    except Exception:
+        raise ValueError(f"Rule {rule_name} not found.")
+    
     if rule.ApplicationName == new_application_name:
         logging.debug(f"Rule {rule_name} application name is already {new_application_name}")
         return
+    
     if not new_application_name or new_application_name is None:
-        # use command to set the application to Any
-        command = f'Set-NetFirewallRule -DisplayName "{rule_name}" -Program Any'
-        run_powershell_command(command)
+        remove_tunnel(rule_name)
         return
 
     rule.ApplicationName = new_application_name
     logging.debug(f"Edited rule {rule_name} application name to {new_application_name}")
+    
+def remove_tunnel(rule_name):
+    firewall = dispatchFirewall()
+    rules = firewall.Rules
+    rule = None
+    try:
+        rule = rules.Item(rule_name)
+    except Exception:
+        raise ValueError(f"Rule {rule_name} not found.")
 
+    rule_properties = {
+        "Name": rule.Name,
+        "Direction": rule.Direction,
+        "Action": rule.Action,
+        "remotePorts": rule.remotePorts,
+        "Protocol": rule.Protocol,
+        "RemoteAddresses": rule.RemoteAddresses,
+        "Grouping": rule.Grouping
+    }
+    
+    # Delete the existing rule
+    rules.Remove(rule.Name)
+    logging.info(f"Deleted rule: {rule.Name}")
+
+    # Create a new rule with no ApplicationName
+    addNewRuleToFirewall(
+        rule_properties["Name"], 
+        rule_properties["Direction"], 
+        rule_properties["Action"], 
+        rule_properties["remotePorts"], 
+        rule_properties["Protocol"], 
+        rule_properties["RemoteAddresses"], 
+        None, 
+        rule_properties["Grouping"]
+    )
+
+    logging.info(f"Recreated rule: {rule_name} with no ApplicationName")
+    
 def choose_option(root, options):
     max_length = max(len(s) for s in options)
     top = Toplevel(root)
@@ -1187,10 +1213,8 @@ def checkbox_tunnel(skip_auto_detect=False):
 
         matches = detect_path()
         if len(matches) > 0:
-            print(f"Detected paths1: {str(matches)}")
             add_option('overwatch_path_array', str(matches))
             config.read(options_path)
-            print(f"Detected paths2: {str(config.get('OPTIONS', 'overwatch_path_array'))}")
         if not matches:
             user_selection = askUserToChooseAfile()
             if user_selection is None:
