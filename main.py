@@ -892,13 +892,13 @@ def searchForGamePath(patterns, start_paths):
     def search_path(start_path):
         try:
             def traverse_directory(dir_entry, current_depth=0):
-                if current_depth >= max_depth:
-                    return
                 if any(parent in dir_entry.path for parent in relevant_parents):
                     for filter_path in filters:
                         full_path = path.join(dir_entry.path, filter_path)
                         if path.exists(full_path):
                             matches.append(full_path)
+                if current_depth >= max_depth:
+                    return
                 try:
                     with scandir(dir_entry.path) as it:
                         for entry in it:
