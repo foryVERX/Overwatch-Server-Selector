@@ -26,3 +26,4 @@ https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lis
 https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/cfg%20-%20Asia%20-%20Singapore%202%20-%20GSG1.txt
 https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/cfg%20-%20Asia%20-%20Japan%202%20-%20GTK1.txt
 https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/pinglist.txt
+https://raw.githubusercontent.com/foryVERX/Overwatch-Server-Selector/main/ip_lists/cfg%20-%20Other%20-%20KSA%20-%20GMEC2.txt
