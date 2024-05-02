@@ -955,6 +955,7 @@ def editFirewallRuleApplicationName(rule_name, new_application_name):
     try:
         rule = rules.Item(rule_name)
     except Exception:
+        add_option('tunnel', False)
         raise ValueError(f"Rule {rule_name} not found.")
     
     if rule.ApplicationName == new_application_name:
@@ -1281,6 +1282,15 @@ def checkbox_switch():
         editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, None)
         return
     overwatch_path = config.get('OPTIONS', 'overwatch_path')
+    if overwatch_path == 'None':
+        result = messagebox.askyesno('Tunnel settings',
+                                 'Tunnel settings is not configure, do you want to open the configurator?')
+        if result:
+            checkbox_tunnel()
+        else:
+            add_option('tunnel', False)
+            tunnelCheckBox_state.set(False)
+            return
     editFirewallRuleApplicationName(DEFAULT_BLOCK_NAME, overwatch_path)
     if not overwatch_path or overwatch_path == 'None':
         logging.debug("Overwatch path is not found")
