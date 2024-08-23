@@ -1,7 +1,5 @@
-Welcome to the 5.3.1 of the MINA Overwatch 2 Server Selector! Here’s what’s new:
+Thank you for using MINA Overwatch Server Selector
 
-New servers update --> Saudi Arabia Central
+Recent update from overwatch might impact the performance of the app, you you face any issues please report it on discord.
 
-Reapply your option to update your block.
-
-Report any issues you encounter on our Discord server. Thank you for your support!
+If you like the app, feel free to donate ;)
