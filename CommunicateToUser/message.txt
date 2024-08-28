@@ -1,5 +1,9 @@
-Thank you for using MINA Overwatch Server Selector
+Dear User,
 
-Recent update from overwatch might impact the performance of the app, you you face any issues please report it on discord.
+I have updated the ip list hopfully the performence will be improved now.
 
-If you like the app, feel free to donate ;)
+Improvements mainly made on:
+
+EU, NA, Australia, and Singapore.
+
+Feel free to communicate issues on discord.
