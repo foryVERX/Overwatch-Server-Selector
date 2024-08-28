@@ -1,0 +1,5 @@
+pywin32
+Pillow
+requests
+urllib3
+pythonping
