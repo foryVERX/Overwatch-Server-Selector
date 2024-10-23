@@ -7,15 +7,15 @@ import base64
 
 
 def pic2str(file, functionName):
-    pic = open(file, 'rb')
-    content = '{} = {}\n'.format(functionName, base64.b64encode(pic.read()))
+    pic = open(file, "rb")
+    content = "{} = {}\n".format(functionName, base64.b64encode(pic.read()))
     pic.close()
 
-    with open('pic2str.py', 'a') as f:
+    with open("pic2str.py", "a") as f:
         f.write(content)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """
     pic2str('BLOCK_MIDDLE_EAST.png', 'BLOCK_MIDDLE_EAST')
     pic2str('DESKTOP_ICON.png', 'DESKTOP_ICON')
@@ -38,6 +38,5 @@ if __name__ == '__main__':
     pic2str('INSTALL_UPDATE.png', 'INSTALL_UPDATE')
     pic2str('TEST PING.png', 'TEST_PING')
     """
-    pic2str('.img/ow2 v5/CANCEL.png', 'CANCEL')
-    pic2str('.img/ow2 v5/MANUALLY LOCATE.png', 'MANUALLY LOCATE')
-
+    pic2str(".img/ow2 v5/CANCEL.png", "CANCEL")
+    pic2str(".img/ow2 v5/MANUALLY LOCATE.png", "MANUALLY LOCATE")
