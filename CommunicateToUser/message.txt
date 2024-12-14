@@ -1,9 +1,7 @@
-Dear User,
+Hi
 
-I have updated the ip list hopfully the performence will be improved now.
+Im aware of the problems some of you have been experiencing with the app. Due to personal constraints, I no longer have the time and energy to support or update it. While the app may still work in part, some major features might not function properly.
 
-Improvements mainly made on:
+I encourage the community to contribute and keep the project alive, but I wont be able to manage it alone anymore. Thank you for your understanding and support.
 
-EU, NA, Australia, and Singapore.
-
-Feel free to communicate issues on discord.
+VERX
