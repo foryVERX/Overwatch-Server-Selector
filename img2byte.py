@@ -17,6 +17,7 @@ def pic2str(file, functionName):
 
 if __name__ == '__main__':
     """
+
     pic2str('BLOCK_MIDDLE_EAST.png', 'BLOCK_MIDDLE_EAST')
     pic2str('DESKTOP_ICON.png', 'DESKTOP_ICON')
     pic2str('play_on_eu.png', 'play_on_eu')
@@ -37,6 +38,8 @@ if __name__ == '__main__':
     pic2str('DISCORD.png', 'Discord_Button')
     pic2str('INSTALL_UPDATE.png', 'INSTALL_UPDATE')
     pic2str('TEST PING.png', 'TEST_PING')
+    pic2str('.img/ow2 v3/ADD_BUTTON.png', 'ADD_BUTTON')
+    pic2str('.img/ow2 v3/DETECT_BUTTON.png', 'DETECT_BUTTON')
     """
     pic2str('.img/ow2 v5/CANCEL.png', 'CANCEL')
     pic2str('.img/ow2 v5/MANUALLY LOCATE.png', 'MANUALLY LOCATE')
